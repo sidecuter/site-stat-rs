@@ -32,8 +32,8 @@ impl MigrationTrait for Migration {
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .from(UserId::Table, UserId::UserId)
-                            .to(SiteStat::Table, SiteStat::UserId)
+                            .from(SiteStat::Table, SiteStat::UserId)
+                            .to(UserId::Table, UserId::UserId)
                             .on_delete(ForeignKeyAction::Cascade)
                             .on_update(ForeignKeyAction::Cascade)
                     )
