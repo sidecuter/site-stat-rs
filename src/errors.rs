@@ -1,5 +1,6 @@
 use actix_web::{error, http::{StatusCode, header::ContentType}, HttpResponse};
 use derive_more::derive::{Display, Error};
+use log::{log, Level};
 use sea_orm::DbErr;
 use crate::schemas::status;
 
@@ -30,7 +31,13 @@ impl error::ResponseError for Error {
 
 impl From<DbErr> for Error {
     fn from(value: DbErr) -> Self {
-        Self::InternalError {message: value.to_string()}
+        log!(Level::Error, "{:?}", value.sql_err());
+        let message = value.to_string();
+        if message.contains("FOREIGN KEY") {
+            Self::NotFound {res: "External id".to_string()}
+        } else {
+            Self::InternalError {message: value.to_string()}
+        }
     }
 }
 

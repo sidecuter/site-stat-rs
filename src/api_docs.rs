@@ -5,14 +5,17 @@ use utoipa::OpenApi;
 #[openapi(
     paths(
         // Auth routes
-        crate::api::get::user_id::get_user_id
+        crate::api::get::user_id::get_user_id,
+        crate::api::stat::site::stat_site
     ),
     components (
         schemas (
             // General schemas
             crate::schemas::status::Status,
             // Get schemas
-            crate::schemas::user_id::UserId
+            crate::schemas::user_id::UserId,
+            //Validation schemas
+            crate::schemas::site_stat::SiteStatisticsIn
         )
     )
 )]

@@ -5,6 +5,21 @@ use crate::schemas::site_stat::{SiteStatisticsIn};
 use crate::errors::{Result, ErrorTrait};
 use crate::schemas::status::Status;
 
+#[utoipa::path(
+    put,
+    path = "/api/stat/site",
+    request_body = SiteStatisticsIn,
+    responses(
+        (
+            status = 200, description = "Create a new todo", body = Status,
+            example = json!(Status::default())
+        ),
+        (
+            status = 500, description = "The title is empty", body = Status,
+            example = json!(Status{status: "database error".to_string()})
+        )
+    ),
+)]
 #[put("site")]
 async fn stat_site(
     data: web::Json<SiteStatisticsIn>,
