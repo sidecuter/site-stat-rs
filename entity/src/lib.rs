@@ -3,3 +3,4 @@
 pub mod prelude;
 
 pub mod user_id;
+pub mod site_stat;
