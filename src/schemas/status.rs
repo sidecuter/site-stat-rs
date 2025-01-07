@@ -5,6 +5,7 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
 pub struct Status {
+    #[schema(example = "OK")]
     pub status: String
 }
 

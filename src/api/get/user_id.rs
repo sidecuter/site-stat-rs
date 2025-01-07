@@ -12,14 +12,15 @@ use crate::schemas::{user_id::UserId, status::Status, traits::OpenApiExample};
     request_body = UserId,
     responses(
         (
-            status = 200, description = "Create a new todo", body = UserId,
+            status = 200, description = "User id generated", body = UserId,
             example = json!(UserId::openapi_example())
         ),
         (
-            status = 500, description = "The title is empty", body = Status,
+            status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
         )
     ),
+    tag = "Get"
 )]
 #[get("/user-id")]
 pub async fn get_user_id(

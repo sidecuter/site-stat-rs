@@ -17,7 +17,11 @@ use utoipa::OpenApi;
             //Validation schemas
             crate::schemas::site_stat::SiteStatisticsIn
         )
-    )
+    ),
+    tags (
+        (name = "Get", description = "Getters for content"),
+        (name = "Stat", description = "Statistics insertion endpoints"),
+    ),
 )]
 pub struct ApiDoc;
 

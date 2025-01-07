@@ -11,14 +11,19 @@ use crate::schemas::status::Status;
     request_body = SiteStatisticsIn,
     responses(
         (
-            status = 200, description = "Create a new todo", body = Status,
+            status = 200, description = "Stats inserted", body = Status,
             example = json!(Status::default())
         ),
         (
-            status = 500, description = "The title is empty", body = Status,
+            status = 404, description = "User not found", body = Status,
+            example = json!(Status{status: "External id not found".to_string()})
+        ),
+        (
+            status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
         )
     ),
+    tag = "Stat"
 )]
 #[put("site")]
 async fn stat_site(
