@@ -1,4 +1,5 @@
 use sea_orm_migration::{prelude::*, schema::*};
+use crate::m20220101_000001_create_table::UserId;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -11,18 +12,30 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(UserId::Table)
+                    .table(SiteStat::Table)
                     .if_not_exists()
+                    .col(pk_auto(SiteStat::Id))
                     .col(
-                        ColumnDef::new(UserId::UserId)
-                            .primary_key()
+                        ColumnDef::new(SiteStat::UserId)
                             .uuid()
                             .not_null()
                     )
                     .col(
-                        ColumnDef::new(UserId::CreationDate)
+                        ColumnDef::new(SiteStat::VisitDate)
                             .date_time()
                             .not_null()
+                    )
+                    .col(
+                        ColumnDef::new(SiteStat::Endpoint)
+                            .string()
+                            .null()
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from(UserId::Table, UserId::UserId)
+                            .to(SiteStat::Table, SiteStat::UserId)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade)
                     )
                     .to_owned(),
             )
@@ -33,16 +46,16 @@ impl MigrationTrait for Migration {
         // Replace the sample below with your own migration scripts
 
         manager
-            .drop_table(Table::drop().table(UserId::Table).to_owned())
+            .drop_table(Table::drop().table(SiteStat::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-pub enum UserId {
+enum SiteStat {
     Table,
-    #[sea_orm(iden = "user_id")]
+    Id,
     UserId,
-    #[sea_orm(iden = "creation_date")]
-    CreationDate
+    Endpoint,
+    VisitDate,
 }
