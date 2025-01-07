@@ -1,9 +1,8 @@
 use stat_api::api_docs;
 use actix_web;
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpRequest, HttpServer};
+use actix_web::{web, App, HttpServer};
 use sea_orm::Database;
-use anyhow::Result;
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
 
