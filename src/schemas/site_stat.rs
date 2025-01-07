@@ -3,14 +3,13 @@ use actix_web::Responder;
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use crate::schemas::user_id::UserId;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "/app")]
-    pub endpoint: String
+    pub endpoint: Option<String>
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
@@ -27,7 +26,17 @@ impl Default for SiteStatisticsIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            endpoint: "/app".to_string()
+            endpoint: Some("/app".to_string())
+        }
+    }
+}
+
+impl Default for SiteStatisticsOut {
+    fn default() -> Self {
+        Self{
+            user_id: uuid::Uuid::new_v4(),
+            endpoint: Some("/app".to_string()),
+            visit_date: chrono::offset::Utc::now().naive_utc()
         }
     }
 }
