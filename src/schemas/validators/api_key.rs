@@ -14,10 +14,6 @@ impl ApiKey {
         let re = Regex::new(Self::REGEX).unwrap();
         re.is_match(&self.0).then(|| ()).ok_or(format!("Invalid api_key format: {}", self.0))
     }
-
-    pub fn new(value: String) -> Self {
-        Self(value)
-    }
 }
 
 impl<'de> Deserialize<'de> for ApiKey {
