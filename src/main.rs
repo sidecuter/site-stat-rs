@@ -2,25 +2,48 @@ use stat_api::{api_docs, errors::Error as ApiError};
 use actix_web;
 use actix_web::middleware::Logger;
 use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpRequest, HttpServer};
-use sea_orm::Database;
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
 use stat_api::app_state::AppState;
 
+#[cfg(not(debug_assertions))]
+async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
+    let mut opt = ConnectOptions::new(connection_string);
+    opt.sqlx_logging(false);
+    Database::connect(opt).await.expect("Failed to create database connection pool")
+}
+
+#[cfg(debug_assertions)]
+async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
+    Database::connect(connection_string).await.expect("Failed to create database connection pool")
+}
+
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{
     dotenv::dotenv().ok();
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .with_test_writer()
-        .init();
+    #[cfg(debug_assertions)]
+    {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::DEBUG)
+            .with_test_writer()
+            .init();
+    }
+    #[cfg(not(debug_assertions))]
+    {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::INFO)
+            .with_test_writer()
+            .init();
+    }
 
     let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{host}:{port}");
     let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://db.app?mode=rwc".to_owned());
     let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned());
-    let pool = Database::connect(database_url).await.expect("Failed to create database connection pool");
+    let pool = get_database_connection(&database_url).await;
 
     log::info!("Listening on http://{}", addr);
     log::info!(
