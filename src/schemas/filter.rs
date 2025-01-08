@@ -5,6 +5,7 @@ use crate::schemas::validators::{ApiKey, Page, Size};
 use crate::schemas::pagination::Pagination;
 use crate::schemas::select_aud::SelectAuditoryOut;
 use crate::schemas::site_stat::SiteStatisticsOut;
+use crate::schemas::start_way::StartWayOut;
 use crate::traits::Paginate;
 
 #[derive(Deserialize, Clone, ToSchema)]
@@ -57,6 +58,27 @@ impl Paginate<Pagination<SelectAuditoryOut>> for Filter {
         let all_pages = pages.num_pages().await?;
         let items = pages.fetch_page(self.page.get()-1).await?;
         Ok(return_answer::<SelectAuditoryOut>(
+            items.into_iter().map(|model| model.into()).collect(),
+            self, total_items, all_pages
+        ))
+    }
+}
+
+impl Paginate<Pagination<StartWayOut>> for Filter {
+    async fn pagination(&self, db: &DatabaseConnection) -> Result<Pagination<StartWayOut>, DbErr> {
+        let pages = if let Some(user_id) = self.user_id {
+            let user_id = entity::prelude::UserId::find_by_id(user_id).one(db).await?;
+            let user_id = user_id.unwrap();
+            user_id.find_related(entity::prelude::StartWay).order_by_asc(entity::start_way::Column::Id)
+                .paginate(db, self.size.get())
+        } else {
+            entity::start_way::Entity::find().order_by_asc(entity::start_way::Column::Id)
+                .paginate(db, self.size.get())
+        };
+        let total_items = pages.num_items().await?;
+        let all_pages = pages.num_pages().await?;
+        let items = pages.fetch_page(self.page.get()-1).await?;
+        Ok(return_answer::<StartWayOut>(
             items.into_iter().map(|model| model.into()).collect(),
             self, total_items, all_pages
         ))

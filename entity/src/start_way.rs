@@ -3,26 +3,34 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "select_aud")]
+#[sea_orm(table_name = "start_way")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub user_id: Uuid,
+    pub start_id: String,
+    pub end_id: String,
     pub visit_date: DateTime,
-    pub auditory_id: String,
-    pub success: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::aud::Entity",
-        from = "Column::AuditoryId",
+        from = "Column::EndId",
         to = "super::aud::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Aud,
+    Aud2,
+    #[sea_orm(
+        belongs_to = "super::aud::Entity",
+        from = "Column::StartId",
+        to = "super::aud::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Aud1,
     #[sea_orm(
         belongs_to = "super::user_id::Entity",
         from = "Column::UserId",
@@ -31,12 +39,6 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     UserId,
-}
-
-impl Related<super::aud::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Aud.def()
-    }
 }
 
 impl Related<super::user_id::Entity> for Entity {
