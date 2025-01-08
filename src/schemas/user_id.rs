@@ -3,6 +3,7 @@ use actix_web::Responder;
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use utoipa::ToSchema;
+use entity::user_id;
 
 #[derive(ToSchema, Debug, Serialize, Clone)]
 pub struct UserId {
@@ -22,8 +23,8 @@ impl Default for UserId {
 
 }
 
-impl From<entity::user_id::Model> for UserId {
-    fn from(value: entity::user_id::Model) -> Self {
+impl From<user_id::Model> for UserId {
+    fn from(value: user_id::Model) -> Self {
         Self {
             user_id: value.user_id,
             creation_date: value.creation_date
@@ -31,8 +32,8 @@ impl From<entity::user_id::Model> for UserId {
     }
 }
 
-impl From<entity::user_id::ActiveModel> for UserId {
-    fn from(value: entity::user_id::ActiveModel) -> Self {
+impl From<user_id::ActiveModel> for UserId {
+    fn from(value: user_id::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
             creation_date: value.creation_date.unwrap()
