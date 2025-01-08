@@ -1,5 +1,5 @@
 use actix_web::{http::{StatusCode, header::ContentType}, body::BoxBody,
-                HttpRequest, HttpResponse, Responder, ResponseError, Error as ActixError};
+                HttpRequest, HttpResponse, Responder, ResponseError};
 use actix_web::error::{JsonPayloadError, QueryPayloadError};
 use log::{log, Level};
 use sea_orm::DbErr;

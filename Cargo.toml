@@ -22,3 +22,4 @@ tracing-subscriber = "0.3.19"
 tracing = "0.1.41"
 utoipa = { version = "5.3.1", features = ["chrono", "uuid"] }
 utoipa-swagger-ui = { version = "8.1.1", features = ["actix-web"] }
+regex = "1.11.1"

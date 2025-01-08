@@ -1,4 +1,4 @@
-use actix_web::body::{BoxBody, MessageBody};
+use actix_web::body::BoxBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::{Error, Responder};
 use actix_web::middleware::Next;
