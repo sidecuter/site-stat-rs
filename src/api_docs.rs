@@ -6,6 +6,7 @@ use utoipa::OpenApi;
     paths(
         // Get routes
         crate::api::get::user_id::get_user_id,
+        crate::api::get::sites::get_sites,
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,
