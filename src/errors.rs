@@ -1,6 +1,5 @@
-use actix_web::{http::{StatusCode, header::ContentType},
-                HttpRequest, HttpResponse, Responder, ResponseError};
-use actix_web::body::BoxBody;
+use actix_web::{http::{StatusCode, header::ContentType}, body::BoxBody,
+                HttpRequest, HttpResponse, Responder, ResponseError, Error as ActixError};
 use actix_web::error::{JsonPayloadError, QueryPayloadError};
 use log::{log, Level};
 use sea_orm::DbErr;
@@ -17,7 +16,9 @@ pub enum Error {
     #[error("{0}")]
     BadRequest(String),
     #[error("{0}")]
-    PathNotFound(String)
+    PathNotFound(String),
+    #[error("{0}")]
+    NotAllowed(String)
 }
 
 impl ResponseError for Error {
@@ -27,7 +28,8 @@ impl ResponseError for Error {
             Error::UnprocessableData(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Error::NotFound(_) => StatusCode::NOT_FOUND,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
-            Error::PathNotFound(_) => StatusCode::NOT_FOUND
+            Error::PathNotFound(_) => StatusCode::NOT_FOUND,
+            Error::NotAllowed(_) => StatusCode::FORBIDDEN
         }
     }
 

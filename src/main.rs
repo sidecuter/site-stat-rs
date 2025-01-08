@@ -5,11 +5,11 @@ use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpRequest, HttpServe
 use sea_orm::Database;
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
+use stat_api::app_state::AppState;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{
     dotenv::dotenv().ok();
-    // pretty_env_logger::init();
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::DEBUG)
         .with_test_writer()
@@ -18,7 +18,8 @@ async fn main() -> std::io::Result<()>{
     let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{host}:{port}");
-    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://db.app".to_owned());
+    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://db.app?mode=rwc".to_owned());
+    let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned());
     let pool = Database::connect(database_url).await.expect("Failed to create database connection pool");
 
     log::info!("Listening on http://{}", addr);
@@ -31,6 +32,7 @@ async fn main() -> std::io::Result<()>{
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(AppState{admin_key: admin_key.clone()}))
             .wrap(Logger::default())
             .configure(api::init_routes)
             .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
