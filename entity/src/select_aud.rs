@@ -7,7 +7,7 @@ use sea_orm::entity::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub user_id: String,
+    pub user_id: Uuid,
     pub visit_data: DateTime,
     pub auditory_id: String,
 }
@@ -15,13 +15,13 @@ pub struct Model {
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::auds::Entity",
+        belongs_to = "super::aud::Entity",
         from = "Column::AuditoryId",
-        to = "super::auds::Column::Id",
+        to = "super::aud::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Auds,
+    Aud,
     #[sea_orm(
         belongs_to = "super::user_id::Entity",
         from = "Column::UserId",
@@ -32,9 +32,9 @@ pub enum Relation {
     UserId,
 }
 
-impl Related<super::auds::Entity> for Entity {
+impl Related<super::aud::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Auds.def()
+        Relation::Aud.def()
     }
 }
 
