@@ -4,9 +4,11 @@ use utoipa::OpenApi;
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        // Auth routes
+        // Get routes
         crate::api::get::user_id::get_user_id,
-        crate::api::stat::site::stat_site
+        // Set routes
+        crate::api::stat::site::stat_site,
+        crate::api::stat::aud::stat_aud,
     ),
     components (
         schemas (
@@ -15,7 +17,8 @@ use utoipa::OpenApi;
             // Get schemas
             crate::schemas::user_id::UserId,
             //Validation schemas
-            crate::schemas::site_stat::SiteStatisticsIn
+            crate::schemas::site_stat::SiteStatisticsIn,
+            crate::schemas::select_aud::SelectAuditoryIn,
         )
     ),
     tags (
