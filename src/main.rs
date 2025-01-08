@@ -2,7 +2,9 @@ use stat_api::{api_docs, errors::Error as ApiError};
 use actix_web;
 use actix_web::middleware::Logger;
 use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpRequest, HttpServer};
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm::{Database, DatabaseConnection};
+#[cfg(not(debug_assertions))]
+use sea_orm::ConnectOptions;
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
 use stat_api::app_state::AppState;
