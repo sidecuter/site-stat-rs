@@ -10,6 +10,7 @@ pub struct Model {
     pub user_id: Uuid,
     pub visit_date: DateTime,
     pub auditory_id: String,
+    pub success: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

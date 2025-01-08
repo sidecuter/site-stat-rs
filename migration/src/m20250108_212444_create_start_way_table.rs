@@ -18,7 +18,6 @@ impl MigrationTrait for Migration {
                     .col(string(StartWay::StartId).not_null())
                     .col(string(StartWay::EndId).not_null())
                     .col(date_time(StartWay::VisitDate).not_null())
-                    .col(boolean(StartWay::Success).not_null())
                     .foreign_key(
                         ForeignKey::create()
                             .from(StartWay::Table, StartWay::UserId)
@@ -59,6 +58,5 @@ enum StartWay {
     UserId,
     StartId,
     EndId,
-    VisitDate,
-    Success
+    VisitDate
 }

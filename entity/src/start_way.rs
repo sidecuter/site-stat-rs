@@ -11,7 +11,6 @@ pub struct Model {
     pub start_id: String,
     pub end_id: String,
     pub visit_date: DateTime,
-    pub success: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

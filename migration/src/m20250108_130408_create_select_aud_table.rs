@@ -16,9 +16,10 @@ impl MigrationTrait for Migration {
                     .table(SelectAud::Table)
                     .if_not_exists()
                     .col(pk_auto(SelectAud::Id))
-                    .col(uuid(SelectAud::UserId).not_null())
+                    .col(uuid(SelectAud::UserId))
                     .col(date_time(SelectAud::VisitDate))
                     .col(string(SelectAud::AuditoryId))
+                    .col(boolean(SelectAud::Success))
                     .foreign_key(
                         ForeignKey::create()
                             .from(SelectAud::Table, SelectAud::AuditoryId)
@@ -53,5 +54,6 @@ enum SelectAud {
     Id,
     UserId,
     VisitDate,
-    AuditoryId
+    AuditoryId,
+    Success
 }
