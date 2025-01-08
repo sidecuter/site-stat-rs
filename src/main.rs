@@ -1,7 +1,7 @@
 use stat_api::{api_docs, errors::Error as ApiError};
 use actix_web;
 use actix_web::middleware::Logger;
-use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpServer};
+use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpRequest, HttpServer};
 use sea_orm::Database;
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
@@ -41,6 +41,17 @@ async fn main() -> std::io::Result<()>{
                     SwaggerUi::new("/swagger/{_:.*}").url("/docs/openapi.json", Default::default()),
                 ),
             )
+            .default_service(web::route().to(|req: HttpRequest| async move {
+                let path = req.path();
+                if path.ends_with('/') {
+                    ApiError::PathNotFound(format!(
+                        "There is no endpoint in this path with this method. Our API doesn't support trailing slashes, try `{}`",
+                        path.trim_end_matches('/')
+                    ))
+                } else {
+                    ApiError::PathNotFound("There is no endpoint in this path with this method".to_owned())
+                }
+            }))
     })
         .bind(addr)?
         .run()

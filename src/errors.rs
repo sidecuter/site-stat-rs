@@ -15,7 +15,9 @@ pub enum Error {
     #[error("{0} not found")]
     NotFound(String),
     #[error("{0}")]
-    BadRequest(String)
+    BadRequest(String),
+    #[error("{0}")]
+    PathNotFound(String)
 }
 
 impl ResponseError for Error {
@@ -24,7 +26,8 @@ impl ResponseError for Error {
             Error::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::UnprocessableData(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Error::NotFound(_) => StatusCode::NOT_FOUND,
-            Error::BadRequest(_) => StatusCode::BAD_REQUEST
+            Error::BadRequest(_) => StatusCode::BAD_REQUEST,
+            Error::PathNotFound(_) => StatusCode::NOT_FOUND
         }
     }
 
