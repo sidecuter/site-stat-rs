@@ -72,7 +72,7 @@ impl Responder for SelectAuditoryOut {
     }
 }
 
-impl CreateFromScheme<select_aud::Model> for SelectAuditoryOut {
+impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
     async fn create(&self, db: &DatabaseConnection) -> Result<select_aud::Model, DbErr> {
         select_aud::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
