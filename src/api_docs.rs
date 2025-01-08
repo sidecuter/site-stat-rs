@@ -8,7 +8,7 @@ use utoipa::OpenApi;
         crate::api::get::user_id::get_user_id,
         crate::api::get::sites::get_sites,
         crate::api::get::auds::get_auds,
-        crate::apt::get::ways::get_ways,
+        crate::api::get::ways::get_ways,
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,

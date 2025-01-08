@@ -17,6 +17,10 @@ use crate::schemas::site_stat::SiteStatisticsOut;
             status = 200, description = "User id generated", body = Pagination<SiteStatisticsOut>
         ),
         (
+            status = 422, description = "Validation failed", body = Status,
+            example = json!(Status{status: "parsing error...".to_string()})
+        ),
+        (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
         )
