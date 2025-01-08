@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
 use crate::m20220101_000001_create_table::UserId;
-use crate::m20250108_120158_create_auds_table::Auds;
+use crate::m20250108_120158_create_auds_table::Aud;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -16,13 +16,13 @@ impl MigrationTrait for Migration {
                     .table(SelectAud::Table)
                     .if_not_exists()
                     .col(pk_auto(SelectAud::Id))
-                    .col(string(SelectAud::UserId).not_null())
+                    .col(uuid(SelectAud::UserId).not_null())
                     .col(date_time(SelectAud::VisitData))
                     .col(string(SelectAud::AuditoryId))
                     .foreign_key(
                         ForeignKey::create()
                             .from(SelectAud::Table, SelectAud::AuditoryId)
-                            .to(Auds::Table, Auds::Id)
+                            .to(Aud::Table, Aud::Id)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade)
                     )
