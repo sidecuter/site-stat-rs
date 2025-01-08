@@ -40,6 +40,6 @@ async fn stat_aud(
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
-    aud::Entity::filter(data.auditory_id.clone(), db.get_ref(), "Auditory".to_string()).await?;
+    aud::Entity::filter(data.auditory_id.to_string(), db.get_ref(), "Auditory".to_string()).await?;
     data.create(db.get_ref()).await.status_ok()
 }
