@@ -21,7 +21,7 @@ use crate::traits::{ConversionTrait, CreateFromScheme};
     tag = "Get"
 )]
 #[get("/user-id")]
-pub async fn get_user_id(
+async fn get_user_id(
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<UserId>{
     UserId::default().create(db.get_ref()).await.convert()
