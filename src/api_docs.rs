@@ -8,9 +8,11 @@ use utoipa::OpenApi;
         crate::api::get::user_id::get_user_id,
         crate::api::get::sites::get_sites,
         crate::api::get::auds::get_auds,
+        crate::api::get::ways::get_ways,
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,
+        crate::api::stat::way::stat_way
     ),
     components (
         schemas (
@@ -20,9 +22,11 @@ use utoipa::OpenApi;
             crate::schemas::user_id::UserId,
             crate::schemas::site_stat::SiteStatisticsOut,
             crate::schemas::select_aud::SelectAuditoryOut,
+            crate::schemas::start_way::StartWayOut,
             //Validation schemas
             crate::schemas::site_stat::SiteStatisticsIn,
             crate::schemas::select_aud::SelectAuditoryIn,
+            crate::schemas::start_way::StartWayIn,
             crate::schemas::filter::Filter,
         )
     ),

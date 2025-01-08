@@ -9,51 +9,54 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-
         manager
             .create_table(
                 Table::create()
-                    .table(SelectAud::Table)
-                    .if_not_exists()
-                    .col(pk_auto(SelectAud::Id))
-                    .col(uuid(SelectAud::UserId))
-                    .col(date_time(SelectAud::VisitDate))
-                    .col(string(SelectAud::AuditoryId))
-                    .col(boolean(SelectAud::Success))
+                    .table(StartWay::Table)
+                    .col(pk_auto(StartWay::Id))
+                    .col(uuid(StartWay::UserId))
+                    .col(string(StartWay::StartId).not_null())
+                    .col(string(StartWay::EndId).not_null())
+                    .col(date_time(StartWay::VisitDate).not_null())
                     .foreign_key(
                         ForeignKey::create()
-                            .from(SelectAud::Table, SelectAud::AuditoryId)
+                            .from(StartWay::Table, StartWay::UserId)
+                            .to(UserId::Table, UserId::UserId)
+                            .on_update(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade)
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from(StartWay::Table, StartWay::StartId)
                             .to(Aud::Table, Aud::Id)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade)
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .from(SelectAud::Table, SelectAud::UserId)
-                            .to(UserId::Table, UserId::UserId)
+                            .from(StartWay::Table, StartWay::EndId)
+                            .to(Aud::Table, Aud::Id)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade)
                     )
-                    .to_owned(),
-            )
-            .await
+                    .to_owned()
+            ).await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-
         manager
-            .drop_table(Table::drop().table(SelectAud::Table).to_owned())
+            .drop_table(Table::drop().table(StartWay::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-enum SelectAud {
+enum StartWay {
     Table,
     Id,
     UserId,
-    VisitDate,
-    AuditoryId,
-    Success
+    StartId,
+    EndId,
+    VisitDate
 }

@@ -3,4 +3,5 @@
 pub use super::aud::Entity as Aud;
 pub use super::select_aud::Entity as SelectAud;
 pub use super::site_stat::Entity as SiteStat;
+pub use super::start_way::Entity as StartWay;
 pub use super::user_id::Entity as UserId;

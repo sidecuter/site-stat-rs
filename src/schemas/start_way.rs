@@ -4,76 +4,76 @@ use chrono::NaiveDateTime;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use entity::select_aud;
+use entity::start_way;
 use crate::schemas::validators::AuditoryId;
 use crate::traits::CreateFromScheme;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
-pub struct SelectAuditoryIn {
+pub struct StartWayIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "a-100")]
-    pub auditory_id: AuditoryId,
-    #[schema(example = true)]
-    pub success: bool
+    pub start_id: AuditoryId,
+    #[schema(example = "a-100")]
+    pub end_id: AuditoryId
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
-pub struct SelectAuditoryOut {
+pub struct StartWayOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "a-100")]
-    pub auditory_id: AuditoryId,
-    #[schema(example = true)]
-    pub success: bool,
+    pub start_id: AuditoryId,
+    #[schema(example = "a-100")]
+    pub end_id: AuditoryId,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub visit_date: NaiveDateTime
 }
 
-impl Default for SelectAuditoryIn {
+impl Default for StartWayIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: AuditoryId::new("a-100".to_string()),
-            success: true
+            start_id: AuditoryId::new("a-100".to_string()),
+            end_id: AuditoryId::new("a-100".to_string())
         }
     }
 }
 
-impl Default for SelectAuditoryOut {
+impl Default for StartWayOut {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: AuditoryId::new("a-100".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc(),
-            success: true
+            start_id: AuditoryId::new("a-100".to_string()),
+            end_id: AuditoryId::new("a-100".to_string()),
+            visit_date: chrono::offset::Utc::now().naive_utc()
         }
     }
 }
 
-impl From<select_aud::Model> for SelectAuditoryOut {
-    fn from(value: select_aud::Model) -> Self {
+impl From<start_way::Model> for StartWayOut {
+    fn from(value: start_way::Model) -> Self {
         Self {
             user_id: value.user_id,
-            auditory_id: AuditoryId::new(value.auditory_id),
-            visit_date: value.visit_date,
-            success: value.success
+            start_id: AuditoryId::new(value.start_id),
+            end_id: AuditoryId::new(value.end_id),
+            visit_date: value.visit_date
         }
     }
 }
 
-impl From<select_aud::ActiveModel> for SelectAuditoryOut {
-    fn from(value: select_aud::ActiveModel) -> Self {
+impl From<start_way::ActiveModel> for StartWayOut {
+    fn from(value: start_way::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
-            auditory_id: AuditoryId::new(value.auditory_id.unwrap()),
-            visit_date: value.visit_date.unwrap(),
-            success: value.success.unwrap()
+            start_id: AuditoryId::new(value.start_id.unwrap()),
+            end_id: AuditoryId::new(value.end_id.unwrap()),
+            visit_date: value.visit_date.unwrap()
         }
     }
 }
 
-impl Responder for SelectAuditoryOut {
+impl Responder for StartWayOut {
     type Body = BoxBody;
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
@@ -81,13 +81,13 @@ impl Responder for SelectAuditoryOut {
     }
 }
 
-impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<select_aud::Model, DbErr> {
-        select_aud::ActiveModel {
+impl CreateFromScheme<start_way::Model> for StartWayIn {
+    async fn create(&self, db: &DatabaseConnection) -> Result<start_way::Model, DbErr> {
+        start_way::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
             visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
-            auditory_id: ActiveValue::Set(self.auditory_id.to_string()),
-            success: ActiveValue::Set(self.success),
+            start_id: ActiveValue::Set(self.start_id.to_string()),
+            end_id: ActiveValue::Set(self.end_id.to_string()),
             ..Default::default()
         }.insert(db).await
     }
