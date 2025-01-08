@@ -19,6 +19,7 @@ use utoipa::OpenApi;
             //Validation schemas
             crate::schemas::site_stat::SiteStatisticsIn,
             crate::schemas::select_aud::SelectAuditoryIn,
+            crate::schemas::filter::Filter,
         )
     ),
     tags (
