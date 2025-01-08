@@ -1,9 +1,11 @@
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
+use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::Serialize;
 use utoipa::ToSchema;
 use entity::user_id;
+use crate::traits::CreateFromScheme;
 
 #[derive(ToSchema, Debug, Serialize, Clone)]
 pub struct UserId {
@@ -46,5 +48,14 @@ impl Responder for UserId {
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
         actix_web::HttpResponse::Ok().json(self)
+    }
+}
+
+impl CreateFromScheme<user_id::Model> for UserId {
+    async fn create(&self, db: &DatabaseConnection) -> Result<user_id::Model, DbErr> {
+        user_id::ActiveModel {
+            user_id: ActiveValue::Set(self.user_id),
+            creation_date: ActiveValue::Set(self.creation_date)
+        }.insert(db).await
     }
 }

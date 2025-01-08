@@ -1,8 +1,11 @@
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
+use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use entity::site_stat;
+use crate::traits::CreateFromScheme;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsIn {
@@ -41,8 +44,8 @@ impl Default for SiteStatisticsOut {
     }
 }
 
-impl From<entity::site_stat::Model> for SiteStatisticsOut {
-    fn from(value: entity::site_stat::Model) -> Self {
+impl From<site_stat::Model> for SiteStatisticsOut {
+    fn from(value: site_stat::Model) -> Self {
         Self {
             user_id: value.user_id,
             endpoint: value.endpoint,
@@ -51,8 +54,8 @@ impl From<entity::site_stat::Model> for SiteStatisticsOut {
     }
 }
 
-impl From<entity::site_stat::ActiveModel> for SiteStatisticsOut {
-    fn from(value: entity::site_stat::ActiveModel) -> Self {
+impl From<site_stat::ActiveModel> for SiteStatisticsOut {
+    fn from(value: site_stat::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
             endpoint: value.endpoint.unwrap(),
@@ -66,5 +69,16 @@ impl Responder for SiteStatisticsOut {
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
         actix_web::HttpResponse::Ok().json(self)
+    }
+}
+
+impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
+    async fn create(&self, db: &DatabaseConnection) -> Result<site_stat::Model, DbErr> {
+        site_stat::ActiveModel {
+            user_id: ActiveValue::Set(self.user_id),
+            visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
+            endpoint: ActiveValue::Set(self.endpoint.clone()),
+            ..Default::default()
+        }.insert(db).await
     }
 }

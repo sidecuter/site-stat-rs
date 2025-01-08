@@ -1,9 +1,8 @@
 use actix_web::{get, web};
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection};
-use entity::user_id;
+use sea_orm::DatabaseConnection;
 use crate::errors::Result as ApiResult;
 use crate::schemas::{user_id::UserId, status::Status, traits::OpenApiExample};
-use crate::traits::ConversionTrait;
+use crate::traits::{ConversionTrait, CreateFromScheme};
 
 #[utoipa::path(
     get,
@@ -25,10 +24,5 @@ use crate::traits::ConversionTrait;
 pub async fn get_user_id(
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<UserId>{
-    let default_user = UserId::default();
-    let active_model = user_id::ActiveModel {
-        user_id: ActiveValue::Set(default_user.user_id),
-        creation_date: ActiveValue::Set(default_user.creation_date)
-    };
-    active_model.insert(db.get_ref()).await.convert()
+    UserId::default().create(db.get_ref()).await.convert()
 }
