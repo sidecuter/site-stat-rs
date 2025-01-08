@@ -5,7 +5,7 @@ use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::select_aud;
-use crate::schemas::auditory::AuditoryId;
+use crate::schemas::validators::AuditoryId;
 use crate::traits::CreateFromScheme;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
