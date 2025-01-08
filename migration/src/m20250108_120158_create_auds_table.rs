@@ -11,18 +11,13 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(UserId::Table)
+                    .table(Aud::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(UserId::UserId)
+                        ColumnDef::new(Aud::Id)
+                            .string()
+                            .not_null()
                             .primary_key()
-                            .uuid()
-                            .not_null()
-                    )
-                    .col(
-                        ColumnDef::new(UserId::CreationDate)
-                            .date_time()
-                            .not_null()
                     )
                     .to_owned(),
             )
@@ -33,16 +28,13 @@ impl MigrationTrait for Migration {
         // Replace the sample below with your own migration scripts
 
         manager
-            .drop_table(Table::drop().table(UserId::Table).to_owned())
+            .drop_table(Table::drop().table(Aud::Table).to_owned())
             .await
     }
 }
 
 #[derive(DeriveIden)]
-pub enum UserId {
+pub enum Aud {
     Table,
-    #[sea_orm(iden = "user_id")]
-    UserId,
-    #[sea_orm(iden = "creation_date")]
-    CreationDate
+    Id,
 }

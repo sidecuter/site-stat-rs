@@ -3,30 +3,21 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "user_id")]
+#[sea_orm(table_name = "aud")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub user_id: Uuid,
-    pub creation_date: DateTime,
+    pub id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(has_many = "super::select_aud::Entity")]
     SelectAud,
-    #[sea_orm(has_many = "super::site_stat::Entity")]
-    SiteStat,
 }
 
 impl Related<super::select_aud::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::SelectAud.def()
-    }
-}
-
-impl Related<super::site_stat::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::SiteStat.def()
     }
 }
 
