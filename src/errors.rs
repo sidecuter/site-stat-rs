@@ -1,4 +1,6 @@
-use actix_web::{error, http::{StatusCode, header::ContentType}, HttpResponse};
+use actix_web::{http::{StatusCode, header::ContentType},
+                HttpRequest, HttpResponse, Responder, ResponseError};
+use actix_web::body::BoxBody;
 use log::{log, Level};
 use sea_orm::DbErr;
 use crate::schemas::status;
@@ -13,7 +15,7 @@ pub enum Error {
     NotFound(String),
 }
 
-impl error::ResponseError for Error {
+impl ResponseError for Error {
     fn status_code(&self) -> StatusCode {
         match *self {
             Error::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -48,6 +50,14 @@ pub trait ErrorTrait {
 impl ErrorTrait for DbErr {
     fn error(self) -> Error {
         self.into()
+    }
+}
+
+impl Responder for Error {
+    type Body = BoxBody;
+
+    fn respond_to(self, _: &HttpRequest) -> HttpResponse<Self::Body> {
+        self.error_response()
     }
 }
 
