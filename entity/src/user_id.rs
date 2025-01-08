@@ -16,6 +16,8 @@ pub enum Relation {
     SelectAud,
     #[sea_orm(has_many = "super::site_stat::Entity")]
     SiteStat,
+    #[sea_orm(has_many = "super::start_way::Entity")]
+    StartWay,
 }
 
 impl Related<super::select_aud::Entity> for Entity {
@@ -27,6 +29,12 @@ impl Related<super::select_aud::Entity> for Entity {
 impl Related<super::site_stat::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::SiteStat.def()
+    }
+}
+
+impl Related<super::start_way::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::StartWay.def()
     }
 }
 
