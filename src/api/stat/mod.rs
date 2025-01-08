@@ -1,5 +1,6 @@
 pub mod site;
 pub mod aud;
+mod way;
 
 use actix_web::web;
 use self::site::stat_site;
