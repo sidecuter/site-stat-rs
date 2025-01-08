@@ -7,6 +7,7 @@ use utoipa::OpenApi;
         // Get routes
         crate::api::get::user_id::get_user_id,
         crate::api::get::sites::get_sites,
+        crate::api::get::auds::get_auds,
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,
@@ -17,6 +18,8 @@ use utoipa::OpenApi;
             crate::schemas::status::Status,
             // Get schemas
             crate::schemas::user_id::UserId,
+            crate::schemas::site_stat::SiteStatisticsOut,
+            crate::schemas::select_aud::SelectAuditoryOut,
             //Validation schemas
             crate::schemas::site_stat::SiteStatisticsIn,
             crate::schemas::select_aud::SelectAuditoryIn,
