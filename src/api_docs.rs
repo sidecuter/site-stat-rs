@@ -11,6 +11,7 @@ use utoipa::OpenApi;
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,
+        crate::api::stat::way::stat_way
     ),
     components (
         schemas (
@@ -20,9 +21,11 @@ use utoipa::OpenApi;
             crate::schemas::user_id::UserId,
             crate::schemas::site_stat::SiteStatisticsOut,
             crate::schemas::select_aud::SelectAuditoryOut,
+            crate::schemas::start_way::StartWayOut,
             //Validation schemas
             crate::schemas::site_stat::SiteStatisticsIn,
             crate::schemas::select_aud::SelectAuditoryIn,
+            crate::schemas::start_way::StartWayIn,
             crate::schemas::filter::Filter,
         )
     ),
