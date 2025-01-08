@@ -1,9 +1,10 @@
 use actix_web::{put, web};
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection};
-use entity::site_stat;
+use entity::{site_stat, user_id};
 use crate::schemas::site_stat::{SiteStatisticsIn};
-use crate::errors::{Result, ErrorTrait};
+use crate::errors::Result as ApiResult;
 use crate::schemas::status::Status;
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
 
 #[utoipa::path(
     put,
@@ -16,7 +17,7 @@ use crate::schemas::status::Status;
         ),
         (
             status = 404, description = "User not found", body = Status,
-            example = json!(Status{status: "External id not found".to_string()})
+            example = json!(Status{status: "User not found".to_string()})
         ),
         (
             status = 500, description = "Database error", body = Status,
@@ -29,11 +30,13 @@ use crate::schemas::status::Status;
 async fn stat_site(
     data: web::Json<SiteStatisticsIn>,
     db: web::Data<DatabaseConnection>
-) -> Result<Status> {
-    site_stat::ActiveModel{
+) -> ApiResult<Status> {
+    user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
+    let active_model = site_stat::ActiveModel {
         user_id: ActiveValue::Set(data.user_id),
         visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
         endpoint: ActiveValue::Set(data.endpoint.clone()),
         ..Default::default()
-    }.insert(db.get_ref()).await.map_err(|e| e.error()).map(|_| Status::default())
+    };
+    active_model.insert(db.get_ref()).await.status_ok()
 }

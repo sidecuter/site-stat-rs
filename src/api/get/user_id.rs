@@ -1,10 +1,9 @@
 use actix_web::{get, web};
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection};
 use entity::user_id;
-use uuid::Uuid;
-use chrono;
-use crate::errors::{Error, ErrorTrait};
+use crate::errors::Result as ApiResult;
 use crate::schemas::{user_id::UserId, status::Status, traits::OpenApiExample};
+use crate::traits::ConversionTrait;
 
 #[utoipa::path(
     get,
@@ -24,10 +23,12 @@ use crate::schemas::{user_id::UserId, status::Status, traits::OpenApiExample};
 )]
 #[get("/user-id")]
 pub async fn get_user_id(
-    pool: web::Data<DatabaseConnection>
-) -> Result<UserId, Error>{
-    user_id::ActiveModel {
-        user_id: ActiveValue::Set(Uuid::new_v4()),
-        creation_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc())
-    }.insert(pool.get_ref()).await.map_err(|e| e.error()).map(|v| v.into())
+    db: web::Data<DatabaseConnection>
+) -> ApiResult<UserId>{
+    let default_user = UserId::default();
+    let active_model = user_id::ActiveModel {
+        user_id: ActiveValue::Set(default_user.user_id),
+        creation_date: ActiveValue::Set(default_user.creation_date)
+    };
+    active_model.insert(db.get_ref()).await.convert()
 }
