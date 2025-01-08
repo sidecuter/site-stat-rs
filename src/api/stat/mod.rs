@@ -1,11 +1,14 @@
 pub mod site;
+pub mod aud;
 
 use actix_web::web;
-use crate::api::stat::site::stat_site;
+use self::site::stat_site;
+use self::aud::stat_aud;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("/stat")
             .service(stat_site)
+            .service(stat_aud)
     );
 }
