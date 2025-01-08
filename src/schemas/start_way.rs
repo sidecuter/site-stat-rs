@@ -15,9 +15,7 @@ pub struct StartWayIn {
     #[schema(example = "a-100")]
     pub start_id: AuditoryId,
     #[schema(example = "a-100")]
-    pub end_id: AuditoryId,
-    #[schema(example = true)]
-    pub success: bool
+    pub end_id: AuditoryId
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
@@ -29,9 +27,7 @@ pub struct StartWayOut {
     #[schema(example = "a-100")]
     pub end_id: AuditoryId,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
-    pub visit_date: NaiveDateTime,
-    #[schema(example = true)]
-    pub success: bool
+    pub visit_date: NaiveDateTime
 }
 
 impl Default for StartWayIn {
@@ -39,8 +35,7 @@ impl Default for StartWayIn {
         Self{
             user_id: uuid::Uuid::new_v4(),
             start_id: AuditoryId::new("a-100".to_string()),
-            end_id: AuditoryId::new("a-100".to_string()),
-            success: true
+            end_id: AuditoryId::new("a-100".to_string())
         }
     }
 }
@@ -51,8 +46,7 @@ impl Default for StartWayOut {
             user_id: uuid::Uuid::new_v4(),
             start_id: AuditoryId::new("a-100".to_string()),
             end_id: AuditoryId::new("a-100".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc(),
-            success: true
+            visit_date: chrono::offset::Utc::now().naive_utc()
         }
     }
 }
@@ -63,8 +57,7 @@ impl From<start_way::Model> for StartWayOut {
             user_id: value.user_id,
             start_id: AuditoryId::new(value.start_id),
             end_id: AuditoryId::new(value.end_id),
-            visit_date: value.visit_date,
-            success: value.success
+            visit_date: value.visit_date
         }
     }
 }
@@ -75,8 +68,7 @@ impl From<start_way::ActiveModel> for StartWayOut {
             user_id: value.user_id.unwrap(),
             start_id: AuditoryId::new(value.start_id.unwrap()),
             end_id: AuditoryId::new(value.end_id.unwrap()),
-            visit_date: value.visit_date.unwrap(),
-            success: value.success.unwrap()
+            visit_date: value.visit_date.unwrap()
         }
     }
 }
@@ -96,7 +88,6 @@ impl CreateFromScheme<start_way::Model> for StartWayIn {
             visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
             start_id: ActiveValue::Set(self.start_id.to_string()),
             end_id: ActiveValue::Set(self.end_id.to_string()),
-            success: ActiveValue::Set(self.success),
             ..Default::default()
         }.insert(db).await
     }

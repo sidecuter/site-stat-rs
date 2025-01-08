@@ -13,7 +13,9 @@ pub struct SelectAuditoryIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "a-100")]
-    pub auditory_id: AuditoryId
+    pub auditory_id: AuditoryId,
+    #[schema(example = true)]
+    pub success: bool
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
@@ -22,6 +24,8 @@ pub struct SelectAuditoryOut {
     pub user_id: uuid::Uuid,
     #[schema(example = "a-100")]
     pub auditory_id: AuditoryId,
+    #[schema(example = true)]
+    pub success: bool,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub visit_date: NaiveDateTime
 }
@@ -30,7 +34,8 @@ impl Default for SelectAuditoryIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: AuditoryId::new("a-100".to_string())
+            auditory_id: AuditoryId::new("a-100".to_string()),
+            success: true
         }
     }
 }
@@ -40,7 +45,8 @@ impl Default for SelectAuditoryOut {
         Self{
             user_id: uuid::Uuid::new_v4(),
             auditory_id: AuditoryId::new("a-100".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc()
+            visit_date: chrono::offset::Utc::now().naive_utc(),
+            success: true
         }
     }
 }
@@ -50,7 +56,8 @@ impl From<select_aud::Model> for SelectAuditoryOut {
         Self {
             user_id: value.user_id,
             auditory_id: AuditoryId::new(value.auditory_id),
-            visit_date: value.visit_date
+            visit_date: value.visit_date,
+            success: value.success
         }
     }
 }
@@ -60,7 +67,8 @@ impl From<select_aud::ActiveModel> for SelectAuditoryOut {
         Self {
             user_id: value.user_id.unwrap(),
             auditory_id: AuditoryId::new(value.auditory_id.unwrap()),
-            visit_date: value.visit_date.unwrap()
+            visit_date: value.visit_date.unwrap(),
+            success: value.success.unwrap()
         }
     }
 }
@@ -79,6 +87,7 @@ impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
             user_id: ActiveValue::Set(self.user_id),
             visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
             auditory_id: ActiveValue::Set(self.auditory_id.to_string()),
+            success: ActiveValue::Set(self.success),
             ..Default::default()
         }.insert(db).await
     }
