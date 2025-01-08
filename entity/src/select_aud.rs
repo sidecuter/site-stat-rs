@@ -8,7 +8,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub user_id: Uuid,
-    pub visit_data: DateTime,
+    pub visit_date: DateTime,
     pub auditory_id: String,
 }
 

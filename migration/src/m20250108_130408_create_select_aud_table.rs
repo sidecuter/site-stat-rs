@@ -17,7 +17,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto(SelectAud::Id))
                     .col(uuid(SelectAud::UserId).not_null())
-                    .col(date_time(SelectAud::VisitData))
+                    .col(date_time(SelectAud::VisitDate))
                     .col(string(SelectAud::AuditoryId))
                     .foreign_key(
                         ForeignKey::create()
@@ -52,6 +52,6 @@ enum SelectAud {
     Table,
     Id,
     UserId,
-    VisitData,
+    VisitDate,
     AuditoryId
 }
