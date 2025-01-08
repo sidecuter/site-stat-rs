@@ -1,7 +1,7 @@
-use stat_api::api_docs;
+use stat_api::{api_docs, errors::Error as ApiError};
 use actix_web;
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpServer};
 use sea_orm::Database;
 use stat_api::api;
 use utoipa_swagger_ui::SwaggerUi;
@@ -33,12 +33,8 @@ async fn main() -> std::io::Result<()>{
             .app_data(web::Data::new(pool.clone()))
             .wrap(Logger::default())
             .configure(api::init_routes)
-            // .default_service(web::route().to(|reg: HttpRequest| async move {
-            //     let path = reg.path();
-            //     if path.ends_with('/') {
-            //         ApiErrr
-            //     }
-            // }))
+            .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
+            .app_data(QueryConfig::default().error_handler(|err, _| ApiError::from(err).into()))
             .service(
                 // OpenAPI document
                 web::scope("/docs").service(api_docs::openapi_json).service(

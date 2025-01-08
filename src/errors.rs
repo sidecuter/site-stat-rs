@@ -1,6 +1,7 @@
 use actix_web::{http::{StatusCode, header::ContentType},
                 HttpRequest, HttpResponse, Responder, ResponseError};
 use actix_web::body::BoxBody;
+use actix_web::error::{JsonPayloadError, QueryPayloadError};
 use log::{log, Level};
 use sea_orm::DbErr;
 use crate::schemas::status;
@@ -13,6 +14,8 @@ pub enum Error {
     UnprocessableData(String),
     #[error("{0} not found")]
     NotFound(String),
+    #[error("{0}")]
+    BadRequest(String)
 }
 
 impl ResponseError for Error {
@@ -21,6 +24,7 @@ impl ResponseError for Error {
             Error::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::UnprocessableData(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Error::NotFound(_) => StatusCode::NOT_FOUND,
+            Error::BadRequest(_) => StatusCode::BAD_REQUEST
         }
     }
 
@@ -50,6 +54,29 @@ pub trait ErrorTrait {
 impl ErrorTrait for DbErr {
     fn error(self) -> Error {
         self.into()
+    }
+}
+
+impl From<QueryPayloadError> for Error {
+    fn from(err: QueryPayloadError) -> Self {
+        match err {
+            QueryPayloadError::Deserialize(err) => Self::UnprocessableData(err.to_string()),
+            _ => Self::UnprocessableData("The parameters query are invalid".to_string()),
+        }
+    }
+}
+
+impl From<JsonPayloadError> for Error {
+    fn from(err: JsonPayloadError) -> Self {
+        match err {
+            JsonPayloadError::ContentType => {
+                Self::BadRequest("The content type is not `application/json`".to_string())
+            }
+            JsonPayloadError::Deserialize(err) => {
+                Self::UnprocessableData(format!("The request body is invalid: {err}"))
+            }
+            _ => Self::BadRequest("The request body is invalid".to_string()),
+        }
     }
 }
 

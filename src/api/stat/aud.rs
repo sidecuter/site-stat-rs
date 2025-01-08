@@ -24,9 +24,13 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
             example = json!(Status{status: "Auditory not found".to_string()})
         ),
         (
+            status = 422, description = "Validation failed", body = Status,
+            example = json!(Status{status: "The request body is invalid: ...".to_string()})
+        ),
+        (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
-        )
+        ),
     ),
     tag = "Stat"
 )]
