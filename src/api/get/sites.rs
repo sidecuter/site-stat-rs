@@ -14,7 +14,7 @@ use crate::schemas::site_stat::SiteStatisticsOut;
     request_body = Filter,
     responses(
         (
-            status = 200, description = "User id generated", body = Pagination<SiteStatisticsOut>
+            status = 200, description = "Paginated output for site visits", body = Pagination<SiteStatisticsOut>
         ),
         (
             status = 403, description = "ApiKey validation error", body = Status,

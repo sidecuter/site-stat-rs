@@ -14,7 +14,7 @@ use crate::schemas::start_way::StartWayOut;
     request_body = Filter,
     responses(
         (
-            status = 200, description = "User id generated", body = Pagination<StartWayOut>
+            status = 200, description = "Paginated output for started ways", body = Pagination<StartWayOut>
         ),
         (
             status = 403, description = "ApiKey validation error", body = Status,
