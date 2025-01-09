@@ -1,4 +1,4 @@
-use sea_orm_migration::{prelude::*, schema::*};
+use sea_orm_migration::prelude::*;
 use sea_orm_migration::sea_orm::EntityTrait;
 use entity::plan::ActiveModel;
 use entity::prelude::Plan;
