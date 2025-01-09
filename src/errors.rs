@@ -18,7 +18,9 @@ pub enum Error {
     #[error("{0}")]
     PathNotFound(String),
     #[error("{0}")]
-    NotAllowed(String)
+    NotAllowed(String),
+    #[error("Too many requests, retry in {0}s")]
+    TooManyRequests(String)
 }
 
 impl ResponseError for Error {
@@ -29,7 +31,8 @@ impl ResponseError for Error {
             Error::NotFound(_) => StatusCode::NOT_FOUND,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
             Error::PathNotFound(_) => StatusCode::NOT_FOUND,
-            Error::NotAllowed(_) => StatusCode::FORBIDDEN
+            Error::NotAllowed(_) => StatusCode::FORBIDDEN,
+            Error::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS
         }
     }
 

@@ -5,6 +5,7 @@ use crate::schemas::select_aud::{SelectAuditoryIn};
 use crate::errors::Result as ApiResult;
 use crate::schemas::status::Status;
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
+use crate::rate_limit::create_in_memory_rate_limit;
 
 #[utoipa::path(
     put,
@@ -28,13 +29,17 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
             example = json!(Status{status: "The request body is invalid: ...".to_string()})
         ),
         (
+            status = 429, description = "Too many requests", body = Status,
+            example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
+        ),
+        (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
         ),
     ),
     tag = "Stat"
 )]
-#[put("select-aud")]
+#[put("select-aud", wrap = "create_in_memory_rate_limit()")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>
