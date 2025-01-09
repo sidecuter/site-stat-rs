@@ -8,6 +8,8 @@ mod m20250108_120158_create_auds_table;
 mod m20250108_120630_populate_auds_table;
 mod m20250108_130408_create_select_aud_table;
 mod m20250108_212444_create_start_way_table;
+mod m20250109_160455_create_plan_table;
+mod m20250109_160938_populate_plans_table;
 
 pub struct Migrator;
 
@@ -21,6 +23,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20250108_120630_populate_auds_table::Migration),
             Box::new(m20250108_130408_create_select_aud_table::Migration),
             Box::new(m20250108_212444_create_start_way_table::Migration),
+            Box::new(m20250109_160455_create_plan_table::Migration),
+            Box::new(m20250109_160938_populate_plans_table::Migration),
         ]
     }
 }
