@@ -23,12 +23,12 @@ macro_rules! impl_paginate_trait {
                     } else {
                         <$entity_path as EntityTrait>::find().order_by_asc($entity_column).paginate(db, self.size.get())
                     };
-                    let total_items = pages.num_items().await?;
+                    let total = pages.num_items().await?;
                     let all_pages = pages.num_pages().await?;
                     let items = pages.fetch_page(self.page.get()-1).await?;
 
                     Ok(return_answer(
-                        items.into_iter().map(|model| model.into()).collect(), self, total_items, all_pages
+                        items.into_iter().map(|model| model.into()).collect(), self, total, all_pages
                     ))
                 }
             }
@@ -36,13 +36,13 @@ macro_rules! impl_paginate_trait {
             fn return_answer(
                 items: Vec<$t_name>,
                 data: &$s_name,
-                total_items: u64,
-                all_pages: u64
+                total: u64,
+                pages: u64
             ) -> Pagination<$t_name> {
                 Pagination::builder()
                     .items(items.into_iter().map(|model| model.into()).collect())
-                    .total_items(total_items)
-                    .all_pages(all_pages)
+                    .total(total)
+                    .pages(pages)
                     .size(data.size.get())
                     .page(data.page.get())
                     .build()
