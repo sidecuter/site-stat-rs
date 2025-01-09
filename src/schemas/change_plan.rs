@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::change_plan;
 use crate::schemas::validators::PlanId;
-use crate::traits::CreateFromScheme;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct ChangePlanIn {
@@ -83,3 +83,5 @@ impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
         }.insert(db).await
     }
 }
+
+impl_paginate_trait!(Filter, ChangePlanOut, entity::change_plan::Entity, entity::change_plan::Column::Id);
