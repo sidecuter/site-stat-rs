@@ -4,17 +4,17 @@ use crate::errors::Result as ApiResult;
 use crate::schemas::status::Status;
 use crate::traits::{ConversionToPaginationTrait, Paginate};
 use crate::middleware::api_key_middleware;
+use crate::schemas::ChangePlanOut;
 use crate::schemas::filter::Filter;
 use crate::schemas::pagination::Pagination;
-use crate::schemas::select_aud::SelectAuditoryOut;
 
 #[utoipa::path(
     get,
-    path = "/api/get/auds",
+    path = "/api/get/plans",
     request_body = Filter,
     responses(
         (
-            status = 200, description = "Paginated output for selected auditories", body = Pagination<SelectAuditoryOut>
+            status = 200, description = "Paginated output for changed plans", body = Pagination<ChangePlanOut>
         ),
         (
             status = 403, description = "ApiKey validation error", body = Status,
@@ -31,10 +31,10 @@ use crate::schemas::select_aud::SelectAuditoryOut;
     ),
     tag = "Get"
 )]
-#[get("/auds", wrap="from_fn(api_key_middleware)")]
-async fn get_auds(
+#[get("/plans", wrap="from_fn(api_key_middleware)")]
+async fn get_plans(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>
-) -> ApiResult<Pagination<SelectAuditoryOut>> {
-    <Filter as Paginate<SelectAuditoryOut>>::pagination(&data, db.get_ref()).await.to_response()
+) -> ApiResult<Pagination<ChangePlanOut>> {
+    <Filter as Paginate<ChangePlanOut>>::pagination(&data, db.get_ref()).await.to_response()
 }

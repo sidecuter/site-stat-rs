@@ -4,67 +4,68 @@ use chrono::NaiveDateTime;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use entity::site_stat;
+use entity::change_plan;
+use crate::schemas::validators::PlanId;
 use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
-pub struct SiteStatisticsIn {
+pub struct ChangePlanIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
-    #[schema(example = "/app")]
-    pub endpoint: Option<String>
+    #[schema(example = "A-0")]
+    pub plan_id: PlanId
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
-pub struct SiteStatisticsOut {
+pub struct ChangePlanOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
-    #[schema(example = "/app")]
-    pub endpoint: Option<String>,
+    #[schema(example = "A-0")]
+    pub plan_id: PlanId,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub visit_date: NaiveDateTime
 }
 
-impl Default for SiteStatisticsIn {
+impl Default for ChangePlanIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            endpoint: Some("/app".to_string())
+            plan_id: PlanId::new("A-0".to_string())
         }
     }
 }
 
-impl Default for SiteStatisticsOut {
+impl Default for ChangePlanOut {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            endpoint: Some("/app".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc()
+            plan_id: PlanId::new("A-0".to_string()),
+            visit_date: chrono::offset::Utc::now().naive_utc(),
         }
     }
 }
 
-impl From<site_stat::Model> for SiteStatisticsOut {
-    fn from(value: site_stat::Model) -> Self {
+impl From<change_plan::Model> for ChangePlanOut {
+    fn from(value: change_plan::Model) -> Self {
         Self {
             user_id: value.user_id,
-            endpoint: value.endpoint,
-            visit_date: value.visit_date
+            plan_id: PlanId::new(value.plan_id),
+            visit_date: value.visit_date,
         }
     }
 }
 
-impl From<site_stat::ActiveModel> for SiteStatisticsOut {
-    fn from(value: site_stat::ActiveModel) -> Self {
+impl From<change_plan::ActiveModel> for ChangePlanOut {
+    fn from(value: change_plan::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
-            endpoint: value.endpoint.unwrap(),
-            visit_date: value.visit_date.unwrap()
+            plan_id: PlanId::new(value.plan_id.unwrap()),
+            visit_date: value.visit_date.unwrap(),
         }
     }
 }
 
-impl Responder for SiteStatisticsOut {
+impl Responder for ChangePlanOut {
     type Body = BoxBody;
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
@@ -72,15 +73,15 @@ impl Responder for SiteStatisticsOut {
     }
 }
 
-impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<site_stat::Model, DbErr> {
-        site_stat::ActiveModel {
+impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
+    async fn create(&self, db: &DatabaseConnection) -> Result<change_plan::Model, DbErr> {
+        change_plan::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
             visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
-            endpoint: ActiveValue::Set(self.endpoint.clone()),
+            plan_id: ActiveValue::Set(self.plan_id.to_string()),
             ..Default::default()
         }.insert(db).await
     }
 }
 
-impl_paginate_trait!(Filter, SiteStatisticsOut, entity::site_stat::Entity, entity::site_stat::Column::Id);
+impl_paginate_trait!(Filter, ChangePlanOut, entity::change_plan::Entity, entity::change_plan::Column::Id);
