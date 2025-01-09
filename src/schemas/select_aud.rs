@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::select_aud;
 use crate::schemas::validators::AuditoryId;
-use crate::traits::CreateFromScheme;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SelectAuditoryIn {
@@ -92,3 +92,5 @@ impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
         }.insert(db).await
     }
 }
+
+impl_paginate_trait!(Filter, SelectAuditoryOut, entity::select_aud::Entity, entity::select_aud::Column::Id);

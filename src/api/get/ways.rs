@@ -36,5 +36,5 @@ async fn get_ways(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<Pagination<StartWayOut>> {
-    <Filter as Paginate<Pagination<StartWayOut>>>::pagination(&data, db.get_ref()).await.to_response()
+    <Filter as Paginate<StartWayOut>>::pagination(&data, db.get_ref()).await.to_response()
 }

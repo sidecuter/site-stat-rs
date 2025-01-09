@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::start_way;
 use crate::schemas::validators::AuditoryId;
-use crate::traits::CreateFromScheme;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct StartWayIn {
@@ -92,3 +92,5 @@ impl CreateFromScheme<start_way::Model> for StartWayIn {
         }.insert(db).await
     }
 }
+
+impl_paginate_trait!(Filter, StartWayOut, entity::start_way::Entity, entity::start_way::Column::Id);

@@ -36,5 +36,5 @@ async fn get_auds(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<Pagination<SelectAuditoryOut>> {
-    <Filter as Paginate<Pagination<SelectAuditoryOut>>>::pagination(&data, db.get_ref()).await.to_response()
+    <Filter as Paginate<SelectAuditoryOut>>::pagination(&data, db.get_ref()).await.to_response()
 }

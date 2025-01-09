@@ -5,7 +5,7 @@ use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::site_stat;
-use crate::traits::CreateFromScheme;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsIn {
@@ -82,3 +82,5 @@ impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
         }.insert(db).await
     }
 }
+
+impl_paginate_trait!(Filter, SiteStatisticsOut, entity::site_stat::Entity, entity::site_stat::Column::Id);

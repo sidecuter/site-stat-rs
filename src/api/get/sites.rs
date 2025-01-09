@@ -36,5 +36,5 @@ async fn get_sites(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>
 ) -> ApiResult<Pagination<SiteStatisticsOut>> {
-    <Filter as Paginate<Pagination<SiteStatisticsOut>>>::pagination(&data, db.get_ref()).await.to_response()
+    <Filter as Paginate<SiteStatisticsOut>>::pagination(&data, db.get_ref()).await.to_response()
 }

@@ -7,3 +7,4 @@ pub use self::filter::FilterTrait;
 pub use self::convert::{ConversionToStatusTrait, ConversionTrait, ConversionToPaginationTrait};
 pub use self::create::CreateFromScheme;
 pub use self::paginate::Paginate;
+pub(crate) use self::paginate::impl_paginate_trait;
