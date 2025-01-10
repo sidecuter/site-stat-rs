@@ -1,12 +1,18 @@
 use std::env;
 use std::future::Ready;
 use std::time::Duration;
-use actix_extensible_rate_limit::backend::memory::InMemoryBackend;
-use actix_extensible_rate_limit::backend::{SimpleInput, SimpleInputFunctionBuilder, SimpleOutput};
-use actix_extensible_rate_limit::{HeaderCompatibleOutput, RateLimiter, RateLimiterBuilder};
+use actix_extensible_rate_limit::{
+    backend::{
+        memory::InMemoryBackend,
+        SimpleInput, SimpleInputFunctionBuilder, SimpleOutput
+    },
+    HeaderCompatibleOutput, RateLimiter, RateLimiterBuilder
+};
 use actix_web::{dev::ServiceRequest, http::StatusCode, HttpResponse};
-use crate::schemas::Status;
-use crate::errors::Error as ApiError;
+use crate::{
+    errors::Error as ApiError,
+    schemas::Status
+};
 
 fn rate_limit_exceeded(rate_info: &SimpleOutput) -> HttpResponse {
     let rest_time = rate_info.seconds_until_reset();

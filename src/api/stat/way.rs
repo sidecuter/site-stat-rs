@@ -1,9 +1,8 @@
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
 use entity::{user_id, aud};
-use crate::schemas::start_way::StartWayIn;
 use crate::errors::Result as ApiResult;
-use crate::schemas::status::Status;
+use crate::schemas::{Status, StartWayIn};
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(

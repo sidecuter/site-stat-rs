@@ -2,7 +2,9 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
 use regex::Regex;
 use utoipa::ToSchema;
+use utoipauto::utoipa_ignore;
 
+#[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
 #[schema(example = "A-0", pattern = r"^([ABVN]D?-\d)$")]
 pub struct PlanId(
@@ -37,5 +39,17 @@ impl<'de> Deserialize<'de> for PlanId {
 impl Display for PlanId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl From<String> for PlanId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for PlanId {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
     }
 }

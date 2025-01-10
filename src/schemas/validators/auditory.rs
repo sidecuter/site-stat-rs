@@ -2,7 +2,9 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
 use regex::Regex;
 use utoipa::ToSchema;
+use utoipauto::utoipa_ignore;
 
+#[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
 #[schema(example = "a-100", pattern = r"^(!?[abvn]d?(-\w+)*)$")]
 pub struct AuditoryId(
@@ -37,5 +39,17 @@ impl<'de> Deserialize<'de> for AuditoryId {
 impl Display for AuditoryId {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+impl From<String> for AuditoryId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for AuditoryId {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
     }
 }
