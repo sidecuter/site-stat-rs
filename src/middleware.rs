@@ -1,10 +1,14 @@
-use actix_web::body::BoxBody;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::{Error, Responder};
-use actix_web::middleware::Next;
-use actix_web::web::Data;
-use crate::app_state::AppState;
-use crate::errors::Error as ApiError;
+use actix_web::{
+    dev::{ServiceRequest, ServiceResponse},
+    middleware::Next,
+    body::BoxBody,
+    web::Data,
+    Error, Responder
+};
+use crate::{
+    errors::Error as ApiError,
+    app_state::AppState
+};
 
 pub async fn api_key_middleware(
     req: ServiceRequest,

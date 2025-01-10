@@ -2,8 +2,7 @@ use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
 use entity::{plan, user_id};
 use crate::errors::Result as ApiResult;
-use crate::schemas::ChangePlanIn;
-use crate::schemas::status::Status;
+use crate::schemas::{Status, ChangePlanIn};
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(

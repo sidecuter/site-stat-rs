@@ -1,12 +1,9 @@
 use actix_web::{get, web, middleware::from_fn};
 use sea_orm::DatabaseConnection;
 use crate::errors::Result as ApiResult;
-use crate::schemas::status::Status;
-use crate::traits::{ConversionToPaginationTrait, Paginate};
 use crate::middleware::api_key_middleware;
-use crate::schemas::ChangePlanOut;
-use crate::schemas::filter::Filter;
-use crate::schemas::pagination::Pagination;
+use crate::traits::{ConversionToPaginationTrait, Paginate};
+use crate::schemas::{Status, Filter, ChangePlanOut, Pagination};
 
 #[utoipa::path(
     get,

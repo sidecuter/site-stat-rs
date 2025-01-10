@@ -1,11 +1,10 @@
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
 use entity::{user_id, aud};
-use crate::schemas::select_aud::{SelectAuditoryIn};
 use crate::errors::Result as ApiResult;
-use crate::schemas::status::Status;
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
+use crate::schemas::{Status, SelectAuditoryIn};
 use crate::rate_limit::create_in_memory_rate_limit;
+use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
     put,

@@ -1,6 +1,6 @@
 use sea_orm::{DatabaseConnection, DbErr};
 use serde::Serialize;
-use crate::schemas::pagination::Pagination;
+use crate::schemas::Pagination;
 
 pub trait Paginate<T: Serialize + Clone> {
     fn pagination(&self, db: &DatabaseConnection) -> impl std::future::Future<Output = Result<Pagination<T>, DbErr>> + Send;
@@ -10,9 +10,8 @@ macro_rules! impl_paginate_trait {
     ($t_name:ident, $entity_path:path, $entity_column:path) => {
         mod paginate {
             use crate::traits::Paginate;
-            use crate::schemas::pagination::Pagination;
             use sea_orm::{DbErr, EntityTrait, DatabaseConnection, ModelTrait, QueryOrder, PaginatorTrait};
-            use crate::schemas::{Filter, $t_name};
+            use crate::schemas::{Filter, Pagination, $t_name};
 
             impl Paginate<$t_name> for Filter {
                 async fn pagination(&self, db: &DatabaseConnection) -> Result<Pagination<$t_name>, DbErr> {

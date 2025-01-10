@@ -1,7 +1,7 @@
 use actix_web::{get, web};
 use sea_orm::DatabaseConnection;
+use crate::schemas::{UserId, Status};
 use crate::errors::Result as ApiResult;
-use crate::schemas::{user_id::UserId, status::Status};
 use crate::traits::{ConversionTrait, CreateFromScheme};
 
 #[utoipa::path(

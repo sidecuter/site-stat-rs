@@ -1,9 +1,12 @@
-use actix_web::{http::{StatusCode, header::ContentType}, body::BoxBody,
-                HttpRequest, HttpResponse, Responder, ResponseError};
-use actix_web::error::{JsonPayloadError, QueryPayloadError};
+use actix_web::{
+    error::{JsonPayloadError, QueryPayloadError},
+    http::{StatusCode, header::ContentType},
+    body::BoxBody, HttpRequest, HttpResponse,
+    Responder, ResponseError
+};
 use log::{log, Level};
 use sea_orm::DbErr;
-use crate::schemas::status;
+use crate::schemas::Status;
 
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum Error {
@@ -39,7 +42,7 @@ impl ResponseError for Error {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code())
             .insert_header(ContentType::json())
-            .json(status::Status{status: self.to_string()})
+            .json(Status{status: self.to_string()})
     }
 }
 
