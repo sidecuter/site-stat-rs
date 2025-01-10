@@ -19,6 +19,5 @@ async fn get_user_endpoint(
     let req = test::TestRequest::get().uri("/user-id")
         .to_request();
     let resp = test::call_service(&app, req).await;
-    println!("{:?}", resp.response().body());
     assert_eq!(resp.status().as_u16(), 200)
 }
