@@ -93,4 +93,4 @@ impl CreateFromScheme<start_way::Model> for StartWayIn {
     }
 }
 
-impl_paginate_trait!(Filter, StartWayOut, entity::start_way::Entity, entity::start_way::Column::Id);
+impl_paginate_trait!(StartWayOut, entity::start_way::Entity, entity::start_way::Column::Id);

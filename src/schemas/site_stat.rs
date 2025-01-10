@@ -83,4 +83,4 @@ impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
     }
 }
 
-impl_paginate_trait!(Filter, SiteStatisticsOut, entity::site_stat::Entity, entity::site_stat::Column::Id);
+impl_paginate_trait!(SiteStatisticsOut, entity::site_stat::Entity, entity::site_stat::Column::Id);

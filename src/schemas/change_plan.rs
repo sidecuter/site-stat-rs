@@ -84,4 +84,4 @@ impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
     }
 }
 
-impl_paginate_trait!(Filter, ChangePlanOut, entity::change_plan::Entity, entity::change_plan::Column::Id);
+impl_paginate_trait!(ChangePlanOut, entity::change_plan::Entity, entity::change_plan::Column::Id);

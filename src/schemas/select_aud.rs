@@ -93,4 +93,4 @@ impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
     }
 }
 
-impl_paginate_trait!(Filter, SelectAuditoryOut, entity::select_aud::Entity, entity::select_aud::Column::Id);
+impl_paginate_trait!(SelectAuditoryOut, entity::select_aud::Entity, entity::select_aud::Column::Id);
