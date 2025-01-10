@@ -8,7 +8,7 @@ members = [".", "entity", "migration"]
 
 [dependencies]
 entity = { path = "entity" }
-#migration = { path = "migration" } # depends on your needs
+migration = { path = "migration" } # depends on your needs
 actix-web = "4.9.0"
 chrono = { version = "0.4.39", default-features = false, features = ["clock", "serde", "std"] }
 log = "0.4.22"
@@ -25,3 +25,6 @@ utoipa-swagger-ui = { version = "8.1.1", features = ["actix-web"] }
 regex = "1.11.1"
 actix-extensible-rate-limit = "0.4.0"
 utoipauto = "0.2.0"
+rstest = "0.24.0"
+once_cell = "1.20.2"
+async-std = "1.13.0"

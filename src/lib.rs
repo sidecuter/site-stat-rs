@@ -6,3 +6,6 @@ pub mod traits;
 pub mod app_state;
 pub mod middleware;
 pub mod rate_limit;
+
+#[cfg(test)]
+mod tests;
