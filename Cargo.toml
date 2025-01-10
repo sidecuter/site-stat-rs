@@ -23,8 +23,6 @@ tracing = "0.1.41"
 utoipa = { version = "5.3.1", features = ["chrono", "uuid"] }
 utoipa-swagger-ui = { version = "8.1.1", features = ["actix-web"] }
 regex = "1.11.1"
-actix-extensible-rate-limit = "0.4.0"
 utoipauto = "0.2.0"
 rstest = "0.24.0"
-once_cell = "1.20.2"
 async-std = "1.13.0"

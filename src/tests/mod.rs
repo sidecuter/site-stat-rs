@@ -1,8 +1,6 @@
 mod set;
 mod stat;
 
-use std::sync::Mutex;
-use once_cell::sync::Lazy;
 use rstest::fixture;
 use sea_orm::{ActiveModelTrait, Database, DatabaseConnection};
 use sea_orm::ActiveValue::Set;
@@ -15,10 +13,6 @@ use entity::{
     change_plan::ActiveModel as ChangePlan
 };
 use migration::{Migrator, MigratorTrait};
-
-pub static DATABASE_CONN: Lazy<Mutex<Option<DatabaseConnection>>> = Lazy::new(|| {
-    Mutex::new(None)
-});
 
 async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
     UserId {
@@ -55,17 +49,12 @@ async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
 }
 
 #[fixture]
-async fn prepare_connection() -> Result<(), Box<dyn std::error::Error>> {
-    let mut db_lock = DATABASE_CONN.lock().unwrap();
-    if db_lock.is_none() {
-        let pool = Database::connect("sqlite::memory:").await;
-        println!("{}", pool.is_err());
-        let pool = pool?;
-        Migrator::up(&pool, None).await?;
-        prepare_database(&pool).await?;
-        *db_lock = Some(pool);
-    }
-    Ok(())
+async fn prepare_connection() -> Result<DatabaseConnection, Box<dyn std::error::Error>> {
+    let pool = Database::connect("sqlite::memory:").await;
+    let pool = pool?;
+    Migrator::up(&pool, None).await?;
+    prepare_database(&pool).await?;
+    Ok(pool)
 }
 
 #[fixture]
