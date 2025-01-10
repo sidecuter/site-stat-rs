@@ -7,7 +7,7 @@ use sea_orm::DatabaseConnection;
 use crate::schemas::{Pagination, StartWayOut};
 
 #[rstest]
-async fn get_auds_endpoint(
+async fn get_ways_endpoint(
     #[future(awt)]
     prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>
 ) {
