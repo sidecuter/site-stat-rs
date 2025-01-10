@@ -15,7 +15,7 @@ pub struct SiteStatisticsIn {
     pub endpoint: Option<String>
 }
 
-#[derive(Serialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,

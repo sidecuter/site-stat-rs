@@ -18,7 +18,7 @@ pub struct SelectAuditoryIn {
     pub success: bool
 }
 
-#[derive(Serialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SelectAuditoryOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,

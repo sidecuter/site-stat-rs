@@ -1,9 +1,9 @@
 use actix_web::body::BoxBody;
 use actix_web::Responder;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Clone, ToSchema)]
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct Pagination<T: Serialize + Clone> {
     pub items: Vec<T>,
     #[schema(example = 10)]

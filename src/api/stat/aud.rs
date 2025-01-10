@@ -3,7 +3,6 @@ use sea_orm::DatabaseConnection;
 use entity::{user_id, aud};
 use crate::errors::Result as ApiResult;
 use crate::schemas::{Status, SelectAuditoryIn};
-use crate::rate_limit::create_in_memory_rate_limit;
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
@@ -27,10 +26,10 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
             status = 422, description = "Validation failed", body = Status,
             example = json!(Status{status: "The request body is invalid: ...".to_string()})
         ),
-        (
-            status = 429, description = "Too many requests", body = Status,
-            example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
-        ),
+        // (
+        //     status = 429, description = "Too many requests", body = Status,
+        //     example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
+        // ),
         (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
@@ -38,7 +37,7 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
     ),
     tag = "Stat"
 )]
-#[put("select-aud", wrap = "create_in_memory_rate_limit()")]
+#[put("select-aud")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>
