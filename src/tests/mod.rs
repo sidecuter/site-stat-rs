@@ -1,4 +1,4 @@
-mod set;
+mod get;
 mod stat;
 
 use rstest::fixture;
