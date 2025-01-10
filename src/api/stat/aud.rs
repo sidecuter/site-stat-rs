@@ -26,10 +26,10 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
             status = 422, description = "Validation failed", body = Status,
             example = json!(Status{status: "The request body is invalid: ...".to_string()})
         ),
-        (
-            status = 429, description = "Too many requests", body = Status,
-            example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
-        ),
+        // (
+        //     status = 429, description = "Too many requests", body = Status,
+        //     example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
+        // ),
         (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
