@@ -2,7 +2,9 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
 use regex::Regex;
 use utoipa::ToSchema;
+use utoipauto::utoipa_ignore;
 
+#[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
 #[schema(example = "a-100", pattern = r"^(!?[abvn]d?(-\w+)*)$")]
 pub struct AuditoryId(

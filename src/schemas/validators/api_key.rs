@@ -2,7 +2,9 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
 use regex::Regex;
 use utoipa::ToSchema;
+use utoipauto::utoipa_ignore;
 
+#[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
 #[schema(example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", pattern = r"^[0-9a-f]{64}$")]
 pub struct ApiKey(String);
