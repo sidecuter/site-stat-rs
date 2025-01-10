@@ -56,10 +56,3 @@ async fn prepare_connection() -> Result<DatabaseConnection, Box<dyn std::error::
     prepare_database(&pool).await?;
     Ok(pool)
 }
-
-#[fixture]
-#[once]
-fn set_env() {
-    std::env::set_var("RATE_LIMIT_INTERVAL", "1");
-    std::env::set_var("RATE_LIMIT_MAX_REQUEST", "1");
-}
