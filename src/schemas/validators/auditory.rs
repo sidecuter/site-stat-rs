@@ -41,3 +41,15 @@ impl Display for AuditoryId {
         write!(f, "{}", self.0)
     }
 }
+
+impl From<String> for AuditoryId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for AuditoryId {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
+    }
+}

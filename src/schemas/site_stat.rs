@@ -39,7 +39,7 @@ impl Default for SiteStatisticsOut {
         Self{
             user_id: uuid::Uuid::new_v4(),
             endpoint: Some("/app".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc()
+            visit_date: chrono::Utc::now().naive_utc()
         }
     }
 }
@@ -76,7 +76,7 @@ impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
     async fn create(&self, db: &DatabaseConnection) -> Result<site_stat::Model, DbErr> {
         site_stat::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
+            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
             endpoint: ActiveValue::Set(self.endpoint.clone()),
             ..Default::default()
         }.insert(db).await

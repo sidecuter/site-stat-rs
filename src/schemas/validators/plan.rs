@@ -41,3 +41,15 @@ impl Display for PlanId {
         write!(f, "{}", self.0)
     }
 }
+
+impl From<String> for PlanId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+impl From<&str> for PlanId {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
+    }
+}

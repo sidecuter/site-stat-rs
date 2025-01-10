@@ -34,7 +34,7 @@ impl Default for SelectAuditoryIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: AuditoryId::new("a-100".to_string()),
+            auditory_id: "a-100".into(),
             success: true
         }
     }
@@ -44,8 +44,8 @@ impl Default for SelectAuditoryOut {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: AuditoryId::new("a-100".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc(),
+            auditory_id: "a-100".into(),
+            visit_date: chrono::Utc::now().naive_utc(),
             success: true
         }
     }
@@ -55,7 +55,7 @@ impl From<select_aud::Model> for SelectAuditoryOut {
     fn from(value: select_aud::Model) -> Self {
         Self {
             user_id: value.user_id,
-            auditory_id: AuditoryId::new(value.auditory_id),
+            auditory_id: value.auditory_id.into(),
             visit_date: value.visit_date,
             success: value.success
         }
@@ -66,7 +66,7 @@ impl From<select_aud::ActiveModel> for SelectAuditoryOut {
     fn from(value: select_aud::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
-            auditory_id: AuditoryId::new(value.auditory_id.unwrap()),
+            auditory_id: value.auditory_id.unwrap().into(),
             visit_date: value.visit_date.unwrap(),
             success: value.success.unwrap()
         }
@@ -85,7 +85,7 @@ impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
     async fn create(&self, db: &DatabaseConnection) -> Result<select_aud::Model, DbErr> {
         select_aud::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
+            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
             auditory_id: ActiveValue::Set(self.auditory_id.to_string()),
             success: ActiveValue::Set(self.success),
             ..Default::default()
