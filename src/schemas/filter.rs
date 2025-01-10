@@ -1,4 +1,4 @@
-use serde::{Deserialize};
+use serde::Deserialize;
 use utoipa::ToSchema;
 use crate::schemas::validators::{ApiKey, Page, Size};
 
