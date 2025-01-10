@@ -1,7 +1,9 @@
 use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
 use utoipa::ToSchema;
+use utoipauto::utoipa_ignore;
 
+#[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
 #[schema(example = 1)]
 pub struct Page(u64);

@@ -1,8 +1,6 @@
 use actix_web::Responder;
 use sea_orm::{DbErr, ModelTrait};
-use crate::errors::Result as ApiResult;
-use crate::schemas::pagination::Pagination;
-use crate::schemas::status::Status;
+use crate::{errors::Result as ApiResult, schemas::{Pagination, Status}};
 use serde::Serialize;
 
 pub trait ConversionTrait<T> {

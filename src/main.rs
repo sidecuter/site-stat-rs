@@ -1,11 +1,18 @@
-use stat_api::{api_docs, errors::Error as ApiError};
-use actix_web;
-use actix_web::middleware::Logger;
-use actix_web::{web, web::{JsonConfig, QueryConfig}, App, HttpRequest, HttpServer};
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
-use stat_api::api;
+use stat_api::{
+    api_docs, errors::Error as ApiError,
+    app_state::AppState,
+    api,
+};
+use actix_web::{
+    self,
+    middleware::Logger,
+    web::{self, JsonConfig, QueryConfig},
+    App, HttpRequest, HttpServer
+};
+use sea_orm::{Database, DatabaseConnection};
+#[cfg(not(debug_assertions))]
+use sea_orm::ConnectOptions;
 use utoipa_swagger_ui::SwaggerUi;
-use stat_api::app_state::AppState;
 
 #[cfg(not(debug_assertions))]
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {

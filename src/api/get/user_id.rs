@@ -1,7 +1,7 @@
 use actix_web::{get, web};
 use sea_orm::DatabaseConnection;
+use crate::schemas::{UserId, Status};
 use crate::errors::Result as ApiResult;
-use crate::schemas::{user_id::UserId, status::Status, traits::OpenApiExample};
 use crate::traits::{ConversionTrait, CreateFromScheme};
 
 #[utoipa::path(
@@ -10,8 +10,7 @@ use crate::traits::{ConversionTrait, CreateFromScheme};
     request_body = UserId,
     responses(
         (
-            status = 200, description = "User id generated", body = UserId,
-            example = json!(UserId::openapi_example())
+            status = 200, description = "User id generated", body = UserId
         ),
         (
             status = 500, description = "Database error", body = Status,

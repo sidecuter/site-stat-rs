@@ -19,7 +19,7 @@ impl Default for UserId {
     fn default() -> Self {
         Self {
             user_id: uuid::Uuid::new_v4(),
-            creation_date: chrono::offset::Utc::now().naive_utc()
+            creation_date: chrono::Utc::now().naive_utc()
         }
     }
 

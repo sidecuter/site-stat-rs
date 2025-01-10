@@ -5,3 +5,6 @@ pub mod api_docs;
 pub mod traits;
 pub mod app_state;
 pub mod middleware;
+
+#[cfg(test)]
+mod tests;

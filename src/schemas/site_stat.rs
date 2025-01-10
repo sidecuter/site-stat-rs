@@ -5,7 +5,7 @@ use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use entity::site_stat;
-use crate::traits::CreateFromScheme;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsIn {
@@ -15,7 +15,7 @@ pub struct SiteStatisticsIn {
     pub endpoint: Option<String>
 }
 
-#[derive(Serialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
@@ -39,7 +39,7 @@ impl Default for SiteStatisticsOut {
         Self{
             user_id: uuid::Uuid::new_v4(),
             endpoint: Some("/app".to_string()),
-            visit_date: chrono::offset::Utc::now().naive_utc()
+            visit_date: chrono::Utc::now().naive_utc()
         }
     }
 }
@@ -76,9 +76,11 @@ impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
     async fn create(&self, db: &DatabaseConnection) -> Result<site_stat::Model, DbErr> {
         site_stat::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::offset::Utc::now().naive_utc()),
+            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
             endpoint: ActiveValue::Set(self.endpoint.clone()),
             ..Default::default()
         }.insert(db).await
     }
 }
+
+impl_paginate_trait!(SiteStatisticsOut, entity::site_stat::Entity, entity::site_stat::Column::Id);

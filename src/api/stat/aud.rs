@@ -1,9 +1,8 @@
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
 use entity::{user_id, aud};
-use crate::schemas::select_aud::{SelectAuditoryIn};
 use crate::errors::Result as ApiResult;
-use crate::schemas::status::Status;
+use crate::schemas::{Status, SelectAuditoryIn};
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
@@ -27,6 +26,10 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
             status = 422, description = "Validation failed", body = Status,
             example = json!(Status{status: "The request body is invalid: ...".to_string()})
         ),
+        // (
+        //     status = 429, description = "Too many requests", body = Status,
+        //     example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
+        // ),
         (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})

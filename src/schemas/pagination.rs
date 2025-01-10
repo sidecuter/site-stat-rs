@@ -1,19 +1,19 @@
 use actix_web::body::BoxBody;
 use actix_web::Responder;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Clone, ToSchema)]
+#[derive(Debug, Deserialize, Serialize, Clone, ToSchema)]
 pub struct Pagination<T: Serialize + Clone> {
     pub items: Vec<T>,
     #[schema(example = 10)]
-    pub all_pages: u64,
+    pub pages: u64,
     #[schema(example = 10)]
     pub page: u64,
     #[schema(example = 10)]
     pub size: u64,
     #[schema(example = 91)]
-    pub total_items: u64
+    pub total: u64
 }
 
 impl<T: Default + Serialize + Clone> Pagination<T> {
@@ -25,10 +25,10 @@ impl<T: Default + Serialize + Clone> Pagination<T> {
 #[derive(Default)]
 pub struct PaginationBuilder<T> {
     pub items: Vec<T>,
-    pub all_pages: u64,
+    pub pages: u64,
     pub page: u64,
     pub size: u64,
-    pub total_items: u64
+    pub total: u64
 }
 
 impl<T: Serialize + Clone> PaginationBuilder<T> {
@@ -37,12 +37,12 @@ impl<T: Serialize + Clone> PaginationBuilder<T> {
         self
     }
 
-    pub fn all_pages(mut self, all_pages: u64) -> Self {
-        self.all_pages = all_pages;
+    pub fn pages(mut self, pages: u64) -> Self {
+        self.pages = pages;
         self
     }
-    pub fn total_items(mut self, total_items: u64) -> Self {
-        self.total_items = total_items;
+    pub fn total(mut self, total: u64) -> Self {
+        self.total = total;
         self
     }
     pub fn page(mut self, page: u64) -> Self {
@@ -57,10 +57,10 @@ impl<T: Serialize + Clone> PaginationBuilder<T> {
     pub fn build(self) -> Pagination<T> {
         Pagination {
             items: self.items,
-            all_pages: self.all_pages,
+            pages: self.pages,
             page: self.page,
             size: self.size,
-            total_items: self.total_items,
+            total: self.total,
         }
     }
 }

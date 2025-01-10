@@ -4,76 +4,68 @@ use chrono::NaiveDateTime;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use entity::select_aud;
-use crate::schemas::validators::AuditoryId;
+use entity::change_plan;
+use crate::schemas::validators::PlanId;
 use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
-pub struct SelectAuditoryIn {
+pub struct ChangePlanIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
-    #[schema(example = "a-100")]
-    pub auditory_id: AuditoryId,
-    #[schema(example = true)]
-    pub success: bool
+    #[schema(example = "A-0")]
+    pub plan_id: PlanId
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
-pub struct SelectAuditoryOut {
+pub struct ChangePlanOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
-    #[schema(example = "a-100")]
-    pub auditory_id: AuditoryId,
-    #[schema(example = true)]
-    pub success: bool,
+    #[schema(example = "A-0")]
+    pub plan_id: PlanId,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub visit_date: NaiveDateTime
 }
 
-impl Default for SelectAuditoryIn {
+impl Default for ChangePlanIn {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: "a-100".into(),
-            success: true
+            plan_id: "A-0".into()
         }
     }
 }
 
-impl Default for SelectAuditoryOut {
+impl Default for ChangePlanOut {
     fn default() -> Self {
         Self{
             user_id: uuid::Uuid::new_v4(),
-            auditory_id: "a-100".into(),
+            plan_id: "A-0".into(),
             visit_date: chrono::Utc::now().naive_utc(),
-            success: true
         }
     }
 }
 
-impl From<select_aud::Model> for SelectAuditoryOut {
-    fn from(value: select_aud::Model) -> Self {
+impl From<change_plan::Model> for ChangePlanOut {
+    fn from(value: change_plan::Model) -> Self {
         Self {
             user_id: value.user_id,
-            auditory_id: value.auditory_id.into(),
+            plan_id: value.plan_id.into(),
             visit_date: value.visit_date,
-            success: value.success
         }
     }
 }
 
-impl From<select_aud::ActiveModel> for SelectAuditoryOut {
-    fn from(value: select_aud::ActiveModel) -> Self {
+impl From<change_plan::ActiveModel> for ChangePlanOut {
+    fn from(value: change_plan::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
-            auditory_id: value.auditory_id.unwrap().into(),
+            plan_id: value.plan_id.unwrap().into(),
             visit_date: value.visit_date.unwrap(),
-            success: value.success.unwrap()
         }
     }
 }
 
-impl Responder for SelectAuditoryOut {
+impl Responder for ChangePlanOut {
     type Body = BoxBody;
 
     fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
@@ -81,16 +73,15 @@ impl Responder for SelectAuditoryOut {
     }
 }
 
-impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<select_aud::Model, DbErr> {
-        select_aud::ActiveModel {
+impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
+    async fn create(&self, db: &DatabaseConnection) -> Result<change_plan::Model, DbErr> {
+        change_plan::ActiveModel {
             user_id: ActiveValue::Set(self.user_id),
             visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
-            auditory_id: ActiveValue::Set(self.auditory_id.to_string()),
-            success: ActiveValue::Set(self.success),
+            plan_id: ActiveValue::Set(self.plan_id.to_string()),
             ..Default::default()
         }.insert(db).await
     }
 }
 
-impl_paginate_trait!(SelectAuditoryOut, entity::select_aud::Entity, entity::select_aud::Column::Id);
+impl_paginate_trait!(ChangePlanOut, entity::change_plan::Entity, entity::change_plan::Column::Id);

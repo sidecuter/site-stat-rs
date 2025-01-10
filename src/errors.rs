@@ -1,9 +1,12 @@
-use actix_web::{http::{StatusCode, header::ContentType}, body::BoxBody,
-                HttpRequest, HttpResponse, Responder, ResponseError};
-use actix_web::error::{JsonPayloadError, QueryPayloadError};
+use actix_web::{
+    error::{JsonPayloadError, QueryPayloadError},
+    http::{StatusCode, header::ContentType},
+    body::BoxBody, HttpRequest, HttpResponse,
+    Responder, ResponseError
+};
 use log::{log, Level};
 use sea_orm::DbErr;
-use crate::schemas::status;
+use crate::schemas::Status;
 
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum Error {
@@ -18,7 +21,9 @@ pub enum Error {
     #[error("{0}")]
     PathNotFound(String),
     #[error("{0}")]
-    NotAllowed(String)
+    NotAllowed(String),
+    #[error("Too many requests, retry in {0}s")]
+    TooManyRequests(String)
 }
 
 impl ResponseError for Error {
@@ -29,14 +34,15 @@ impl ResponseError for Error {
             Error::NotFound(_) => StatusCode::NOT_FOUND,
             Error::BadRequest(_) => StatusCode::BAD_REQUEST,
             Error::PathNotFound(_) => StatusCode::NOT_FOUND,
-            Error::NotAllowed(_) => StatusCode::FORBIDDEN
+            Error::NotAllowed(_) => StatusCode::FORBIDDEN,
+            Error::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS
         }
     }
 
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code())
             .insert_header(ContentType::json())
-            .json(status::Status{status: self.to_string()})
+            .json(Status{status: self.to_string()})
     }
 }
 

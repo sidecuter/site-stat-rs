@@ -12,12 +12,20 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::change_plan::Entity")]
+    ChangePlan,
     #[sea_orm(has_many = "super::select_aud::Entity")]
     SelectAud,
     #[sea_orm(has_many = "super::site_stat::Entity")]
     SiteStat,
     #[sea_orm(has_many = "super::start_way::Entity")]
     StartWay,
+}
+
+impl Related<super::change_plan::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ChangePlan.def()
+    }
 }
 
 impl Related<super::select_aud::Entity> for Entity {
