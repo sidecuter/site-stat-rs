@@ -1,4 +1,5 @@
-use serde::Deserialize;
+use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use crate::schemas::validators::{ApiKey, Page, Size};
 
@@ -14,4 +15,20 @@ pub struct Filter{
     #[schema(example = 50, maximum = 100)]
     #[serde(default)]
     pub size: Size
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+enum Target {
+    Site,
+    Auds,
+    Ways,
+    Plans
+}
+
+#[derive(Deserialize, Clone, Debug)]
+#[serde(tag = "target")]
+pub struct FilterQuery {
+    target: Target,
+    start_date: Option<NaiveDateTime>,
+    end_date: Option<NaiveDateTime>
 }
