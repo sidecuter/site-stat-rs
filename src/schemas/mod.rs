@@ -7,14 +7,16 @@ pub mod pagination;
 mod validators;
 pub mod start_way;
 pub mod change_plan;
+pub mod stats;
 
 pub use self::{
     pagination::Pagination,
     status::Status,
     site_stat::{SiteStatisticsIn, SiteStatisticsOut},
     select_aud::{SelectAuditoryIn, SelectAuditoryOut},
-    filter::Filter,
+    filter::{Filter, FilterQuery},
     user_id::UserId,
     start_way::{StartWayIn, StartWayOut},
-    change_plan::{ChangePlanIn, ChangePlanOut}
+    change_plan::{ChangePlanIn, ChangePlanOut},
+    stats::Statistics
 };
