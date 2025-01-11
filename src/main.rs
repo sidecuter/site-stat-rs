@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()>{
     let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{host}:{port}");
-    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://db.app?mode=rwc".to_owned());
+    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://app.db?mode=rwc".to_owned());
     let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned());
     let pool = get_database_connection(&database_url).await;
 
