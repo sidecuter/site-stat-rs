@@ -1,7 +1,7 @@
 use crate::errors::Result as ApiResult;
 use crate::middleware::api_key_middleware;
 use crate::schemas::{FilterQuery, Statistics, Status, Target};
-use actix_web::{get, web};
+use actix_web::{get, web, middleware::from_fn};
 use chrono::{NaiveDateTime, NaiveTime};
 use entity::prelude::{ChangePlan, SelectAud, SiteStat, StartWay, UserId};
 use itertools::Itertools;
