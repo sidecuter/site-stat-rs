@@ -1,18 +1,15 @@
+use crate::{app_state::AppState, errors::Error as ApiError};
 use actix_web::{
+    body::BoxBody,
     dev::{ServiceRequest, ServiceResponse},
     middleware::Next,
-    body::BoxBody,
     web::Data,
-    Error, Responder
-};
-use crate::{
-    errors::Error as ApiError,
-    app_state::AppState
+    Error, Responder,
 };
 
 pub async fn api_key_middleware(
     req: ServiceRequest,
-    next: Next<BoxBody>
+    next: Next<BoxBody>,
 ) -> Result<ServiceResponse<BoxBody>, Error> {
     let state = req.app_data::<Data<AppState>>();
     let admin_key = if let Some(state_unwrap) = state {
@@ -23,8 +20,9 @@ pub async fn api_key_middleware(
     if req.query_string().contains(&format!("api_key={admin_key}")) {
         next.call(req).await
     } else {
-        let (request, _pl)= req.into_parts();
-        let response = ApiError::NotAllowed("Specified api_key is not present in app".to_string()).respond_to(&request);
+        let (request, _pl) = req.into_parts();
+        let response = ApiError::NotAllowed("Specified api_key is not present in app".to_string())
+            .respond_to(&request);
         Ok(ServiceResponse::new(request, response))
     }
 }

@@ -1,34 +1,33 @@
-use stat_api::{
-    api_docs, errors::Error as ApiError,
-    app_state::AppState,
-    api,
-};
 use actix_web::{
     self,
     middleware::Logger,
     web::{self, JsonConfig, QueryConfig},
-    App, HttpRequest, HttpServer
+    App, HttpRequest, HttpServer,
 };
-use sea_orm::{Database, DatabaseConnection};
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
+use sea_orm::{Database, DatabaseConnection};
+use stat_api::{api, api_docs, app_state::AppState, errors::Error as ApiError};
 use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(not(debug_assertions))]
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
     let mut opt = ConnectOptions::new(connection_string);
     opt.sqlx_logging(false);
-    Database::connect(opt).await.expect("Failed to create database connection pool")
+    Database::connect(opt)
+        .await
+        .expect("Failed to create database connection pool")
 }
 
 #[cfg(debug_assertions)]
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
-    Database::connect(connection_string).await.expect("Failed to create database connection pool")
+    Database::connect(connection_string)
+        .await
+        .expect("Failed to create database connection pool")
 }
 
-
 #[actix_web::main]
-async fn main() -> std::io::Result<()>{
+async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     #[cfg(debug_assertions)]
     {
@@ -48,8 +47,11 @@ async fn main() -> std::io::Result<()>{
     let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
     let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{host}:{port}");
-    let database_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://app.db?mode=rwc".to_owned());
-    let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned());
+    let database_url =
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://app.db?mode=rwc".to_owned());
+    let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| {
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned()
+    });
     let pool = get_database_connection(&database_url).await;
 
     log::info!("Listening on http://{}", addr);

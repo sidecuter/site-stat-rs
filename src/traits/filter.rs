@@ -1,19 +1,25 @@
+use crate::errors::{Error as ApiError, Result as ApiResult};
 use sea_orm::{DatabaseConnection, EntityTrait, PrimaryKeyTrait};
-use crate::errors::{Result as ApiResult, Error as ApiError};
 
 pub trait FilterTrait<PK> {
-
-    fn filter(pk: PK, db: &DatabaseConnection, msg: String) -> impl std::future::Future<Output = ApiResult<()>> + Send;
+    fn filter(
+        pk: PK,
+        db: &DatabaseConnection,
+        msg: String,
+    ) -> impl std::future::Future<Output = ApiResult<()>> + Send;
 }
 
 impl<T, PK> FilterTrait<PK> for T
 where
     T: EntityTrait,
-    <T::PrimaryKey as PrimaryKeyTrait>::ValueType: From<PK>, PK: Send
+    <T::PrimaryKey as PrimaryKeyTrait>::ValueType: From<PK>,
+    PK: Send,
 {
-
     async fn filter(pk: PK, db: &DatabaseConnection, msg: String) -> ApiResult<()> {
-        Self::find_by_id(pk).one(db).await?.ok_or(ApiError::NotFound(msg))?;
+        Self::find_by_id(pk)
+            .one(db)
+            .await?
+            .ok_or(ApiError::NotFound(msg))?;
         Ok(())
     }
 }

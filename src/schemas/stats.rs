@@ -9,7 +9,7 @@ pub struct Statistics {
     pub unique: usize,
     pub count: usize,
     pub all: usize,
-    pub period: Option<(NaiveDateTime, NaiveDateTime)>
+    pub period: Option<(NaiveDateTime, NaiveDateTime)>,
 }
 
 impl Responder for Statistics {

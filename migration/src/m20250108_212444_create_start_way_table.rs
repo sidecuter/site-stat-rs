@@ -1,6 +1,6 @@
-use sea_orm_migration::{prelude::*, schema::*};
 use crate::m20220101_000001_create_table::UserId;
 use crate::m20250108_120158_create_auds_table::Aud;
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -24,24 +24,25 @@ impl MigrationTrait for Migration {
                             .from(StartWay::Table, StartWay::UserId)
                             .to(UserId::Table, UserId::UserId)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .from(StartWay::Table, StartWay::StartId)
                             .to(Aud::Table, Aud::Id)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .from(StartWay::Table, StartWay::EndId)
                             .to(Aud::Table, Aud::Id)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .to_owned()
-            ).await
+                    .to_owned(),
+            )
+            .await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
@@ -59,5 +60,5 @@ enum StartWay {
     UserId,
     StartId,
     EndId,
-    VisitDate
+    VisitDate,
 }

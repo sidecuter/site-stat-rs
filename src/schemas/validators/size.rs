@@ -1,5 +1,5 @@
-use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
+use std::fmt::{Display, Formatter};
 use utoipa::ToSchema;
 use utoipauto::utoipa_ignore;
 
@@ -9,10 +9,12 @@ use utoipauto::utoipa_ignore;
 pub struct Size(u64);
 
 impl Size {
-
     fn validate(&self) -> Result<(), String> {
         if self.0 > 100 {
-            Err(format!("Size value greater than 100. Current value: {}", self.0))
+            Err(format!(
+                "Size value greater than 100. Current value: {}",
+                self.0
+            ))
         } else {
             Ok(())
         }

@@ -1,6 +1,9 @@
+use crate::{
+    errors::Result as ApiResult,
+    schemas::{Pagination, Status},
+};
 use actix_web::Responder;
 use sea_orm::{DbErr, ModelTrait};
-use crate::{errors::Result as ApiResult, schemas::{Pagination, Status}};
 use serde::Serialize;
 
 pub trait ConversionTrait<T> {
@@ -36,11 +39,12 @@ impl<T: Responder + From<Status>, W: ModelTrait> ConversionToStatusTrait<T> for 
     }
 }
 
-impl<T: Responder + Serialize + Clone> ConversionToPaginationTrait<T> for Result<Pagination<T>, DbErr> {
+impl<T: Responder + Serialize + Clone> ConversionToPaginationTrait<T>
+    for Result<Pagination<T>, DbErr>
+{
     type Output = ApiResult<Pagination<T>>;
 
     fn to_response(self) -> Self::Output {
         self.map_err(|e| e.into())
     }
 }
-

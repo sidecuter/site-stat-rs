@@ -1,9 +1,9 @@
-use actix_web::{put, web};
-use sea_orm::DatabaseConnection;
-use entity::{user_id, aud};
 use crate::errors::Result as ApiResult;
-use crate::schemas::{Status, StartWayIn};
+use crate::schemas::{StartWayIn, Status};
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
+use actix_web::{put, web};
+use entity::{aud, user_id};
+use sea_orm::DatabaseConnection;
 
 #[utoipa::path(
     put,
@@ -40,10 +40,20 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 #[put("start-way")]
 async fn stat_way(
     data: web::Json<StartWayIn>,
-    db: web::Data<DatabaseConnection>
+    db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
-    aud::Entity::filter(data.start_id.to_string(), db.get_ref(), "Start auditory".to_string()).await?;
-    aud::Entity::filter(data.end_id.to_string(), db.get_ref(), "End auditory".to_string()).await?;
+    aud::Entity::filter(
+        data.start_id.to_string(),
+        db.get_ref(),
+        "Start auditory".to_string(),
+    )
+    .await?;
+    aud::Entity::filter(
+        data.end_id.to_string(),
+        db.get_ref(),
+        "End auditory".to_string(),
+    )
+    .await?;
     data.create(db.get_ref()).await.status_ok()
 }

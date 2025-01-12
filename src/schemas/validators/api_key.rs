@@ -1,12 +1,15 @@
-use std::fmt::{Display, Formatter};
-use serde::{Deserialize, Deserializer, Serialize};
 use regex::Regex;
+use serde::{Deserialize, Deserializer, Serialize};
+use std::fmt::{Display, Formatter};
 use utoipa::ToSchema;
 use utoipauto::utoipa_ignore;
 
 #[utoipa_ignore]
 #[derive(Debug, Serialize, Clone, ToSchema)]
-#[schema(example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", pattern = r"^[0-9a-f]{64}$")]
+#[schema(
+    example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    pattern = r"^[0-9a-f]{64}$"
+)]
 pub struct ApiKey(String);
 
 impl ApiKey {
@@ -14,7 +17,9 @@ impl ApiKey {
 
     fn validate(&self) -> Result<(), String> {
         let re = Regex::new(Self::REGEX).unwrap();
-        re.is_match(&self.0).then(|| ()).ok_or(format!("Invalid api_key format: {}", self.0))
+        re.is_match(&self.0)
+            .then(|| ())
+            .ok_or(format!("Invalid api_key format: {}", self.0))
     }
 }
 

@@ -1,9 +1,9 @@
-use actix_web::{get, web, middleware::from_fn};
-use sea_orm::DatabaseConnection;
 use crate::errors::Result as ApiResult;
 use crate::middleware::api_key_middleware;
+use crate::schemas::{Filter, Pagination, SelectAuditoryOut, Status};
 use crate::traits::{ConversionToPaginationTrait, Paginate};
-use crate::schemas::{Status, Filter, Pagination, SelectAuditoryOut};
+use actix_web::{get, middleware::from_fn, web};
+use sea_orm::DatabaseConnection;
 
 #[utoipa::path(
     get,
@@ -28,10 +28,12 @@ use crate::schemas::{Status, Filter, Pagination, SelectAuditoryOut};
     ),
     tag = "Get"
 )]
-#[get("/auds", wrap="from_fn(api_key_middleware)")]
+#[get("/auds", wrap = "from_fn(api_key_middleware)")]
 async fn get_auds(
     data: web::Query<Filter>,
-    db: web::Data<DatabaseConnection>
+    db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<SelectAuditoryOut>> {
-    <Filter as Paginate<SelectAuditoryOut>>::pagination(&data, db.get_ref()).await.to_response()
+    <Filter as Paginate<SelectAuditoryOut>>::pagination(&data, db.get_ref())
+        .await
+        .to_response()
 }
