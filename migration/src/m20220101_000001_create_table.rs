@@ -35,5 +35,5 @@ pub enum UserId {
     #[sea_orm(iden = "user_id")]
     UserId,
     #[sea_orm(iden = "creation_date")]
-    CreationDate
+    CreationDate,
 }

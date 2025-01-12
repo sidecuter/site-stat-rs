@@ -1,6 +1,6 @@
-use sea_orm_migration::{prelude::*, schema::*};
 use crate::m20220101_000001_create_table::UserId;
 use crate::m20250109_160455_create_plan_table::Plan;
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -25,16 +25,16 @@ impl MigrationTrait for Migration {
                             .from(ChangePlan::Table, ChangePlan::UserId)
                             .to(UserId::Table, UserId::UserId)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .from(ChangePlan::Table, ChangePlan::PlanId)
                             .to(Plan::Table, Plan::Id)
                             .on_delete(ForeignKeyAction::Cascade)
-                            .on_update(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
                     )
-                    .to_owned()
+                    .to_owned(),
             )
             .await
     }
@@ -54,5 +54,5 @@ enum ChangePlan {
     Id,
     UserId,
     VisitDate,
-    PlanId
+    PlanId,
 }
