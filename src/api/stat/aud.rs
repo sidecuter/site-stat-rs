@@ -1,8 +1,8 @@
+use crate::entity::{aud, user_id};
 use crate::errors::Result as ApiResult;
 use crate::schemas::{SelectAuditoryIn, Status};
 use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 use actix_web::{put, web};
-use crate::entity::{aud, user_id};
 use sea_orm::DatabaseConnection;
 
 #[utoipa::path(

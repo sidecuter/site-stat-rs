@@ -1,6 +1,6 @@
 use crate::data::AUDS;
-use sea_orm_migration::prelude::*;
 use crate::m20250108_120158_create_auds_table::Aud;
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

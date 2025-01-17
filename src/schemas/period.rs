@@ -1,8 +1,8 @@
+use crate::schemas::FilterQuery;
 use actix_web::web::Query;
 use chrono::{NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use crate::schemas::FilterQuery;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct Period(pub Option<(NaiveDateTime, NaiveDateTime)>);

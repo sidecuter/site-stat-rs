@@ -1,13 +1,13 @@
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, LoaderTrait, Select, QueryFilter};
-use crate::entity::{change_plan, select_aud, start_way, site_stat, user_id};
-use crate::schemas::{Period, Target};
+use crate::entity::{change_plan, select_aud, site_stat, start_way, user_id};
 use crate::errors::Result as ApiResult;
+use crate::schemas::{Period, Target};
+use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, LoaderTrait, QueryFilter, Select};
 
 pub enum Query {
     Site(Select<site_stat::Entity>),
     Auds(Select<select_aud::Entity>),
     Ways(Select<start_way::Entity>),
-    Plans(Select<change_plan::Entity>)
+    Plans(Select<change_plan::Entity>),
 }
 
 impl Query {
@@ -15,28 +15,28 @@ impl Query {
         let period = if let Period(Some(period)) = period {
             period
         } else {
-            return self
+            return self;
         };
         match self {
             Query::Site(query) => Query::Site(
                 query
                     .filter(site_stat::Column::VisitDate.gte(period.0))
-                    .filter(site_stat::Column::VisitDate.lte(period.1))
+                    .filter(site_stat::Column::VisitDate.lte(period.1)),
             ),
             Query::Auds(query) => Query::Auds(
                 query
                     .filter(select_aud::Column::VisitDate.gte(period.0))
-                    .filter(select_aud::Column::VisitDate.lte(period.1))
+                    .filter(select_aud::Column::VisitDate.lte(period.1)),
             ),
             Query::Ways(query) => Query::Ways(
                 query
                     .filter(start_way::Column::VisitDate.gte(period.0))
-                    .filter(start_way::Column::VisitDate.lte(period.1))
+                    .filter(start_way::Column::VisitDate.lte(period.1)),
             ),
             Query::Plans(query) => Query::Plans(
                 query
                     .filter(change_plan::Column::VisitDate.gte(period.0))
-                    .filter(change_plan::Column::VisitDate.lte(period.1))
+                    .filter(change_plan::Column::VisitDate.lte(period.1)),
             ),
         }
     }

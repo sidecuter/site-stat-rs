@@ -1,6 +1,6 @@
 use crate::data::PLANS;
-use sea_orm_migration::prelude::*;
 use crate::m20250109_160455_create_plan_table::Plan;
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
