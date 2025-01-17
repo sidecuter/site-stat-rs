@@ -7,9 +7,9 @@ pub mod start_way;
 pub mod stats;
 pub mod status;
 pub mod user_id;
+pub mod period;
 mod validators;
 mod query;
-mod period;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
