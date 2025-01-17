@@ -1,6 +1,6 @@
+use crate::schemas::Period;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
-use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -9,7 +9,7 @@ pub struct Statistics {
     pub unique: usize,
     pub count: usize,
     pub all: usize,
-    pub period: Option<(NaiveDateTime, NaiveDateTime)>,
+    pub period: Period,
 }
 
 impl Responder for Statistics {

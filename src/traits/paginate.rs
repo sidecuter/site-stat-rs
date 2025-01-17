@@ -24,7 +24,9 @@ macro_rules! impl_paginate_trait {
                     db: &DatabaseConnection,
                 ) -> Result<Pagination<$t_name>, DbErr> {
                     let pages = if let Some(user_id) = self.user_id {
-                        let user_id = entity::prelude::UserId::find_by_id(user_id).one(db).await?;
+                        let user_id = crate::entity::prelude::UserId::find_by_id(user_id)
+                            .one(db)
+                            .await?;
                         let user_id = user_id.unwrap();
                         user_id
                             .find_related($entity_path)

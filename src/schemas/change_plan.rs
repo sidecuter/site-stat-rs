@@ -1,9 +1,9 @@
+use crate::entity::change_plan;
 use crate::schemas::validators::PlanId;
 use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use entity::change_plan;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -88,6 +88,6 @@ impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
 
 impl_paginate_trait!(
     ChangePlanOut,
-    entity::change_plan::Entity,
-    entity::change_plan::Column::Id
+    crate::entity::change_plan::Entity,
+    crate::entity::change_plan::Column::Id
 );

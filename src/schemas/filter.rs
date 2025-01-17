@@ -21,6 +21,7 @@ pub struct Filter {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+#[serde(rename_all = "lowercase")]
 pub enum Target {
     Site,
     Auds,

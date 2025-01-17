@@ -1,8 +1,8 @@
+use crate::entity::user_id;
 use crate::traits::CreateFromScheme;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use entity::user_id;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::Serialize;
 use utoipa::ToSchema;

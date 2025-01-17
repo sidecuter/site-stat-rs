@@ -7,6 +7,7 @@ use rstest::*;
 use sea_orm::DatabaseConnection;
 
 #[rstest]
+#[tokio::test]
 async fn get_plans_endpoint(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
 ) {

@@ -9,6 +9,7 @@ use sea_orm::DatabaseConnection;
 #[rstest]
 #[case::insert_correct("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec", "OK", 200)]
 #[case::insert_incorrect_user("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1", "User not found", 404)]
+#[tokio::test]
 async fn stat_site_endpoint(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
     #[case] user_id: String,
