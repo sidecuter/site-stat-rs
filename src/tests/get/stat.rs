@@ -8,19 +8,19 @@ use crate::schemas::Statistics;
 
 #[rstest]
 #[case::site(
-    "Site",
+    "site",
     1
 )]
 #[case::auds(
-    "Auds",
+    "auds",
     1
 )]
 #[case::ways(
-    "Ways",
+    "ways",
     1
 )]
 #[case::plans(
-    "Plans",
+    "plans",
     1
 )]
 async fn get_stat_endpoint(
