@@ -15,6 +15,7 @@ use sea_orm::DatabaseConnection;
     "Changed plan not found",
     404
 )]
+#[tokio::test]
 async fn stat_aud_endpoint(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
     #[case] user_id: String,

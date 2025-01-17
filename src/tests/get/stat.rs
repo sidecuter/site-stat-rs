@@ -23,6 +23,7 @@ use crate::schemas::Statistics;
     "plans",
     1
 )]
+#[tokio::test]
 async fn get_stat_endpoint(
     #[future(awt)]
     prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
