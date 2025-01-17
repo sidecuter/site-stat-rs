@@ -2,7 +2,7 @@ use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use entity::site_stat;
+use crate::entity::site_stat;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -87,6 +87,6 @@ impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
 
 impl_paginate_trait!(
     SiteStatisticsOut,
-    entity::site_stat::Entity,
-    entity::site_stat::Column::Id
+    crate::entity::site_stat::Entity,
+    crate::entity::site_stat::Column::Id
 );

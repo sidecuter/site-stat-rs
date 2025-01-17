@@ -3,7 +3,7 @@ use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use entity::select_aud;
+use crate::entity::select_aud;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -97,6 +97,6 @@ impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
 
 impl_paginate_trait!(
     SelectAuditoryOut,
-    entity::select_aud::Entity,
-    entity::select_aud::Column::Id
+    crate::entity::select_aud::Entity,
+    crate::entity::select_aud::Column::Id
 );

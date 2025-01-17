@@ -1,5 +1,5 @@
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, LoaderTrait, Select, QueryFilter};
-use entity::{change_plan, select_aud, start_way, site_stat, user_id};
+use crate::entity::{change_plan, select_aud, start_way, site_stat, user_id};
 use crate::schemas::{Period, Target};
 use crate::errors::Result as ApiResult;
 

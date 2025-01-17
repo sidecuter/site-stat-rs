@@ -3,7 +3,7 @@ use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use entity::start_way;
+use crate::entity::start_way;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -97,6 +97,6 @@ impl CreateFromScheme<start_way::Model> for StartWayIn {
 
 impl_paginate_trait!(
     StartWayOut,
-    entity::start_way::Entity,
-    entity::start_way::Column::Id
+    crate::entity::start_way::Entity,
+    crate::entity::start_way::Column::Id
 );

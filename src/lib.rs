@@ -5,6 +5,7 @@ pub mod errors;
 pub mod middleware;
 pub mod schemas;
 pub mod traits;
+pub mod entity;
 
 #[cfg(test)]
 mod tests;
