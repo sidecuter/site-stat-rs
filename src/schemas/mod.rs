@@ -8,6 +8,8 @@ pub mod stats;
 pub mod status;
 pub mod user_id;
 mod validators;
+mod query;
+mod period;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
@@ -19,4 +21,6 @@ pub use self::{
     stats::Statistics,
     status::Status,
     user_id::UserId,
+    query::Query,
+    period::Period
 };
