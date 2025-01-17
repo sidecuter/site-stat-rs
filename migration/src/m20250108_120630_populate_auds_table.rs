@@ -1,8 +1,6 @@
 use crate::data::AUDS;
-use crate::sea_orm::ActiveValue::Set;
-use entity::{aud::ActiveModel, prelude::Aud};
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::sea_orm::EntityTrait;
+use crate::m20250108_120158_create_auds_table::Aud;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -10,20 +8,22 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        let db = manager.get_connection();
-        let auds: Vec<_> = AUDS
-            .iter()
-            .map(|aud| ActiveModel {
-                id: Set(aud.to_string()),
-            })
-            .collect();
         // Replace the sample below with your own migration scripts
-        Aud::insert_many(auds).exec(db).await.map(|_| ())
+        let mut insert = Query::insert()
+            .into_table(Aud::Table)
+            .columns([Aud::Id])
+            .to_owned();
+        for aud in AUDS {
+            insert = insert.values_panic([aud.into()]).to_owned();
+        }
+        manager.exec_stmt(insert).await?;
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-        let db = manager.get_connection();
-        Aud::delete_many().exec(db).await.map(|_| ())
+        let delete = Query::delete().from_table(Aud::Table).to_owned();
+        manager.exec_stmt(delete).await?;
+        Ok(())
     }
 }

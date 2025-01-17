@@ -1,9 +1,6 @@
 use crate::data::PLANS;
-use crate::sea_orm::ActiveValue::Set;
-use entity::plan::ActiveModel;
-use entity::prelude::Plan;
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::sea_orm::EntityTrait;
+use crate::m20250109_160455_create_plan_table::Plan;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -12,20 +9,21 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-        let db = manager.get_connection();
-        let plan: Vec<_> = PLANS
-            .iter()
-            .map(|plan| ActiveModel {
-                id: Set(plan.to_string()),
-            })
-            .collect();
-        Plan::insert_many(plan).exec(db).await.map(|_| ())
+        let mut insert = Query::insert()
+            .into_table(Plan::Table)
+            .columns([Plan::Id])
+            .to_owned();
+        for plan in PLANS {
+            insert = insert.values_panic([plan.into()]).to_owned();
+        }
+        manager.exec_stmt(insert).await?;
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-
-        let db = manager.get_connection();
-        Plan::delete_many().exec(db).await.map(|_| ())
+        let delete = Query::delete().from_table(Plan::Table).to_owned();
+        manager.exec_stmt(delete).await?;
+        Ok(())
     }
 }
