@@ -13,12 +13,7 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Aud::Table)
                     .if_not_exists()
-                    .col(
-                        ColumnDef::new(Aud::Id)
-                            .string()
-                            .not_null()
-                            .primary_key()
-                    )
+                    .col(ColumnDef::new(Aud::Id).string().not_null().primary_key())
                     .to_owned(),
             )
             .await

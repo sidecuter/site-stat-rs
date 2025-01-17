@@ -1,6 +1,5 @@
 pub use sea_orm_migration::prelude::*;
 
-
 pub mod data;
 mod m20220101_000001_create_table;
 mod m20250107_204426_create_site_stat_table;

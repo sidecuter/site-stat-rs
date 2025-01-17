@@ -1,5 +1,5 @@
-use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Deserializer, Serialize};
+use std::fmt::{Display, Formatter};
 use utoipa::ToSchema;
 use utoipauto::utoipa_ignore;
 
@@ -9,10 +9,12 @@ use utoipauto::utoipa_ignore;
 pub struct Page(u64);
 
 impl Page {
-
     fn validate(&self) -> Result<(), String> {
         if self.0 < 1 {
-            Err(format!("Page value lesser than 1. Current value: {}", self.0))
+            Err(format!(
+                "Page value lesser than 1. Current value: {}",
+                self.0
+            ))
         } else {
             Ok(())
         }

@@ -1,12 +1,12 @@
+use crate::entity::start_way;
+use crate::schemas::validators::AuditoryId;
+use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
 use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use entity::start_way;
-use crate::schemas::validators::AuditoryId;
-use crate::traits::{impl_paginate_trait, CreateFromScheme};
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct StartWayIn {
@@ -15,7 +15,7 @@ pub struct StartWayIn {
     #[schema(example = "a-100")]
     pub start_id: AuditoryId,
     #[schema(example = "a-100")]
-    pub end_id: AuditoryId
+    pub end_id: AuditoryId,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
@@ -27,26 +27,26 @@ pub struct StartWayOut {
     #[schema(example = "a-101")]
     pub end_id: AuditoryId,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
-    pub visit_date: NaiveDateTime
+    pub visit_date: NaiveDateTime,
 }
 
 impl Default for StartWayIn {
     fn default() -> Self {
-        Self{
+        Self {
             user_id: uuid::Uuid::new_v4(),
             start_id: "a-100".into(),
-            end_id: "a-101".into()
+            end_id: "a-101".into(),
         }
     }
 }
 
 impl Default for StartWayOut {
     fn default() -> Self {
-        Self{
+        Self {
             user_id: uuid::Uuid::new_v4(),
             start_id: "a-100".into(),
             end_id: "a-101".into(),
-            visit_date: chrono::Utc::now().naive_utc()
+            visit_date: chrono::Utc::now().naive_utc(),
         }
     }
 }
@@ -57,7 +57,7 @@ impl From<start_way::Model> for StartWayOut {
             user_id: value.user_id,
             start_id: value.start_id.into(),
             end_id: value.end_id.into(),
-            visit_date: value.visit_date
+            visit_date: value.visit_date,
         }
     }
 }
@@ -68,7 +68,7 @@ impl From<start_way::ActiveModel> for StartWayOut {
             user_id: value.user_id.unwrap(),
             start_id: value.start_id.unwrap().into(),
             end_id: value.end_id.unwrap().into(),
-            visit_date: value.visit_date.unwrap()
+            visit_date: value.visit_date.unwrap(),
         }
     }
 }
@@ -89,8 +89,14 @@ impl CreateFromScheme<start_way::Model> for StartWayIn {
             start_id: ActiveValue::Set(self.start_id.to_string()),
             end_id: ActiveValue::Set(self.end_id.to_string()),
             ..Default::default()
-        }.insert(db).await
+        }
+        .insert(db)
+        .await
     }
 }
 
-impl_paginate_trait!(StartWayOut, entity::start_way::Entity, entity::start_way::Column::Id);
+impl_paginate_trait!(
+    StartWayOut,
+    crate::entity::start_way::Entity,
+    crate::entity::start_way::Column::Id
+);

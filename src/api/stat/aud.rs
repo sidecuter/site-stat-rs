@@ -1,9 +1,9 @@
+use crate::entity::{aud, user_id};
+use crate::errors::Result as ApiResult;
+use crate::schemas::{SelectAuditoryIn, Status};
+use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
-use entity::{user_id, aud};
-use crate::errors::Result as ApiResult;
-use crate::schemas::{Status, SelectAuditoryIn};
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
     put,
@@ -40,9 +40,14 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 #[put("select-aud")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
-    db: web::Data<DatabaseConnection>
+    db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
-    aud::Entity::filter(data.auditory_id.to_string(), db.get_ref(), "Auditory".to_string()).await?;
+    aud::Entity::filter(
+        data.auditory_id.to_string(),
+        db.get_ref(),
+        "Auditory".to_string(),
+    )
+    .await?;
     data.create(db.get_ref()).await.status_ok()
 }

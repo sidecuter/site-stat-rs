@@ -1,9 +1,9 @@
+use crate::entity::user_id;
+use crate::errors::Result as ApiResult;
+use crate::schemas::{SiteStatisticsIn, Status};
+use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
-use entity::user_id;
-use crate::errors::Result as ApiResult;
-use crate::schemas::{Status, SiteStatisticsIn};
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
     put,
@@ -32,7 +32,7 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 #[put("site")]
 async fn stat_site(
     data: web::Json<SiteStatisticsIn>,
-    db: web::Data<DatabaseConnection>
+    db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
     data.create(db.get_ref()).await.status_ok()

@@ -1,9 +1,9 @@
+use crate::entity::{plan, user_id};
+use crate::errors::Result as ApiResult;
+use crate::schemas::{ChangePlanIn, Status};
+use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::DatabaseConnection;
-use entity::{plan, user_id};
-use crate::errors::Result as ApiResult;
-use crate::schemas::{Status, ChangePlanIn};
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 
 #[utoipa::path(
     put,
@@ -36,9 +36,14 @@ use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
 #[put("change-plan")]
 async fn stat_plan(
     data: web::Json<ChangePlanIn>,
-    db: web::Data<DatabaseConnection>
+    db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
-    plan::Entity::filter(data.plan_id.to_string(), db.get_ref(), "Changed plan".to_string()).await?;
+    plan::Entity::filter(
+        data.plan_id.to_string(),
+        db.get_ref(),
+        "Changed plan".to_string(),
+    )
+    .await?;
     data.create(db.get_ref()).await.status_ok()
 }

@@ -1,3 +1,3 @@
 pub struct AppState {
-    pub admin_key: String
+    pub admin_key: String,
 }

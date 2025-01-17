@@ -13,7 +13,7 @@ pub struct Pagination<T: Serialize + Clone> {
     #[schema(example = 10)]
     pub size: u64,
     #[schema(example = 91)]
-    pub total: u64
+    pub total: u64,
 }
 
 impl<T: Default + Serialize + Clone> Pagination<T> {
@@ -28,7 +28,7 @@ pub struct PaginationBuilder<T> {
     pub pages: u64,
     pub page: u64,
     pub size: u64,
-    pub total: u64
+    pub total: u64,
 }
 
 impl<T: Serialize + Clone> PaginationBuilder<T> {

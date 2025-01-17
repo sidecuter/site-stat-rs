@@ -1,5 +1,5 @@
-use sea_orm_migration::{prelude::*, schema::*};
 use crate::m20220101_000001_create_table::UserId;
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -15,27 +15,15 @@ impl MigrationTrait for Migration {
                     .table(SiteStat::Table)
                     .if_not_exists()
                     .col(pk_auto(SiteStat::Id))
-                    .col(
-                        ColumnDef::new(SiteStat::UserId)
-                            .uuid()
-                            .not_null()
-                    )
-                    .col(
-                        ColumnDef::new(SiteStat::VisitDate)
-                            .date_time()
-                            .not_null()
-                    )
-                    .col(
-                        ColumnDef::new(SiteStat::Endpoint)
-                            .string()
-                            .null()
-                    )
+                    .col(ColumnDef::new(SiteStat::UserId).uuid().not_null())
+                    .col(ColumnDef::new(SiteStat::VisitDate).date_time().not_null())
+                    .col(ColumnDef::new(SiteStat::Endpoint).string().null())
                     .foreign_key(
                         ForeignKey::create()
                             .from(SiteStat::Table, SiteStat::UserId)
                             .to(UserId::Table, UserId::UserId)
                             .on_delete(ForeignKeyAction::Cascade)
-                            .on_update(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
                     )
                     .to_owned(),
             )
