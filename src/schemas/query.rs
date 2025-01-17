@@ -1,6 +1,7 @@
-use sea_orm::{ColumnTrait, DatabaseConnection, LoaderTrait, Select};
-use entity::{change_plan, select_aud, start_way, site_stat, prelude::UserId};
-use crate::schemas::Period;
+use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, LoaderTrait, Select, QueryFilter};
+use entity::{change_plan, select_aud, start_way, site_stat, user_id};
+use crate::schemas::{Period, Target};
+use crate::errors::Result as ApiResult;
 
 pub enum Query {
     Site(Select<site_stat::Entity>),
@@ -40,13 +41,24 @@ impl Query {
         }
     }
 
-    pub async fn get_users(self, db: &DatabaseConnection) -> crate::errors::Result<Vec<entity::user_id::Model>> {
+    pub async fn get_users(self, db: &DatabaseConnection) -> ApiResult<Vec<user_id::Model>> {
         let users = match self {
-            Query::Site(query) => query.all(db).await?.load_one(UserId, db).await?,
-            Query::Auds(query) => query.all(db).await?.load_one(UserId, db).await?,
-            Query::Ways(query) => query.all(db).await?.load_one(UserId, db).await?,
-            Query::Plans(query) => query.all(db).await?.load_one(UserId, db).await?,
+            Query::Site(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
+            Query::Auds(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
+            Query::Ways(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
+            Query::Plans(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
         };
         Ok(users.into_iter().map(|v| v.unwrap()).collect())
+    }
+}
+
+impl From<&Target> for Query {
+    fn from(value: &Target) -> Self {
+        match value {
+            Target::Site => Self::Site(site_stat::Entity::find()),
+            Target::Auds => Self::Auds(select_aud::Entity::find()),
+            Target::Ways => Self::Ways(start_way::Entity::find()),
+            Target::Plans => Self::Plans(change_plan::Entity::find()),
+        }
     }
 }
