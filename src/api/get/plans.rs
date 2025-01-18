@@ -8,7 +8,7 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/plans",
-    request_body = Filter,
+    params(Filter),
     responses(
         (
             status = 200, description = "Paginated output for changed plans", body = Pagination<ChangePlanOut>

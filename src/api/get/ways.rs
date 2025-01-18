@@ -8,7 +8,7 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/ways",
-    request_body = Filter,
+    params(Filter),
     responses(
         (
             status = 200, description = "Paginated output for started ways", body = Pagination<StartWayOut>

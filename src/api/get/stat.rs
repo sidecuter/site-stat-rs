@@ -7,7 +7,7 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/stat",
-    request_body = FilterQuery,
+    params(FilterQuery),
     responses(
         (
             status = 200, description = "Statistics", body = Statistics

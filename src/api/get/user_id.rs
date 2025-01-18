@@ -7,7 +7,6 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/user-id",
-    request_body = UserId,
     responses(
         (
             status = 200, description = "User id generated", body = UserId
