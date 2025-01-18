@@ -27,23 +27,5 @@ async fn get_stat(
 ) -> ApiResult<Statistics> {
     let period: Period = (&data).into();
     let query: Query = (&data.target).into();
-    let mut users = query.attach_period(&period).get_users(db.get_ref()).await?;
-    let all = users.iter().count();
-    users.sort_by(|a, b| a.user_id.cmp(&b.user_id));
-    let no_dup: Vec<_> = users.iter().cloned().dedup().collect();
-    let unique = if let Period(Some(period)) = period {
-        no_dup
-            .iter()
-            .filter(|&a| (a.creation_date >= period.0) && (a.creation_date <= period.1))
-            .count()
-    } else {
-        no_dup.iter().count()
-    };
-    let count = all - unique;
-    Ok(Statistics {
-        unique,
-        count,
-        all,
-        period,
-    })
+    Ok(query.count(db.get_ref(), &period).await?)
 }
