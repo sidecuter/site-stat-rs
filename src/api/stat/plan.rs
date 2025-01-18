@@ -1,9 +1,9 @@
 use crate::entity::{plan, user_id};
 use crate::errors::Result as ApiResult;
 use crate::schemas::{ChangePlanIn, Status};
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
-use sea_orm::DatabaseConnection;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 
 #[utoipa::path(
     put,
@@ -45,5 +45,5 @@ async fn stat_plan(
         "Changed plan".to_string(),
     )
     .await?;
-    data.create(db.get_ref()).await.status_ok()
+    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
 }

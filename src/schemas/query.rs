@@ -1,7 +1,10 @@
 use crate::entity::{change_plan, select_aud, site_stat, start_way, user_id};
-use crate::errors::Result as ApiResult;
-use crate::schemas::{Period, Target};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, LoaderTrait, QueryFilter, Select};
+use crate::schemas::{Period, Statistics, Target};
+use sea_orm::sea_query::SelectStatement;
+use sea_orm::{
+    ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, PaginatorTrait, QueryFilter,
+    QuerySelect, QueryTrait, Select,
+};
 
 pub enum Query {
     Site(Select<site_stat::Entity>),
@@ -11,54 +14,97 @@ pub enum Query {
 }
 
 impl Query {
-    pub fn attach_period(self, period: &Period) -> Self {
-        let period = if let Period(Some(period)) = period {
-            period
-        } else {
-            return self;
-        };
+    pub fn generate_query(&self) -> SelectStatement {
         match self {
-            Query::Site(query) => Query::Site(
-                query
-                    .filter(site_stat::Column::VisitDate.gte(period.0))
-                    .filter(site_stat::Column::VisitDate.lte(period.1)),
-            ),
-            Query::Auds(query) => Query::Auds(
-                query
-                    .filter(select_aud::Column::VisitDate.gte(period.0))
-                    .filter(select_aud::Column::VisitDate.lte(period.1)),
-            ),
-            Query::Ways(query) => Query::Ways(
-                query
-                    .filter(start_way::Column::VisitDate.gte(period.0))
-                    .filter(start_way::Column::VisitDate.lte(period.1)),
-            ),
-            Query::Plans(query) => Query::Plans(
-                query
-                    .filter(change_plan::Column::VisitDate.gte(period.0))
-                    .filter(change_plan::Column::VisitDate.lte(period.1)),
-            ),
+            Query::Site(q) => q.to_owned().into_query(),
+            Query::Auds(q) => q.to_owned().into_query(),
+            Query::Ways(q) => q.to_owned().into_query(),
+            Query::Plans(q) => q.to_owned().into_query(),
         }
     }
 
-    pub async fn get_users(self, db: &DatabaseConnection) -> ApiResult<Vec<user_id::Model>> {
-        let users = match self {
-            Query::Site(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
-            Query::Auds(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
-            Query::Ways(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
-            Query::Plans(query) => query.all(db).await?.load_one(user_id::Entity, db).await?,
+    pub async fn count(
+        mut self,
+        db: &DatabaseConnection,
+        period: &Period,
+    ) -> Result<Statistics, DbErr> {
+        self = self.filter(period);
+        let subquery = self.generate_query();
+        let mut statement = user_id::Entity::find()
+            .filter(Condition::any().add(user_id::Column::UserId.in_subquery(subquery.clone())))
+            .to_owned();
+        let visitors = statement.clone().count(db).await?;
+        statement = if let Period(Some((ps, pe))) = period {
+            statement
+                .filter(user_id::Column::CreationDate.between(*ps, *pe))
+                .to_owned()
+        } else {
+            statement
         };
-        Ok(users.into_iter().map(|v| v.unwrap()).collect())
+        let unique = statement.count(db).await?;
+        let all = self.count_all(db).await?;
+        Ok(Statistics {
+            unique,
+            count: visitors,
+            all,
+            period: period.to_owned(),
+        })
+    }
+
+    async fn count_all(self, db: &DatabaseConnection) -> Result<u64, DbErr> {
+        match self {
+            Query::Site(q) => q.count(db).await,
+            Query::Auds(q) => q.count(db).await,
+            Query::Ways(q) => q.count(db).await,
+            Query::Plans(q) => q.count(db).await,
+        }
+    }
+
+    pub fn filter(self, period: &Period) -> Self {
+        if let Period(Some(period)) = period {
+            match self {
+                Query::Site(query) => Query::Site(
+                    query.filter(site_stat::Column::VisitDate.between(period.0, period.1)),
+                ),
+                Query::Auds(query) => Query::Auds(
+                    query.filter(select_aud::Column::VisitDate.between(period.0, period.1)),
+                ),
+                Query::Ways(query) => Query::Ways(
+                    query.filter(start_way::Column::VisitDate.between(period.0, period.1)),
+                ),
+                Query::Plans(query) => Query::Plans(
+                    query.filter(change_plan::Column::VisitDate.between(period.0, period.1)),
+                ),
+            }
+        } else {
+            self
+        }
     }
 }
 
 impl From<&Target> for Query {
     fn from(value: &Target) -> Self {
         match value {
-            Target::Site => Self::Site(site_stat::Entity::find()),
-            Target::Auds => Self::Auds(select_aud::Entity::find()),
-            Target::Ways => Self::Ways(start_way::Entity::find()),
-            Target::Plans => Self::Plans(change_plan::Entity::find()),
+            Target::Site => Self::Site(
+                site_stat::Entity::find()
+                    .select_only()
+                    .column(site_stat::Column::UserId),
+            ),
+            Target::Auds => Self::Auds(
+                select_aud::Entity::find()
+                    .select_only()
+                    .column(select_aud::Column::UserId),
+            ),
+            Target::Ways => Self::Ways(
+                start_way::Entity::find()
+                    .select_only()
+                    .column(start_way::Column::UserId),
+            ),
+            Target::Plans => Self::Plans(
+                change_plan::Entity::find()
+                    .select_only()
+                    .column(change_plan::Column::UserId),
+            ),
         }
     }
 }

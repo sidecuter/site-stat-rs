@@ -1,12 +1,14 @@
 use crate::entity::start_way;
 use crate::schemas::validators::AuditoryId;
-use crate::traits::{impl_paginate_trait, CreateFromScheme};
+use crate::traits::Paginate;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
+use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait};
+use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use crate::schemas::Filter;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct StartWayIn {
@@ -81,22 +83,27 @@ impl Responder for StartWayOut {
     }
 }
 
-impl CreateFromScheme<start_way::Model> for StartWayIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<start_way::Model, DbErr> {
+impl IntoActiveModel<start_way::ActiveModel> for StartWayIn {
+    fn into_active_model(self) -> start_way::ActiveModel {
         start_way::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
-            start_id: ActiveValue::Set(self.start_id.to_string()),
-            end_id: ActiveValue::Set(self.end_id.to_string()),
+            user_id: Set(self.user_id),
+            start_id: Set(self.start_id.to_string()),
+            end_id: Set(self.end_id.to_string()),
+            visit_date: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }
-        .insert(db)
-        .await
     }
 }
 
-impl_paginate_trait!(
-    StartWayOut,
-    crate::entity::start_way::Entity,
-    crate::entity::start_way::Column::Id
-);
+impl Paginate<'_, start_way::Entity, start_way::Model> for StartWayOut {
+    fn get_query(filter: &Filter) -> Select<start_way::Entity> {
+        if let Some(user_id) = filter.user_id {
+            start_way::Entity::find()
+                .filter(start_way::Column::UserId.eq(user_id))
+                .order_by_asc(start_way::Column::Id)
+        } else {
+            start_way::Entity::find()
+                .order_by_asc(start_way::Column::UserId)
+        }
+    }
+}
