@@ -1,9 +1,9 @@
 use crate::entity::user_id;
-use crate::traits::CreateFromScheme;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
+use sea_orm::IntoActiveModel;
+use sea_orm::ActiveValue::Set;
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -50,13 +50,11 @@ impl Responder for UserId {
     }
 }
 
-impl CreateFromScheme<user_id::Model> for UserId {
-    async fn create(&self, db: &DatabaseConnection) -> Result<user_id::Model, DbErr> {
+impl IntoActiveModel<user_id::ActiveModel> for UserId {
+    fn into_active_model(self) -> user_id::ActiveModel {
         user_id::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id),
-            creation_date: ActiveValue::Set(self.creation_date),
+            user_id: Set(self.user_id),
+            creation_date: Set(self.creation_date),
         }
-        .insert(db)
-        .await
     }
 }

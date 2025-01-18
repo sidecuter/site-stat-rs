@@ -15,7 +15,7 @@ use sea_orm::DatabaseConnection;
 async fn get_stat_endpoint(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
     #[case] target: String,
-    #[case] all: usize,
+    #[case] all: u64,
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();

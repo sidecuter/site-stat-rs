@@ -1,12 +1,14 @@
 use crate::entity::change_plan;
 use crate::schemas::validators::PlanId;
-use crate::traits::{impl_paginate_trait, CreateFromScheme};
+use crate::traits::Paginate;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
+use sea_orm::{ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Select};
+use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use crate::schemas::Filter;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct ChangePlanIn {
@@ -73,21 +75,26 @@ impl Responder for ChangePlanOut {
     }
 }
 
-impl CreateFromScheme<change_plan::Model> for ChangePlanIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<change_plan::Model, DbErr> {
+impl IntoActiveModel<change_plan::ActiveModel> for ChangePlanIn {
+    fn into_active_model(self) -> change_plan::ActiveModel {
         change_plan::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
-            plan_id: ActiveValue::Set(self.plan_id.to_string()),
+            user_id: Set(self.user_id),
+            visit_date: Set(chrono::Utc::now().naive_utc()),
+            plan_id: Set(self.plan_id.to_string()),
             ..Default::default()
         }
-        .insert(db)
-        .await
     }
 }
 
-impl_paginate_trait!(
-    ChangePlanOut,
-    crate::entity::change_plan::Entity,
-    crate::entity::change_plan::Column::Id
-);
+impl Paginate<'_, change_plan::Entity, change_plan::Model> for ChangePlanOut {
+    fn get_query(filter: &Filter) -> Select<change_plan::Entity> {
+        if let Some(user_id) = filter.user_id {
+            change_plan::Entity::find()
+                .filter(change_plan::Column::UserId.eq(user_id))
+                .order_by_asc(change_plan::Column::Id)
+        } else {
+            change_plan::Entity::find()
+                .order_by_asc(change_plan::Column::Id)
+        }
+    }
+}

@@ -6,9 +6,9 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct Statistics {
-    pub unique: usize,
-    pub count: usize,
-    pub all: usize,
+    pub unique: u64,
+    pub count: u64,
+    pub all: u64,
     pub period: Period,
 }
 
