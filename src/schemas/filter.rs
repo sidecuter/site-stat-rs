@@ -1,9 +1,9 @@
 use crate::schemas::validators::{ApiKey, Page, Size};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use utoipa::{IntoParams, ToSchema};
+use utoipa::ToSchema;
 
-#[derive(Deserialize, Clone, ToSchema, IntoParams)]
+#[derive(Deserialize, Clone, ToSchema)]
 pub struct Filter {
     #[allow(dead_code)]
     #[schema(
@@ -29,7 +29,7 @@ pub enum Target {
     Plans,
 }
 
-#[derive(Deserialize, Clone, Debug, ToSchema, IntoParams)]
+#[derive(Deserialize, Clone, Debug, ToSchema)]
 #[serde(tag = "target")]
 pub struct FilterQuery {
     #[allow(dead_code)]

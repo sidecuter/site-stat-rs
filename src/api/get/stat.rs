@@ -7,7 +7,12 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/stat",
-    params(FilterQuery),
+    params(
+        ("api_key" = inline(crate::schemas::validators::ApiKey), Query),
+        ("target" = inline(crate::schemas::Target), Query),
+        ("start_date" = inline(Option<chrono::NaiveDate>), Query, example = "2025-01-11"),
+        ("end_date" = inline(Option<chrono::NaiveDate>), Query, example = "2025-01-12"),
+    ),
     responses(
         (
             status = 200, description = "Statistics", body = Statistics

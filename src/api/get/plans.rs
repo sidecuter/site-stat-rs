@@ -8,7 +8,12 @@ use sea_orm::DatabaseConnection;
 #[utoipa::path(
     get,
     path = "/api/get/plans",
-    params(Filter),
+    params(
+        ("api_key" = inline(crate::schemas::validators::ApiKey), Query),
+        ("user_id" = inline(Option<uuid::Uuid>), Query, example = "84f332ed-fedc-48f6-9119-c6833932646f"),
+        ("page" = inline(Option<crate::schemas::validators::Page>), Query, minimum = 1, example = "1"),
+        ("size" = inline(Option<crate::schemas::validators::Page>), Query, maximum = 100, example = "50"),
+    ),
     responses(
         (
             status = 200, description = "Paginated output for changed plans", body = Pagination<ChangePlanOut>
