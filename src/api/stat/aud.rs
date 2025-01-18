@@ -1,9 +1,9 @@
 use crate::entity::{aud, user_id};
 use crate::errors::Result as ApiResult;
 use crate::schemas::{SelectAuditoryIn, Status};
-use crate::traits::{ConversionToStatusTrait, CreateFromScheme, FilterTrait};
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
-use sea_orm::DatabaseConnection;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 
 #[utoipa::path(
     put,
@@ -29,7 +29,7 @@ use sea_orm::DatabaseConnection;
         // (
         //     status = 429, description = "Too many requests", body = Status,
         //     example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
-        // ),
+        // ),CreateFromScheme
         (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
@@ -49,5 +49,5 @@ async fn stat_aud(
         "Auditory".to_string(),
     )
     .await?;
-    data.create(db.get_ref()).await.status_ok()
+    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
 }

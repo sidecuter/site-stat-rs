@@ -1,7 +1,7 @@
 use crate::errors::Result as ApiResult;
 use crate::middleware::api_key_middleware;
 use crate::schemas::{Filter, Pagination, SiteStatisticsOut, Status};
-use crate::traits::{ConversionToPaginationTrait, Paginate};
+use crate::traits::Paginate;
 use actix_web::{get, middleware::from_fn, web};
 use sea_orm::DatabaseConnection;
 
@@ -33,7 +33,5 @@ async fn get_sites(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<SiteStatisticsOut>> {
-    <Filter as Paginate<SiteStatisticsOut>>::pagination(&data, db.get_ref())
-        .await
-        .to_response()
+    Ok(SiteStatisticsOut::pagination(db.get_ref(), &data).await?)
 }

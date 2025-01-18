@@ -1,11 +1,13 @@
 use crate::entity::site_stat;
-use crate::traits::{impl_paginate_trait, CreateFromScheme};
+use crate::traits::Paginate;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
+use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait};
+use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use crate::schemas::Filter;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SiteStatisticsIn {
@@ -72,21 +74,26 @@ impl Responder for SiteStatisticsOut {
     }
 }
 
-impl CreateFromScheme<site_stat::Model> for SiteStatisticsIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<site_stat::Model, DbErr> {
+impl IntoActiveModel<site_stat::ActiveModel> for SiteStatisticsIn {
+    fn into_active_model(self) -> site_stat::ActiveModel {
         site_stat::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
-            endpoint: ActiveValue::Set(self.endpoint.clone()),
+            user_id: Set(self.user_id),
+            visit_date: Set(chrono::Utc::now().naive_utc()),
+            endpoint: Set(self.endpoint),
             ..Default::default()
         }
-        .insert(db)
-        .await
     }
 }
 
-impl_paginate_trait!(
-    SiteStatisticsOut,
-    crate::entity::site_stat::Entity,
-    crate::entity::site_stat::Column::Id
-);
+impl Paginate<'_, site_stat::Entity, site_stat::Model> for SiteStatisticsOut {
+    fn get_query(filter: &Filter) -> Select<site_stat::Entity> {
+        if let Some(user_id) = filter.user_id {
+            site_stat::Entity::find()
+                .filter(site_stat::Column::UserId.eq(user_id))
+                .order_by_asc(site_stat::Column::Id)
+        } else {
+            site_stat::Entity::find()
+                .order_by_asc(site_stat::Column::UserId)
+        }
+    }
+}

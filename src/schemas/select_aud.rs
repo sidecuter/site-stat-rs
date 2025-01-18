@@ -1,12 +1,14 @@
 use crate::entity::select_aud;
 use crate::schemas::validators::AuditoryId;
-use crate::traits::{impl_paginate_trait, CreateFromScheme};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use chrono::NaiveDateTime;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DbErr};
+use sea_orm::ActiveValue::Set;
+use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use crate::schemas::Filter;
+use crate::traits::Paginate;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct SelectAuditoryIn {
@@ -81,22 +83,27 @@ impl Responder for SelectAuditoryOut {
     }
 }
 
-impl CreateFromScheme<select_aud::Model> for SelectAuditoryIn {
-    async fn create(&self, db: &DatabaseConnection) -> Result<select_aud::Model, DbErr> {
+impl IntoActiveModel<select_aud::ActiveModel> for SelectAuditoryIn {
+    fn into_active_model(self) -> select_aud::ActiveModel {
         select_aud::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id),
-            visit_date: ActiveValue::Set(chrono::Utc::now().naive_utc()),
-            auditory_id: ActiveValue::Set(self.auditory_id.to_string()),
-            success: ActiveValue::Set(self.success),
+            user_id: Set(self.user_id),
+            visit_date: Set(chrono::Utc::now().naive_utc()),
+            auditory_id: Set(self.auditory_id.to_string()),
+            success: Set(self.success),
             ..Default::default()
         }
-        .insert(db)
-        .await
     }
 }
 
-impl_paginate_trait!(
-    SelectAuditoryOut,
-    crate::entity::select_aud::Entity,
-    crate::entity::select_aud::Column::Id
-);
+impl Paginate<'_, select_aud::Entity, select_aud::Model> for SelectAuditoryOut {
+    fn get_query(filter: &Filter) -> Select<select_aud::Entity> {
+        if let Some(user_id) = filter.user_id {
+            select_aud::Entity::find()
+                .filter(select_aud::Column::UserId.eq(user_id))
+                .order_by_asc(select_aud::Column::Id)
+        } else {
+            select_aud::Entity::find()
+                .order_by_asc(select_aud::Column::Id)
+        }
+    }
+}

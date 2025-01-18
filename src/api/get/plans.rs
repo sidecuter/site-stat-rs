@@ -1,7 +1,7 @@
 use crate::errors::Result as ApiResult;
 use crate::middleware::api_key_middleware;
 use crate::schemas::{ChangePlanOut, Filter, Pagination, Status};
-use crate::traits::{ConversionToPaginationTrait, Paginate};
+use crate::traits::Paginate;
 use actix_web::{get, middleware::from_fn, web};
 use sea_orm::DatabaseConnection;
 
@@ -33,7 +33,5 @@ async fn get_plans(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<ChangePlanOut>> {
-    <Filter as Paginate<ChangePlanOut>>::pagination(&data, db.get_ref())
-        .await
-        .to_response()
+    Ok(ChangePlanOut::pagination(db.get_ref(), &data).await?)
 }
