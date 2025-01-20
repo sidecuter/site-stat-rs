@@ -1,11 +1,7 @@
 use crate::{app_state::AppState, errors::Error as ApiError};
-use actix_web::{
-    body::BoxBody,
-    dev::{ServiceRequest, ServiceResponse},
-    middleware::Next,
-    web::Data,
-    Error, Responder,
-};
+use actix_web::{body::BoxBody, dev::{ServiceRequest, ServiceResponse}, middleware::Next, web::Data, Error, Responder};
+use actix_governor::{Governor, GovernorConfigBuilder, PeerIpKeyExtractor};
+use actix_governor::governor::middleware::StateInformationMiddleware;
 
 pub async fn api_key_middleware(
     req: ServiceRequest,
@@ -25,4 +21,14 @@ pub async fn api_key_middleware(
             .respond_to(&request);
         Ok(ServiceResponse::new(request, response))
     }
+}
+
+pub fn build_rate_limits() -> Governor<PeerIpKeyExtractor, StateInformationMiddleware>{
+    let config = GovernorConfigBuilder::default()
+        .burst_size(1)
+        .requests_per_second(1)
+        .use_headers()
+        .finish()
+        .unwrap();
+    Governor::new(&config)
 }

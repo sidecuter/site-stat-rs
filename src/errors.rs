@@ -60,16 +60,6 @@ impl From<DbErr> for Error {
     }
 }
 
-pub trait ErrorTrait {
-    fn error(self) -> Error;
-}
-
-impl ErrorTrait for DbErr {
-    fn error(self) -> Error {
-        self.into()
-    }
-}
-
 impl From<QueryPayloadError> for Error {
     fn from(err: QueryPayloadError) -> Self {
         match err {

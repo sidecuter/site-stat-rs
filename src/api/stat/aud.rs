@@ -4,6 +4,7 @@ use crate::schemas::{SelectAuditoryIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use crate::middleware::build_rate_limits;
 
 #[utoipa::path(
     put,
@@ -26,10 +27,10 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
             status = 422, description = "Validation failed", body = Status,
             example = json!(Status{status: "The request body is invalid: ...".to_string()})
         ),
-        // (
-        //     status = 429, description = "Too many requests", body = Status,
-        //     example = json!(Status{status: "Too many requests, retry in 1s".to_string()})
-        // ),CreateFromScheme
+        (
+            status = 429, description = "Too many requests", content_type = "text/plain",
+            example = "Too many requests, retry in 0s"
+        ),
         (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
@@ -37,7 +38,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
     ),
     tag = "Stat"
 )]
-#[put("select-aud")]
+#[put("select-aud", wrap="build_rate_limits()")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>,
