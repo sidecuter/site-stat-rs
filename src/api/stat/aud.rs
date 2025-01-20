@@ -4,6 +4,7 @@ use crate::schemas::{SelectAuditoryIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use crate::middleware::build_rate_limits;
 
 #[utoipa::path(
     put,
@@ -37,7 +38,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
     ),
     tag = "Stat"
 )]
-#[put("select-aud")]
+#[put("select-aud", wrap="build_rate_limits()")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>,
