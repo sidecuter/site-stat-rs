@@ -19,3 +19,14 @@ impl Responder for Statistics {
         actix_web::HttpResponse::Ok().json(self)
     }
 }
+
+impl Default for Statistics {
+    fn default() -> Self {
+        Self {
+            unique: 0,
+            count: 10,
+            all: 100,
+            period: Period(None)
+        }
+    }
+}

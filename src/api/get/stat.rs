@@ -15,7 +15,8 @@ use sea_orm::DatabaseConnection;
     ),
     responses(
         (
-            status = 200, description = "Statistics", body = Statistics
+            status = 200, description = "Statistics", body = Statistics,
+            example = json!(Statistics::default())
         ),
         (
             status = 500, description = "Database error", body = Status,
