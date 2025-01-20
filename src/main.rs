@@ -33,14 +33,12 @@ async fn main() -> std::io::Result<()> {
     {
         tracing_subscriber::fmt()
             .with_max_level(tracing::Level::DEBUG)
-            .with_test_writer()
             .init();
     }
     #[cfg(not(debug_assertions))]
     {
         tracing_subscriber::fmt()
             .with_max_level(tracing::Level::INFO)
-            .with_test_writer()
             .init();
     }
 
