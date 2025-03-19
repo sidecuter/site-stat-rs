@@ -10,6 +10,7 @@ pub mod stats;
 pub mod status;
 pub mod user_id;
 pub(crate) mod validators;
+pub mod review;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
