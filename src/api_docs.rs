@@ -8,6 +8,7 @@ use utoipauto::utoipauto;
     tags (
         (name = "Get", description = "Getters for content"),
         (name = "Stat", description = "Statistics insertion endpoints"),
+        (name = "Review", description = "Endpoint for reviews"),
     ),
 )]
 pub struct ApiDoc;

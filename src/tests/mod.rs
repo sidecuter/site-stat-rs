@@ -1,10 +1,12 @@
 mod get;
 mod stat;
+mod review;
 
 use crate::entity::{
     change_plan::ActiveModel as ChangePlan, select_aud::ActiveModel as SelectAuditory,
     site_stat::ActiveModel as SiteStat, start_way::ActiveModel as StartWay,
     user_id::ActiveModel as UserId,
+    review::ActiveModel as Review,
 };
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
@@ -17,16 +19,16 @@ async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         creation_date: Set(chrono::Utc::now().naive_utc()),
     }
-    .insert(db)
-    .await?;
+        .insert(db)
+        .await?;
     SiteStat {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
         endpoint: Set(None),
         ..Default::default()
     }
-    .insert(db)
-    .await?;
+        .insert(db)
+        .await?;
     SelectAuditory {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
@@ -34,8 +36,8 @@ async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
         success: Set(true),
         ..Default::default()
     }
-    .insert(db)
-    .await?;
+        .insert(db)
+        .await?;
     StartWay {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
@@ -43,16 +45,25 @@ async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
         end_id: Set("a-101".into()),
         ..Default::default()
     }
-    .insert(db)
-    .await?;
+        .insert(db)
+        .await?;
     ChangePlan {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
         plan_id: Set("A-0".into()),
         ..Default::default()
     }
-    .insert(db)
-    .await?;
+        .insert(db)
+        .await?;
+    Review {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        creation_date: Set(chrono::Utc::now().naive_utc()),
+        text: Set("Awesome review".to_owned()),
+        problem: Set("way".to_owned()),
+        ..Default::default()
+    }
+        .insert(db)
+        .await?;
     Ok(())
 }
 
