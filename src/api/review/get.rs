@@ -31,7 +31,7 @@ use sea_orm::DatabaseConnection;
             example = json!(Status{status: "database error".to_string()})
         )
     ),
-    tag = "Get"
+    tag = "Review"
 )]
 #[get("/get", wrap = "from_fn(api_key_middleware)")]
 async fn get_reviews(
