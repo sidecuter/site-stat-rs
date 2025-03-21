@@ -24,6 +24,8 @@ pub enum Error {
     NotAllowed(String),
     #[error("Too many requests, retry in {0}s")]
     TooManyRequests(String),
+    #[error("{0}")]
+    UnsupportedMediaType(String)
 }
 
 impl ResponseError for Error {
@@ -36,6 +38,7 @@ impl ResponseError for Error {
             Error::PathNotFound(_) => StatusCode::NOT_FOUND,
             Error::NotAllowed(_) => StatusCode::FORBIDDEN,
             Error::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
+            Error::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE
         }
     }
 
@@ -57,6 +60,12 @@ impl From<DbErr> for Error {
         } else {
             Self::InternalError(value.to_string())
         }
+    }
+}
+
+impl From<uuid::Error> for Error {
+    fn from(value: uuid::Error) -> Self {
+        Self::InternalError(value.to_string())
     }
 }
 

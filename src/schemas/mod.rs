@@ -24,4 +24,5 @@ pub use self::{
     stats::Statistics,
     status::Status,
     user_id::UserId,
+    review::{ReviewIn, ReviewOut, Problem}
 };

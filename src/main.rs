@@ -2,7 +2,7 @@ use actix_web::{
     self,
     middleware::Logger,
     web::{self, JsonConfig, QueryConfig},
-    App, HttpRequest, HttpServer,
+    App, HttpServer,
 };
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
@@ -74,6 +74,7 @@ async fn main() -> std::io::Result<()> {
                 ),
             )
     })
+        .workers(1)
         .bind(addr)?
         .run()
         .await

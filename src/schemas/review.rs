@@ -1,18 +1,23 @@
 use std::fmt::{Display, Formatter};
-use std::str::FromStr;
 use crate::entity::review;
 use crate::traits::Paginate;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
-use actix_multipart::form::{tempfile::TempFile, MultipartForm};
+use actix_multipart::form::{
+    tempfile::TempFile,
+    MultipartForm,
+    text::Text,
+};
 use chrono::NaiveDateTime;
 use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait};
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
+use uuid::Uuid;
 use crate::schemas::Filter;
+use crate::errors::{Result as ApiResult, Error as ApiError};
 
-#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]
 pub enum Problem {
     Way,
@@ -21,13 +26,50 @@ pub enum Problem {
     Other
 }
 
+#[derive(ToSchema, Debug, MultipartForm)]
+pub struct ReviewFormIn {
+    #[schema(value_type = Uuid, example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
+    pub user_id: Text<Uuid>,
+    #[schema(value_type = String)]
+    pub text: Text<String>,
+    #[schema(value_type = Problem)]
+    pub problem: Text<Problem>,
+    #[multipart(limit = "20 MiB")]
+    #[schema(value_type = Option<String>, format = Binary, content_media_type = "application/octet-stream")]
+    pub image: Option<TempFile>
+}
+
+#[derive(Debug, Clone)]
+pub struct ReviewIn {
+    pub user_id: Uuid,
+    pub text: String,
+    pub problem: Problem,
+    pub image_id: Option<String>,
+    pub image_ext: Option<String>
+}
+
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+pub struct ReviewOut {
+    #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
+    pub user_id: Uuid,
+    pub text: String,
+    pub problem: Problem,
+    #[schema(example = ".png")]
+    pub image_ext: Option<String>,
+    #[schema(example = "0b696946f48a47b0b0ddd93276d29d65")]
+    pub image_id: Option<String>,
+    #[schema(example = "2025-01-07T20:10:34.956397956")]
+    pub creation_date: NaiveDateTime,
+}
+
 impl From<String> for Problem {
     fn from(value: String) -> Self {
-        match value {
-            String::from("way") => Problem::Way,
-            String::from("plan") => Problem::Plan,
-            String::from("other") => Problem::Other,
-            String::from("work") => Problem::Work,
+        match &value as &str {
+            "way" => Problem::Way,
+            "plan" => Problem::Plan,
+            "other" => Problem::Other,
+            "work" => Problem::Work,
+            _ => panic!("Unexpected behavior")
         }
     }
 }
@@ -44,37 +86,47 @@ impl Display for Problem {
     }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, MultipartForm)]
-pub struct ReviewIn {
-    #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
-    pub user_id: uuid::Uuid,
-    pub text: String,
-    pub problem: Problem,
-    #[multipart(limit = "20 MiB")]
-    pub image: Option<TempFile>
+impl ReviewFormIn {
+    pub fn save_image(self) -> ApiResult<(Option<String>, Option<String>)> {
+        Ok(if let Some(img) = self.image {
+            if let Some(mime) = img.content_type {
+                if mime.type_() != mime::IMAGE {
+                    Err(ApiError::UnsupportedMediaType("This endpoint accepts only images".to_owned()))?;
+                }
+            } else {
+                Err(ApiError::UnprocessableData("File has no mime type".to_owned()))?;
+            }
+            let img_id = Uuid::new_v4().to_string().replace("-", "");
+            let img_ext = format!(".{}", img.file_name.unwrap().split(".").last().unwrap());
+            let path = format!("./static/{}{}", img_id, img_ext);
+            log::info!("saving to {path}");
+            img.file.persist(path).unwrap();
+            (Some(img_id), Some(img_ext))
+        } else {
+            (None, None)
+        })
+    }
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
-pub struct ReviewOut {
-    #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
-    pub user_id: uuid::Uuid,
-    pub text: String,
-    pub problem: Problem,
-    #[schema(example = ".png")]
-    pub image_ext: Option<String>,
-    #[schema(example = "0b696946f48a47b0b0ddd93276d29d65")]
-    pub image_id: Option<String>,
-    #[schema(example = "2025-01-07T20:10:34.956397956")]
-    pub creation_date: NaiveDateTime,
+impl Default for ReviewFormIn {
+    fn default() -> Self {
+        Self {
+            user_id: Text(Uuid::new_v4()),
+            text: Text(String::from("Some cool review")),
+            problem: Text(Problem::Other),
+            image: None
+        }
+    }
 }
 
 impl Default for ReviewIn {
     fn default() -> Self {
         Self {
-            user_id: uuid::Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
             text: String::from("Some cool review"),
             problem: Problem::Other,
-            image: None
+            image_ext: None,
+            image_id: None,
         }
     }
 }
@@ -82,11 +134,11 @@ impl Default for ReviewIn {
 impl Default for ReviewOut {
     fn default() -> Self {
         Self {
-            user_id: uuid::Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
             text: String::from("Some cool review"),
             problem: Problem::Other,
             image_ext: Some(String::from(".png")),
-            image_id: Some(String::from("0b696946f48a47b0b0ddd93276d29d65")),
+            image_id: Some(Uuid::new_v4().to_string()),
             creation_date: chrono::Utc::now().naive_utc(),
         }
     }
@@ -128,22 +180,12 @@ impl Responder for ReviewOut {
 
 impl IntoActiveModel<review::ActiveModel> for ReviewIn {
     fn into_active_model(self) -> review::ActiveModel {
-        let (img_id, img_ext) = if let Some(img) = self.image {
-            let img_id = uuid::Uuid::new_v4().to_string();
-            let img_ext = format!(".{}", img.file_name.unwrap().split(".").last());
-            let path = format!("./static/{}{}", img_id, img_ext);
-            log::info!("saving to {path}");
-            img.file.persist(path).unwrap();
-            (Some(img_id), Some(img_ext))
-        } else {
-            (None, None)
-        };
         review::ActiveModel {
             user_id: Set(self.user_id),
             text: Set(self.text),
             problem: Set(self.problem.to_string()),
-            image_id: Set(img_id),
-            image_ext: Set(img_ext),
+            image_id: Set(self.image_id),
+            image_ext: Set(self.image_ext),
             creation_date: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }
