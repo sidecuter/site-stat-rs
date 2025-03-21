@@ -23,10 +23,11 @@ regex = "1.11.1"
 utoipauto = "0.2.0"
 actix-governor = { version = "0.8.0", features = ["log", "logger"] }
 actix-multipart = "0.7.2"
-mime = "0.3.17"
 actix-files = "0.6.6"
+mime = "0.3.17"
 
 [dev-dependencies]
 rstest = "0.25.0"
 tokio = { version = "1.44.1", features = ["rt", "macros"] }
+rand = "0.9.0"
 migration = { path = "migration" }

@@ -3008,6 +3008,7 @@ dependencies = [
  "log",
  "migration",
  "mime",
+ "rand 0.9.0",
  "regex",
  "rstest",
  "sea-orm",
