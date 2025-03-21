@@ -22,6 +22,10 @@ use crate::schemas::review::ReviewFormIn;
             example = json!(Status{status: "Auditory not found".to_string()})
         ),
         (
+            status = 415, description = "File type not supported", body = Status,
+            example = json!(Status{status: "This endpoint accepts only images".to_string()})
+        ),
+        (
             status = 500, description = "Database error", body = Status,
             example = json!(Status{status: "database error".to_string()})
         ),
