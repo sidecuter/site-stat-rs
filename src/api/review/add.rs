@@ -5,6 +5,7 @@ use crate::schemas::{ReviewIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{post, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use crate::app_state::AppState;
 use crate::schemas::review::ReviewFormIn;
 
 #[utoipa::path(
@@ -29,6 +30,7 @@ use crate::schemas::review::ReviewFormIn;
 )]
 #[post("add")]
 async fn add_review(
+    state: web::Data<AppState>,
     MultipartForm(data): MultipartForm<ReviewFormIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
@@ -39,7 +41,7 @@ async fn add_review(
         problem: data.problem.clone(),
         ..Default::default()
     };
-    let (image_id, image_ext) = data.save_image()?;
+    let (image_id, image_ext) = data.save_image(&state).await?;
     review_in.image_id = image_id;
     review_in.image_ext = image_ext;
     review_in.into_active_model().insert(db.get_ref()).await.status_ok()

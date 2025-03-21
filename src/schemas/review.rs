@@ -1,8 +1,9 @@
 use std::fmt::{Display, Formatter};
+use std::path::Path;
 use crate::entity::review;
 use crate::traits::Paginate;
 use actix_web::body::BoxBody;
-use actix_web::Responder;
+use actix_web::{web, Responder};
 use actix_multipart::form::{
     tempfile::TempFile,
     MultipartForm,
@@ -14,6 +15,7 @@ use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
+use crate::app_state::AppState;
 use crate::schemas::Filter;
 use crate::errors::{Result as ApiResult, Error as ApiError};
 
@@ -87,7 +89,7 @@ impl Display for Problem {
 }
 
 impl ReviewFormIn {
-    pub fn save_image(self) -> ApiResult<(Option<String>, Option<String>)> {
+    pub async fn save_image(self, state: &AppState) -> ApiResult<(Option<String>, Option<String>)> {
         Ok(if let Some(img) = self.image {
             if let Some(mime) = img.content_type {
                 if mime.type_() != mime::IMAGE {
@@ -98,9 +100,24 @@ impl ReviewFormIn {
             }
             let img_id = Uuid::new_v4().to_string().replace("-", "");
             let img_ext = format!(".{}", img.file_name.unwrap().split(".").last().unwrap());
-            let path = format!("./static/{}{}", img_id, img_ext);
+            let path = Path::new(&state.files_path)
+                .join(format!("{}{}", img_id, img_ext))
+                .to_str()
+                .ok_or(ApiError::UnprocessableData("File name is not a valid UTF-8 sequence".to_owned()))?
+                .to_owned();
             log::info!("saving to {path}");
-            img.file.persist(path).unwrap();
+            let mut target_file = web::block(|| {
+                if Path::new(&path).exists() {
+                    std::fs::remove_file(path.clone()).unwrap();
+                };
+                std::fs::File::create(path)
+            }).await??;
+            let mut img_file = web::block(move || {
+               img.file.reopen()
+            }).await??;
+            web::block(move || {
+                std::io::copy(&mut img_file, &mut target_file)
+            }).await??;
             (Some(img_id), Some(img_ext))
         } else {
             (None, None)

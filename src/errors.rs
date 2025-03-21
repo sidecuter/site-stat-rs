@@ -5,6 +5,7 @@ use actix_web::{
     http::{header::ContentType, StatusCode},
     HttpRequest, HttpResponse, Responder, ResponseError,
 };
+use actix_web::error::BlockingError;
 use log::{log, Level};
 use sea_orm::DbErr;
 
@@ -89,6 +90,18 @@ impl From<JsonPayloadError> for Error {
             }
             _ => Self::BadRequest("The request body is invalid".to_string()),
         }
+    }
+}
+
+impl From<BlockingError> for Error {
+    fn from(value: BlockingError) -> Self {
+        Self::InternalError(value.to_string())
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Self::InternalError(value.to_string())
     }
 }
 

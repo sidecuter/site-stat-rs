@@ -1,3 +1,4 @@
+use std::fs;
 use actix_web::{
     self,
     middleware::Logger,
@@ -41,17 +42,12 @@ async fn main() -> std::io::Result<()> {
             .with_max_level(tracing::Level::INFO)
             .init();
     }
-
-    let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
-    let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
-    let addr = format!("{host}:{port}");
-    let database_url =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://app.db?mode=rwc".to_owned());
-    let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_| {
-        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned()
-    });
-    let pool = get_database_connection(&database_url).await;
-
+    let app_state = AppState::new();
+    let addr = format!("{}:{}", app_state.host, app_state.port);
+    let pool = get_database_connection(&app_state.database_url).await;
+    if !std::path::Path::new(&app_state.files_path).exists() {
+        fs::create_dir(app_state.files_path.clone())?;
+    }
     log::info!("Listening on http://{}", addr);
     log::info!(
         "OpenAPI document is available at http://{}/docs/openapi.json",
@@ -62,7 +58,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(AppState{admin_key: admin_key.clone()}))
+            .app_data(web::Data::new(AppState::new()))
             .wrap(Logger::default())
             .configure(api::init_routes)
             .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
@@ -74,7 +70,6 @@ async fn main() -> std::io::Result<()> {
                 ),
             )
     })
-        .workers(1)
         .bind(addr)?
         .run()
         .await
