@@ -4,6 +4,7 @@ pub mod sites;
 pub mod stat;
 pub mod user_id;
 pub mod ways;
+pub mod popular;
 
 use actix_web::web;
 
@@ -15,6 +16,7 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .service(auds::get_auds)
             .service(ways::get_ways)
             .service(plans::get_plans)
-            .service(stat::get_stat),
+            .service(stat::get_stat)
+            .service(popular::get_popular),
     );
 }

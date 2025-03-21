@@ -11,6 +11,7 @@ pub mod status;
 pub mod user_id;
 pub(crate) mod validators;
 pub mod review;
+pub mod popular;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
@@ -24,5 +25,6 @@ pub use self::{
     stats::Statistics,
     status::Status,
     user_id::UserId,
-    review::{ReviewIn, ReviewOut, Problem}
+    review::{ReviewIn, ReviewOut, Problem},
+    popular::Popular
 };
