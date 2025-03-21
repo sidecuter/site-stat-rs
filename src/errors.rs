@@ -5,6 +5,7 @@ use actix_web::{
     http::{header::ContentType, StatusCode},
     HttpRequest, HttpResponse, Responder, ResponseError,
 };
+use actix_web::error::BlockingError;
 use log::{log, Level};
 use sea_orm::DbErr;
 
@@ -24,6 +25,8 @@ pub enum Error {
     NotAllowed(String),
     #[error("Too many requests, retry in {0}s")]
     TooManyRequests(String),
+    #[error("{0}")]
+    UnsupportedMediaType(String)
 }
 
 impl ResponseError for Error {
@@ -36,6 +39,7 @@ impl ResponseError for Error {
             Error::PathNotFound(_) => StatusCode::NOT_FOUND,
             Error::NotAllowed(_) => StatusCode::FORBIDDEN,
             Error::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
+            Error::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE
         }
     }
 
@@ -60,6 +64,12 @@ impl From<DbErr> for Error {
     }
 }
 
+impl From<uuid::Error> for Error {
+    fn from(value: uuid::Error) -> Self {
+        Self::InternalError(value.to_string())
+    }
+}
+
 impl From<QueryPayloadError> for Error {
     fn from(err: QueryPayloadError) -> Self {
         match err {
@@ -80,6 +90,18 @@ impl From<JsonPayloadError> for Error {
             }
             _ => Self::BadRequest("The request body is invalid".to_string()),
         }
+    }
+}
+
+impl From<BlockingError> for Error {
+    fn from(value: BlockingError) -> Self {
+        Self::InternalError(value.to_string())
+    }
+}
+
+impl From<std::io::Error> for Error {
+    fn from(value: std::io::Error) -> Self {
+        Self::InternalError(value.to_string())
     }
 }
 

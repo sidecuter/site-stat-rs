@@ -10,6 +10,7 @@ mod m20250108_212444_create_start_way_table;
 mod m20250109_160455_create_plan_table;
 mod m20250109_160938_populate_plans_table;
 mod m20250109_162921_create_change_plan_table;
+mod m20250319_203709_create_review_table;
 
 pub struct Migrator;
 
@@ -26,6 +27,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250109_160455_create_plan_table::Migration),
             Box::new(m20250109_160938_populate_plans_table::Migration),
             Box::new(m20250109_162921_create_change_plan_table::Migration),
+            Box::new(m20250319_203709_create_review_table::Migration),
         ]
     }
 }
