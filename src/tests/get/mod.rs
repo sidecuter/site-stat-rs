@@ -4,3 +4,4 @@ mod sites;
 mod stat;
 mod user;
 mod ways;
+mod popular;
