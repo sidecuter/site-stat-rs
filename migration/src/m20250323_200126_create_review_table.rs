@@ -19,8 +19,7 @@ impl MigrationTrait for Migration {
                     .col(uuid(Review::UserId))
                     .col(date_time(Review::CreationDate))
                     .col(string(Review::Text))
-                    .col(ColumnDef::new(Review::ImageId).string().null())
-                    .col(ColumnDef::new(Review::ImageExt).string().null())
+                    .col(ColumnDef::new(Review::ImageName).string().null())
                     .col(string(Review::ProblemId))
                     .foreign_key(
                         ForeignKey::create()
@@ -57,7 +56,6 @@ pub enum Review {
     UserId,
     ProblemId,
     Text,
-    ImageId,
-    ImageExt,
+    ImageName,
     CreationDate
 }
