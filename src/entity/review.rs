@@ -10,8 +10,7 @@ pub struct Model {
     pub user_id: Uuid,
     pub creation_date: DateTime,
     pub text: String,
-    pub image_id: Option<String>,
-    pub image_ext: Option<String>,
+    pub image_name: Option<String>,
     pub problem_id: String,
 }
 

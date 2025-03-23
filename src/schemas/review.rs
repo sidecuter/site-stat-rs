@@ -46,8 +46,7 @@ pub struct ReviewIn {
     pub user_id: Uuid,
     pub text: String,
     pub problem: Problem,
-    pub image_id: Option<String>,
-    pub image_ext: Option<String>
+    pub image_name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
@@ -56,10 +55,8 @@ pub struct ReviewOut {
     pub user_id: Uuid,
     pub text: String,
     pub problem: Problem,
-    #[schema(example = ".png")]
-    pub image_ext: Option<String>,
-    #[schema(example = "0b696946f48a47b0b0ddd93276d29d65")]
-    pub image_id: Option<String>,
+    #[schema(example = "0b696946f48a47b0b0ddd93276d29d65.png")]
+    pub image_name: Option<String>,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub creation_date: NaiveDateTime,
 }
@@ -89,7 +86,7 @@ impl Display for Problem {
 }
 
 impl ReviewFormIn {
-    pub async fn save_image(self, state: &AppState) -> ApiResult<(Option<String>, Option<String>)> {
+    pub async fn save_image(self, state: &AppState) -> ApiResult<Option<String>> {
         Ok(if let Some(img) = self.image {
             if let Some(mime) = img.content_type {
                 if mime.type_() != mime::IMAGE {
@@ -100,8 +97,9 @@ impl ReviewFormIn {
             }
             let img_id = Uuid::new_v4().to_string().replace("-", "");
             let img_ext = format!(".{}", img.file_name.unwrap().split(".").last().unwrap());
+            let img_name = format!("{img_id}{img_ext}");
             let path = Path::new(&state.files_path)
-                .join(format!("{}{}", img_id, img_ext))
+                .join(img_name.clone())
                 .to_str()
                 .ok_or(ApiError::UnprocessableData("File name is not a valid UTF-8 sequence".to_owned()))?
                 .to_owned();
@@ -118,9 +116,9 @@ impl ReviewFormIn {
             web::block(move || {
                 std::io::copy(&mut img_file, &mut target_file)
             }).await??;
-            (Some(img_id), Some(img_ext))
+            Some(img_name)
         } else {
-            (None, None)
+            None
         })
     }
 }
@@ -142,8 +140,7 @@ impl Default for ReviewIn {
             user_id: Uuid::new_v4(),
             text: String::from("Some cool review"),
             problem: Problem::Other,
-            image_ext: None,
-            image_id: None,
+            image_name: None,
         }
     }
 }
@@ -154,8 +151,7 @@ impl Default for ReviewOut {
             user_id: Uuid::new_v4(),
             text: String::from("Some cool review"),
             problem: Problem::Other,
-            image_ext: Some(String::from(".png")),
-            image_id: Some(Uuid::new_v4().to_string()),
+            image_name: Some(format!("{}.png", Uuid::new_v4().to_string().replace("-", ""))),
             creation_date: chrono::Utc::now().naive_utc(),
         }
     }
@@ -167,8 +163,7 @@ impl From<review::Model> for ReviewOut {
             user_id: value.user_id,
             text: value.text,
             problem: value.problem_id.into(),
-            image_ext: value.image_ext,
-            image_id: value.image_id,
+            image_name: value.image_name,
             creation_date: value.creation_date,
         }
     }
@@ -180,8 +175,7 @@ impl From<review::ActiveModel> for ReviewOut {
             user_id: value.user_id.unwrap(),
             text: value.text.unwrap(),
             problem: value.problem_id.unwrap().into(),
-            image_ext: value.image_ext.unwrap(),
-            image_id: value.image_id.unwrap(),
+            image_name: value.image_name.unwrap(),
             creation_date: value.creation_date.unwrap(),
         }
     }
@@ -201,8 +195,7 @@ impl IntoActiveModel<review::ActiveModel> for ReviewIn {
             user_id: Set(self.user_id),
             text: Set(self.text),
             problem_id: Set(self.problem.to_string()),
-            image_id: Set(self.image_id),
-            image_ext: Set(self.image_ext),
+            image_name: Set(self.image_name),
             creation_date: Set(chrono::Utc::now().naive_utc()),
             ..Default::default()
         }
