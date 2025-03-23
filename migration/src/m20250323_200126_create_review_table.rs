@@ -1,6 +1,6 @@
 use sea_orm_migration::{prelude::*, schema::*};
-use crate::sea_orm::{EnumIter, Iterable};
 use crate::m20220101_000001_create_table::UserId;
+use crate::m20250323_195737_create_problem_table::Problem;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -19,21 +19,21 @@ impl MigrationTrait for Migration {
                     .col(uuid(Review::UserId))
                     .col(date_time(Review::CreationDate))
                     .col(string(Review::Text))
-                    .col(ColumnDef::new(Review::ImageId).string().null())
-                    .col(ColumnDef::new(Review::ImageExt).string().null())
-                    .col(ColumnDef::new(Review::Problem)
-                        .enumeration(
-                            Alias::new("enum"),
-                            Problem::iter()
-                        )
-                        .not_null()
-                    )
+                    .col(ColumnDef::new(Review::ImageName).string().null())
+                    .col(string(Review::ProblemId))
                     .foreign_key(
                         ForeignKey::create()
                             .from(Review::Table, Review::UserId)
                             .to(UserId::Table, UserId::UserId)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade)
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from(Review::Table, Review::ProblemId)
+                            .to(Problem::Table, Problem::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade)
                     )
                     .to_owned()
             )
@@ -54,21 +54,8 @@ pub enum Review {
     Table,
     Id,
     UserId,
-    Problem,
+    ProblemId,
     Text,
-    ImageId,
-    ImageExt,
+    ImageName,
     CreationDate
-}
-
-#[derive(Iden, EnumIter)]
-pub enum Problem {
-    #[iden = "other"]
-    Other,
-    #[iden = "way"]
-    Way,
-    #[iden = "work"]
-    Work,
-    #[iden = "plan"]
-    Plan
 }

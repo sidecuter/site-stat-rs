@@ -10,14 +10,20 @@ pub struct Model {
     pub user_id: Uuid,
     pub creation_date: DateTime,
     pub text: String,
-    pub image_id: Option<String>,
-    pub image_ext: Option<String>,
-    #[sea_orm(column_type = "custom(\"enum_text\")")]
-    pub problem: String,
+    pub image_name: Option<String>,
+    pub problem_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::problem::Entity",
+        from = "Column::ProblemId",
+        to = "super::problem::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Problem,
     #[sea_orm(
         belongs_to = "super::user_id::Entity",
         from = "Column::UserId",
@@ -26,6 +32,12 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     UserId,
+}
+
+impl Related<super::problem::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Problem.def()
+    }
 }
 
 impl Related<super::user_id::Entity> for Entity {

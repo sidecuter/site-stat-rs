@@ -25,45 +25,29 @@ pub fn generate_multipart_payload(
     has_file: bool
 ) -> (Bytes, HeaderMap) {
     let filebuf = Bytes::from_static(b"Lorem ipsum.");
+    let boundary = Alphanumeric.sample_string(&mut rng(), 32);
+    let boundary_str = [BOUNDARY_PREFIX, &boundary].concat();
+    let boundary = boundary_str.as_bytes();
+    let sub = |buf: &mut BytesMut, name, val| {
+        buf.put(CRLF);
+        buf.put(format!("Content-Disposition: form-data; name=\"{name}\"").as_bytes());
+        buf.put(CRLF_CRLF);
+        buf.put(format!("{val}").as_bytes());
+        buf.put(CRLF);
+        buf.put(HYPHENS);
+        buf.put(boundary);
+    };
     let mut buf = if has_file {
         BytesMut::with_capacity(filebuf.len() + 128 + 330)
     } else {
         BytesMut::with_capacity(330)
     };
-    let boundary = Alphanumeric.sample_string(&mut rng(), 32);
-    let boundary_str = [BOUNDARY_PREFIX, &boundary].concat();
-    let boundary = boundary_str.as_bytes();
 
     buf.put(HYPHENS);
     buf.put(boundary);
-    buf.put(CRLF);
-
-    buf.put("Content-Disposition: form-data; name=\"user_id\"".as_bytes());
-    buf.put(CRLF_CRLF);
-
-    buf.put(user_id.as_bytes());
-    buf.put(CRLF);
-
-    buf.put(HYPHENS);
-    buf.put(boundary);
-    buf.put(CRLF);
-    buf.put("Content-Disposition: form-data; name=\"problem\"".as_bytes());
-    buf.put(CRLF_CRLF);
-
-    buf.put(problem.to_string().as_bytes());
-    buf.put(CRLF);
-
-    buf.put(HYPHENS);
-    buf.put(boundary);
-    buf.put(CRLF);
-    buf.put("Content-Disposition: form-data; name=\"text\"".as_bytes());
-    buf.put(CRLF_CRLF);
-
-    buf.put(text.as_bytes());
-    buf.put(CRLF);
-
-    buf.put(HYPHENS);
-    buf.put(boundary);
+    sub(&mut buf, "user_id", user_id);
+    sub(&mut buf, "problem", problem.to_string());
+    sub(&mut buf, "text", text);
     if has_file {
         buf.put(CRLF);
         buf.put("Content-Disposition: form-data; name=\"image\"".as_bytes());
