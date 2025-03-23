@@ -45,8 +45,7 @@ async fn add_review(
         problem: data.problem.clone(),
         ..Default::default()
     };
-    let (image_id, image_ext) = data.save_image(&state).await?;
-    review_in.image_id = image_id;
-    review_in.image_ext = image_ext;
+    let image_name = data.save_image(&state).await?;
+    review_in.image_name = image_name;
     review_in.into_active_model().insert(db.get_ref()).await.status_ok()
 }
