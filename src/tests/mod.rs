@@ -6,7 +6,7 @@ use crate::entity::{
     change_plan::ActiveModel as ChangePlan, select_aud::ActiveModel as SelectAuditory,
     site_stat::ActiveModel as SiteStat, start_way::ActiveModel as StartWay,
     user_id::ActiveModel as UserId,
-    review::ActiveModel as Review,
+    review::ActiveModel as Review
 };
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
@@ -59,7 +59,7 @@ async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         creation_date: Set(chrono::Utc::now().naive_utc()),
         text: Set("Awesome review".to_owned()),
-        problem: Set("way".to_owned()),
+        problem_id: Set("way".to_owned()),
         ..Default::default()
     }
         .insert(db)
