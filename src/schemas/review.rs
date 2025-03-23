@@ -166,7 +166,7 @@ impl From<review::Model> for ReviewOut {
         Self {
             user_id: value.user_id,
             text: value.text,
-            problem: value.problem.into(),
+            problem: value.problem_id.into(),
             image_ext: value.image_ext,
             image_id: value.image_id,
             creation_date: value.creation_date,
@@ -179,7 +179,7 @@ impl From<review::ActiveModel> for ReviewOut {
         Self {
             user_id: value.user_id.unwrap(),
             text: value.text.unwrap(),
-            problem: value.problem.unwrap().into(),
+            problem: value.problem_id.unwrap().into(),
             image_ext: value.image_ext.unwrap(),
             image_id: value.image_id.unwrap(),
             creation_date: value.creation_date.unwrap(),
@@ -200,7 +200,7 @@ impl IntoActiveModel<review::ActiveModel> for ReviewIn {
         review::ActiveModel {
             user_id: Set(self.user_id),
             text: Set(self.text),
-            problem: Set(self.problem.to_string()),
+            problem_id: Set(self.problem.to_string()),
             image_id: Set(self.image_id),
             image_ext: Set(self.image_ext),
             creation_date: Set(chrono::Utc::now().naive_utc()),
