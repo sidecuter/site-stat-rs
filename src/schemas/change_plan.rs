@@ -1,29 +1,32 @@
-use crate::entity::change_plan;
-use crate::schemas::validators::PlanId;
-use crate::traits::Paginate;
-use actix_web::body::BoxBody;
-use actix_web::Responder;
-use chrono::NaiveDateTime;
 use sea_orm::{ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Select};
-use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
+use sea_orm::ActiveValue::Set;
+use actix_web::body::BoxBody;
+use chrono::NaiveDateTime;
+use actix_web::Responder;
+use validator::Validate;
 use utoipa::ToSchema;
+use crate::schemas::validators::PLAN_RE;
+use crate::entity::change_plan;
+use crate::traits::Paginate;
 use crate::schemas::Filter;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Deserialize, ToSchema, Debug, Clone, Validate)]
 pub struct ChangePlanIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "A-0")]
-    pub plan_id: PlanId,
+    #[validate(length(min = 3, max=4), regex(path = *PLAN_RE))]
+    pub plan_id: String,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, ToSchema, Debug, Clone, Validate)]
 pub struct ChangePlanOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
     #[schema(example = "A-0")]
-    pub plan_id: PlanId,
+    #[validate(length(min = 3, max=4), regex(path = *PLAN_RE))]
+    pub plan_id: String,
     #[schema(example = "2025-01-07T20:10:34.956397956")]
     pub visit_date: NaiveDateTime,
 }
@@ -51,7 +54,7 @@ impl From<change_plan::Model> for ChangePlanOut {
     fn from(value: change_plan::Model) -> Self {
         Self {
             user_id: value.user_id,
-            plan_id: value.plan_id.into(),
+            plan_id: value.plan_id,
             visit_date: value.visit_date,
         }
     }
@@ -61,7 +64,7 @@ impl From<change_plan::ActiveModel> for ChangePlanOut {
     fn from(value: change_plan::ActiveModel) -> Self {
         Self {
             user_id: value.user_id.unwrap(),
-            plan_id: value.plan_id.unwrap().into(),
+            plan_id: value.plan_id.unwrap(),
             visit_date: value.visit_date.unwrap(),
         }
     }
@@ -80,7 +83,7 @@ impl IntoActiveModel<change_plan::ActiveModel> for ChangePlanIn {
         change_plan::ActiveModel {
             user_id: Set(self.user_id),
             visit_date: Set(chrono::Utc::now().naive_utc()),
-            plan_id: Set(self.plan_id.to_string()),
+            plan_id: Set(self.plan_id),
             ..Default::default()
         }
     }

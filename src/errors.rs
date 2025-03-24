@@ -54,7 +54,6 @@ impl ResponseError for Error {
 impl From<DbErr> for Error {
     fn from(value: DbErr) -> Self {
         tracing::error!("{:?}", value.sql_err());
-        // log!(Level::Error, "{:?}", value.sql_err());
         let message = value.to_string();
         if message.contains("FOREIGN KEY") {
             Self::NotFound("External id".to_string())
