@@ -13,7 +13,7 @@ use crate::entity::change_plan;
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
-#[derive(Deserialize, ToSchema, Debug, Clone, Validate)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Validate)]
 pub struct ChangePlanIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
@@ -22,7 +22,7 @@ pub struct ChangePlanIn {
     pub plan_id: String,
 }
 
-#[derive(Serialize, ToSchema, Debug, Clone, Validate)]
+#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Validate)]
 pub struct ChangePlanOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
