@@ -1,5 +1,5 @@
 use crate::entity::{plan, user_id};
-use crate::errors::{Result as ApiResult, Error as ApiError};
+use crate::errors::{ApiResult, ApiError};
 use crate::schemas::{ChangePlanIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};

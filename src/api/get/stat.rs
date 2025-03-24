@@ -1,4 +1,4 @@
-use crate::errors::Result as ApiResult;
+use crate::errors::ApiResult;
 use crate::middleware::api_key_middleware;
 use crate::schemas::{FilterQuery, Period, Query, Statistics, Status};
 use actix_web::{get, middleware::from_fn, web};

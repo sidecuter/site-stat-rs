@@ -1,4 +1,4 @@
-use crate::errors::{Error as ApiError, Result as ApiResult};
+use crate::errors::{ApiError, ApiResult};
 use sea_orm::{DatabaseConnection, EntityTrait, PrimaryKeyTrait};
 
 pub trait FilterTrait<PK> {

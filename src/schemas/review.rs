@@ -17,7 +17,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 use crate::app_state::AppState;
 use crate::schemas::Filter;
-use crate::errors::{Result as ApiResult, Error as ApiError};
+use crate::errors::{ApiResult, ApiError};
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]

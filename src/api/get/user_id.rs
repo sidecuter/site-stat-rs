@@ -1,4 +1,4 @@
-use crate::errors::Result as ApiResult;
+use crate::errors::ApiResult;
 use crate::schemas::{Status, UserId};
 use crate::traits::ConversionTrait;
 use actix_web::{get, web};

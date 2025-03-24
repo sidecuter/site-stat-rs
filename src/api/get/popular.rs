@@ -1,4 +1,4 @@
-use crate::errors::Result as ApiResult;
+use crate::errors::ApiResult;
 use crate::schemas::{Popular, Status};
 use actix_web::{get, web};
 use sea_orm::{

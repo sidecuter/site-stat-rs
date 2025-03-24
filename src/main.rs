@@ -8,7 +8,7 @@ use actix_web::{
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
-use stat_api::{api, api_docs, app_state::AppState, errors::Error as ApiError};
+use stat_api::{api, api_docs, app_state::AppState, errors::ApiError};
 use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(not(debug_assertions))]
