@@ -4,8 +4,8 @@ use validator::Validate;
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use crate::schemas::{SelectAuditoryIn, Status};
 use crate::middleware::build_rate_limits;
-use crate::entity::{aud, user_id};
 use crate::errors::{ApiError, ApiResult};
+use crate::entity::{aud, user_id};
 
 #[utoipa::path(
     put,
