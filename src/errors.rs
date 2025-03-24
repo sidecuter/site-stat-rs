@@ -6,7 +6,6 @@ use actix_web::{
     HttpRequest, HttpResponse, Responder, ResponseError,
 };
 use actix_web::error::BlockingError;
-use log::{log, Level};
 use sea_orm::DbErr;
 
 #[derive(Debug, thiserror::Error, Clone)]
@@ -54,7 +53,8 @@ impl ResponseError for Error {
 
 impl From<DbErr> for Error {
     fn from(value: DbErr) -> Self {
-        log!(Level::Error, "{:?}", value.sql_err());
+        tracing::error!("{:?}", value.sql_err());
+        // log!(Level::Error, "{:?}", value.sql_err());
         let message = value.to_string();
         if message.contains("FOREIGN KEY") {
             Self::NotFound("External id".to_string())

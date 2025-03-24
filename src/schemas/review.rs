@@ -103,7 +103,7 @@ impl ReviewFormIn {
                 .to_str()
                 .ok_or(ApiError::UnprocessableData("File name is not a valid UTF-8 sequence".to_owned()))?
                 .to_owned();
-            log::info!("saving to {path}");
+            tracing::info!("saving to {path}");
             let mut target_file = web::block(|| {
                 if Path::new(&path).exists() {
                     std::fs::remove_file(path.clone()).unwrap();

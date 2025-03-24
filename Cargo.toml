@@ -9,7 +9,6 @@ members = [".", "migration"]
 [dependencies]
 actix-web = "4.9.0"
 chrono = { version = "0.4.39", default-features = false, features = ["serde", "std"] }
-log = "0.4.25"
 dotenv = "0.15"
 sea-orm = { version = "1.1.4", features = ["debug-print", "runtime-tokio", "sqlx-sqlite", "with-uuid"] }
 serde = { version = "1.0.217", features = ["derive"] }
@@ -25,6 +24,7 @@ actix-governor = { version = "0.8.0", features = ["log", "logger"] }
 actix-multipart = "0.7.2"
 actix-files = "0.6.6"
 mime = "0.3.17"
+validator = { version = "0.20.0", features = ["derive"] }
 
 [dev-dependencies]
 rstest = "0.25.0"

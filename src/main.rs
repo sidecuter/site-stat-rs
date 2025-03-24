@@ -48,12 +48,11 @@ async fn main() -> std::io::Result<()> {
     if !std::path::Path::new(&app_state.files_path).exists() {
         fs::create_dir(app_state.files_path.clone())?;
     }
-    log::info!("Listening on http://{}", addr);
-    log::info!(
-        "OpenAPI document is available at http://{}/docs/openapi.json",
-        addr,
+    tracing::info!("Listening on http://{addr}");
+    tracing::info!(
+        "OpenAPI document is available at http://{addr}/docs/openapi.json",
     );
-    log::info!("Swagger UI is available at http://{}/docs/swagger/", addr);
+    tracing::info!("Swagger UI is available at http://{addr}/docs/swagger/");
 
     HttpServer::new(move || {
         App::new()
