@@ -19,7 +19,6 @@ tracing = "0.1.41"
 utoipa = { version = "5.3.1", features = ["chrono", "uuid"] }
 utoipa-swagger-ui = { version = "9.0.0", features = ["actix-web"] }
 regex = "1.11.1"
-utoipauto = "0.2.0"
 actix-governor = { version = "0.8.0", features = ["log", "logger"] }
 actix-multipart = "0.7.2"
 actix-files = "0.6.6"
