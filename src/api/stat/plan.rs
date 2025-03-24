@@ -45,7 +45,7 @@ async fn stat_plan(
     }?;
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
     plan::Entity::filter(
-        data.plan_id.to_string(),
+        data.plan_id.clone(),
         db.get_ref(),
         "Changed plan".to_string(),
     )
