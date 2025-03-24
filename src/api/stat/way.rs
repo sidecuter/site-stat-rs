@@ -3,8 +3,8 @@ use actix_web::{put, web};
 use validator::Validate;
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use crate::schemas::{StartWayIn, Status};
-use crate::entity::{aud, user_id};
 use crate::errors::{ApiError, ApiResult};
+use crate::entity::{aud, user_id};
 
 #[utoipa::path(
     put,
