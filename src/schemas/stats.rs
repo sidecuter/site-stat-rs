@@ -1,7 +1,7 @@
 use crate::schemas::Period;
+use serde::{Deserialize, Serialize};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
-use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
