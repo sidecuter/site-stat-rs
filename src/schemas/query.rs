@@ -1,10 +1,10 @@
-use crate::entity::{change_plan, select_aud, site_stat, start_way, user_id};
-use crate::schemas::{Period, Statistics, Target};
-use sea_orm::sea_query::SelectStatement;
 use sea_orm::{
     ColumnTrait, Condition, DatabaseConnection, DbErr, EntityTrait, PaginatorTrait, QueryFilter,
     QuerySelect, QueryTrait, Select,
+    sea_query::SelectStatement
 };
+use crate::entity::{change_plan, select_aud, site_stat, start_way, user_id};
+use crate::schemas::{Period, Statistics, Target};
 
 pub enum Query {
     Site(Select<site_stat::Entity>),

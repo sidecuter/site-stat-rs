@@ -1,4 +1,4 @@
-use crate::{app_state::AppState, errors::Error as ApiError};
+use crate::{app_state::AppState, errors::ApiError};
 use actix_web::{body::BoxBody, dev::{ServiceRequest, ServiceResponse}, middleware::Next, web::Data, Error, Responder};
 use actix_governor::{Governor, GovernorConfigBuilder, PeerIpKeyExtractor};
 use actix_governor::governor::middleware::StateInformationMiddleware;

@@ -9,7 +9,6 @@ members = [".", "migration"]
 [dependencies]
 actix-web = "4.9.0"
 chrono = { version = "0.4.39", default-features = false, features = ["serde", "std"] }
-log = "0.4.25"
 dotenv = "0.15"
 sea-orm = { version = "1.1.4", features = ["debug-print", "runtime-tokio", "sqlx-sqlite", "with-uuid"] }
 serde = { version = "1.0.217", features = ["derive"] }
@@ -20,11 +19,11 @@ tracing = "0.1.41"
 utoipa = { version = "5.3.1", features = ["chrono", "uuid"] }
 utoipa-swagger-ui = { version = "9.0.0", features = ["actix-web"] }
 regex = "1.11.1"
-utoipauto = "0.2.0"
 actix-governor = { version = "0.8.0", features = ["log", "logger"] }
 actix-multipart = "0.7.2"
 actix-files = "0.6.6"
 mime = "0.3.17"
+validator = { version = "0.20.0", features = ["derive"] }
 
 [dev-dependencies]
 rstest = "0.25.0"
