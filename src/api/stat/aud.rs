@@ -1,10 +1,11 @@
-use crate::entity::{aud, user_id};
-use crate::errors::Result as ApiResult;
-use crate::schemas::{SelectAuditoryIn, Status};
-use crate::traits::{ConversionToStatusTrait, FilterTrait};
-use actix_web::{put, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use actix_web::{put, web};
+use validator::Validate;
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
+use crate::schemas::{SelectAuditoryIn, Status};
 use crate::middleware::build_rate_limits;
+use crate::errors::{ApiError, ApiResult};
+use crate::entity::{aud, user_id};
 
 #[utoipa::path(
     put,
@@ -43,9 +44,13 @@ async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
+    match data.validate() {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+    }?;
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
     aud::Entity::filter(
-        data.auditory_id.to_string(),
+        data.auditory_id.clone(),
         db.get_ref(),
         "Auditory".to_string(),
     )

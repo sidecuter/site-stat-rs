@@ -8,7 +8,7 @@ use actix_web::{
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
-use stat_api::{api, api_docs, app_state::AppState, errors::Error as ApiError};
+use stat_api::{api, api_docs, app_state::AppState, errors::ApiError};
 use utoipa_swagger_ui::SwaggerUi;
 
 #[cfg(not(debug_assertions))]
@@ -48,12 +48,11 @@ async fn main() -> std::io::Result<()> {
     if !std::path::Path::new(&app_state.files_path).exists() {
         fs::create_dir(app_state.files_path.clone())?;
     }
-    log::info!("Listening on http://{}", addr);
-    log::info!(
-        "OpenAPI document is available at http://{}/docs/openapi.json",
-        addr,
+    tracing::info!("Listening on http://{addr}");
+    tracing::info!(
+        "OpenAPI document is available at http://{addr}/docs/openapi.json",
     );
-    log::info!("Swagger UI is available at http://{}/docs/swagger/", addr);
+    tracing::info!("Swagger UI is available at http://{addr}/docs/swagger/");
 
     HttpServer::new(move || {
         App::new()

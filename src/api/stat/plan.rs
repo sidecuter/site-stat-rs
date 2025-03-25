@@ -1,9 +1,10 @@
 use crate::entity::{plan, user_id};
-use crate::errors::Result as ApiResult;
+use crate::errors::{ApiResult, ApiError};
 use crate::schemas::{ChangePlanIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use validator::Validate;
 
 #[utoipa::path(
     put,
@@ -38,9 +39,13 @@ async fn stat_plan(
     data: web::Json<ChangePlanIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
+    match data.validate() {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+    }?;
     user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
     plan::Entity::filter(
-        data.plan_id.to_string(),
+        data.plan_id.clone(),
         db.get_ref(),
         "Changed plan".to_string(),
     )

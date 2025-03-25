@@ -1,5 +1,5 @@
 use crate::entity::user_id;
-use crate::errors::Result as ApiResult;
+use crate::errors::ApiResult;
 use crate::schemas::{SiteStatisticsIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};

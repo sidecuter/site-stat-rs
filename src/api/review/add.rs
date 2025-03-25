@@ -1,6 +1,6 @@
 use actix_multipart::form::MultipartForm;
 use crate::entity::user_id;
-use crate::errors::Result as ApiResult;
+use crate::errors::ApiResult;
 use crate::schemas::{ReviewIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{post, web};

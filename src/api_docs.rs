@@ -1,10 +1,48 @@
 use actix_web::{get, HttpResponse, Responder};
 use utoipa::OpenApi;
-use utoipauto::utoipauto;
 
-#[utoipauto]
 #[derive(OpenApi)]
 #[openapi(
+    paths(
+        // Get routes
+        crate::api::get::user_id::get_user_id,
+        crate::api::get::sites::get_sites,
+        crate::api::get::auds::get_auds,
+        crate::api::get::ways::get_ways,
+        crate::api::get::plans::get_plans,
+        crate::api::get::popular::get_popular,
+        crate::api::get::stat::get_stat,
+        // Set routes
+        crate::api::stat::site::stat_site,
+        crate::api::stat::aud::stat_aud,
+        crate::api::stat::way::stat_way,
+        crate::api::stat::plan::stat_plan,
+        // Review routes
+        crate::api::review::add::add_review,
+        crate::api::review::get::get_reviews,
+    ),
+    components (
+        schemas (
+            crate::schemas::status::Status,
+            crate::schemas::UserId,
+            crate::schemas::SiteStatisticsIn,
+            crate::schemas::SiteStatisticsOut,
+            crate::schemas::SelectAuditoryIn,
+            crate::schemas::SelectAuditoryOut,
+            crate::schemas::StartWayIn,
+            crate::schemas::StartWayOut,
+            crate::schemas::ChangePlanIn,
+            crate::schemas::ChangePlanOut,
+            crate::schemas::Filter,
+            crate::schemas::Target,
+            crate::schemas::FilterQuery,
+            crate::schemas::stats::Statistics,
+            crate::schemas::review::ReviewFormIn,
+            crate::schemas::review::ReviewOut,
+            crate::schemas::popular::Popular,
+            crate::schemas::period::Period,
+        )
+    ),
     tags (
         (name = "Get", description = "Getters for content"),
         (name = "Stat", description = "Statistics insertion endpoints"),

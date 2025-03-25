@@ -1,5 +1,5 @@
 use crate::{
-    errors::Result as ApiResult,
+    errors::ApiResult,
     schemas::Status,
 };
 use actix_web::Responder;
