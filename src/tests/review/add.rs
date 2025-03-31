@@ -28,11 +28,11 @@ pub fn generate_multipart_payload(
     let boundary = Alphanumeric.sample_string(&mut rng(), 32);
     let boundary_str = [BOUNDARY_PREFIX, &boundary].concat();
     let boundary = boundary_str.as_bytes();
-    let sub = |buf: &mut BytesMut, name, val| {
+    let sub = |buf: &mut BytesMut, name, val: String| {
         buf.put(CRLF);
         buf.put(format!("Content-Disposition: form-data; name=\"{name}\"").as_bytes());
         buf.put(CRLF_CRLF);
-        buf.put(format!("{val}").as_bytes());
+        buf.put(val.as_bytes());
         buf.put(CRLF);
         buf.put(HYPHENS);
         buf.put(boundary);

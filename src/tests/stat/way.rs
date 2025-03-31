@@ -43,8 +43,7 @@ async fn stat_way_endpoint(
     let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_way)).await;
     let payload = StartWayIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        start_id: start_id.into(),
-        end_id: end_id.into(),
+        start_id, end_id,
     };
     let req = test::TestRequest::put()
         .uri("/start-way")

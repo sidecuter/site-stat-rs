@@ -28,7 +28,7 @@ async fn stat_plan_endpoint(
     let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_plan)).await;
     let payload = ChangePlanIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        plan_id: plan_id.into(),
+        plan_id,
     };
     let req = test::TestRequest::put()
         .uri("/change-plan")
