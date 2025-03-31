@@ -43,7 +43,7 @@ async fn stat_plan(
         Ok(_) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
     }?;
-    user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
+    user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     plan::Entity::filter(
         data.plan_id.clone(),
         db.get_ref(),

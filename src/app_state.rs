@@ -30,6 +30,12 @@ const METHODS_ARRAY: [&str; 9] = [
 
 static METHODS: LazyLock<HashSet<String>> = LazyLock::new(|| METHODS_ARRAY.iter().map(|&v| v.to_string()).collect());
 
+impl Default for AppState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AppState {
     pub fn new() -> Self {
         let host = std::env::var("HOST").unwrap_or_else(|_| "localhost".to_owned());
@@ -40,15 +46,14 @@ impl AppState {
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned()
         );
         let files_path = std::env::var("FILES_PATH").unwrap_or_else(|_| "./static".to_owned());
-        let allowed_host = std::env::var("ALLOWED_HOST").map_or(None, |v| Some(v));
-        let allowed_methods = std::env::var("ALLOWED_METHODS").map_or(None, |v|
-            Some(v
+        let allowed_host = std::env::var("ALLOWED_HOST").ok();
+        let allowed_methods = std::env::var("ALLOWED_METHODS").ok().map(|v|
+            v
                 .replace(['[', ']', '"', ' '], "")
                 .split(",")
                 .filter(|&v| METHODS.contains(v))
                 .map(|v| Method::from_str(v).expect("Method should be allowed"))
                 .collect()
-            )
         );
         Self { host, port, admin_key, database_url, files_path, allowed_host, allowed_methods }
     }

@@ -28,6 +28,6 @@ impl<T: Responder + From<W>, W: ModelTrait> ConversionTrait<T> for Result<W, DbE
 impl<W: ModelTrait> ConversionToStatusTrait for Result<W, DbErr> {
     type Output = ApiResult<Status>;
     fn status_ok(self) -> Self::Output {
-        self.map_err(|e| e.into()).map(|_| Status::default().into())
+        self.map_err(|e| e.into()).map(|_| Status::default())
     }
 }

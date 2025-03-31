@@ -34,7 +34,7 @@ where
         pages: u64,
     ) -> Pagination<Self> {
         Pagination::builder()
-            .items(items.into_iter().map(|model| model.into()).collect())
+            .items(items)
             .total(total)
             .pages(pages)
             .size(data.size)
