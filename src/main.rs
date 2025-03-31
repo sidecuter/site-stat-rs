@@ -5,6 +5,7 @@ use actix_web::{
     web::{self, JsonConfig, QueryConfig},
     App, HttpServer,
 };
+use actix_cors::Cors;
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
@@ -55,7 +56,19 @@ async fn main() -> std::io::Result<()> {
     tracing::info!("Swagger UI is available at http://{addr}/docs/swagger/");
 
     HttpServer::new(move || {
+        let cors = Cors::default();
+        let cors = if let Some(host) = &app_state.allowed_host {
+            cors.allowed_origin(&host.clone())
+        } else {
+            cors
+        };
+        let cors = if let Some(methods) = &app_state.allowed_methods {
+            cors.allowed_methods(methods.clone())
+        } else {
+            cors
+        };
         App::new()
+            .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(AppState::new()))
             .wrap(Logger::default())
