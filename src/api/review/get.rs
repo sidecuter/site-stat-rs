@@ -1,8 +1,9 @@
 use actix_web::{get, middleware::from_fn, web};
 use sea_orm::DatabaseConnection;
+use validator::Validate;
 use crate::schemas::{Filter, Pagination, ReviewOut, Status};
 use crate::middleware::api_key_middleware;
-use crate::errors::ApiResult;
+use crate::errors::{ApiError, ApiResult};
 use crate::traits::Paginate;
 
 #[utoipa::path(
@@ -38,5 +39,9 @@ async fn get_reviews(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<ReviewOut>> {
+    match data.validate() {
+        Ok(_) => Ok(()),
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+    }?;
     Ok(ReviewOut::pagination(db.get_ref(), &data).await?)
 }
