@@ -2,6 +2,7 @@ mod get;
 mod stat;
 mod review;
 
+use actix_web::{test, web, App};
 use crate::entity::{
     change_plan::ActiveModel as ChangePlan, select_aud::ActiveModel as SelectAuditory,
     site_stat::ActiveModel as SiteStat, start_way::ActiveModel as StartWay,
@@ -9,10 +10,12 @@ use crate::entity::{
     review::ActiveModel as Review
 };
 use migration::{Migrator, MigratorTrait};
-use rstest::fixture;
+use rstest::{fixture, rstest};
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, Database, DatabaseConnection};
+use utoipa_swagger_ui::SwaggerUi;
 use uuid::Uuid;
+use crate::api_docs;
 
 async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
     UserId {
@@ -74,4 +77,24 @@ async fn prepare_connection() -> Result<DatabaseConnection, Box<dyn std::error::
     Migrator::up(&pool, None).await?;
     prepare_database(&pool).await?;
     Ok(pool)
+}
+
+#[rstest]
+#[tokio::test]
+async fn test_swagger() {
+    let app = test::init_service(
+        App::new()
+            .service(
+                // OpenAPI document
+                web::scope("/docs").service(api_docs::openapi_json).service(
+                    SwaggerUi::new("/swagger/{_:.*}").url("/docs/openapi.json", Default::default()),
+                ),
+            )
+    ).await;
+    let req = test::TestRequest::get().uri("/docs/openapi.json").to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status().as_u16(), 200);
+    let req = test::TestRequest::get().uri("/docs/swagger/").to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status().as_u16(), 200)
 }
