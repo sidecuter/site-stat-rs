@@ -17,7 +17,7 @@ const CRLF_CRLF: &[u8] = b"\r\n\r\n";
 const HYPHENS: &[u8] = b"--";
 const BOUNDARY_PREFIX: &str = "------------------------";
 
-const BLACK_1X1_PNG: &[u8] = &[
+pub const BLACK_1X1_PNG: &[u8] = &[
     0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
     0x00, 0x00, 0x00, 0x0D,
     0x49, 0x48, 0x44, 0x52,
