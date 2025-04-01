@@ -33,8 +33,7 @@ pub enum Target {
     Plans,
 }
 
-#[derive(Deserialize, Clone, Debug, ToSchema, Validate)]
-#[serde(tag = "target")]
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Validate)]
 pub struct FilterQuery {
     #[allow(dead_code)]
     #[schema(
