@@ -162,18 +162,6 @@ impl From<review::Model> for ReviewOut {
     }
 }
 
-impl From<review::ActiveModel> for ReviewOut {
-    fn from(value: review::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            text: value.text.unwrap(),
-            problem: value.problem_id.unwrap().into(),
-            image_name: value.image_name.unwrap(),
-            creation_date: value.creation_date.unwrap(),
-        }
-    }
-}
-
 impl Responder for ReviewOut {
     type Body = BoxBody;
 

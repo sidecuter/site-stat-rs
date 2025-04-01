@@ -62,16 +62,6 @@ impl From<change_plan::Model> for ChangePlanOut {
     }
 }
 
-impl From<change_plan::ActiveModel> for ChangePlanOut {
-    fn from(value: change_plan::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            plan_id: value.plan_id.unwrap(),
-            visit_date: value.visit_date.unwrap(),
-        }
-    }
-}
-
 impl Responder for ChangePlanOut {
     type Body = BoxBody;
 

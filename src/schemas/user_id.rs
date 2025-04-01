@@ -31,15 +31,6 @@ impl From<user_id::Model> for UserId {
     }
 }
 
-impl From<user_id::ActiveModel> for UserId {
-    fn from(value: user_id::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            creation_date: value.creation_date.unwrap(),
-        }
-    }
-}
-
 impl Responder for UserId {
     type Body = BoxBody;
 

@@ -71,17 +71,6 @@ impl From<start_way::Model> for StartWayOut {
     }
 }
 
-impl From<start_way::ActiveModel> for StartWayOut {
-    fn from(value: start_way::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            start_id: value.start_id.unwrap(),
-            end_id: value.end_id.unwrap(),
-            visit_date: value.visit_date.unwrap(),
-        }
-    }
-}
-
 impl Responder for StartWayOut {
     type Body = BoxBody;
 

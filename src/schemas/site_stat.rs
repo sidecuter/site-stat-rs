@@ -58,16 +58,6 @@ impl From<site_stat::Model> for SiteStatisticsOut {
     }
 }
 
-impl From<site_stat::ActiveModel> for SiteStatisticsOut {
-    fn from(value: site_stat::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            endpoint: value.endpoint.unwrap(),
-            visit_date: value.visit_date.unwrap(),
-        }
-    }
-}
-
 impl Responder for SiteStatisticsOut {
     type Body = BoxBody;
 
