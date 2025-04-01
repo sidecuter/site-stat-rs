@@ -5,12 +5,8 @@ use crate::api::get::{
     ways::get_ways
 };
 use crate::schemas::{
-    Pagination,
-    SiteStatisticsOut,
-    SelectAuditoryOut,
-    StartWayOut,
-    ChangePlanOut,
-    ReviewOut
+    Pagination, SiteStatisticsOut, SelectAuditoryOut,
+    StartWayOut, ChangePlanOut, ReviewOut, Filter
 };
 use rstest::*;
 use actix_web::web::Data;
@@ -42,111 +38,33 @@ impl Display for Endpoint {
 }
 
 #[rstest]
-#[case::site_validation(
-    Endpoint::Sites,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    0,
-    422
-)]
-#[case::auds_validation(
-    Endpoint::Auds,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    0,
-    422
-)]
-#[case::ways_validation(
-    Endpoint::Ways,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    0,
-    422
-)]
-#[case::plans_validation(
-    Endpoint::Plans,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    0,
-    422
-)]
-#[case::reviews_validation(
-    Endpoint::Reviews,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    0,
-    422
-)]
-#[case::site_ok(
-    Endpoint::Sites,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    1,
-    200
-)]
-#[case::auds_ok(
-    Endpoint::Auds,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    1,
-    200
-)]
-#[case::ways_ok(
-    Endpoint::Ways,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    1,
-    200
-)]
-#[case::plans_ok(
-    Endpoint::Plans,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    1,
-    200
-)]
-#[case::reviews_ok(
-    Endpoint::Reviews,
-    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-    1,
-    200
-)]
-#[case::site_notallowed(Endpoint::Sites, "1", 0, 403)]
-#[case::auds_notallowed(Endpoint::Auds, "1", 0, 403)]
-#[case::ways_notallowed(Endpoint::Ways, "1", 0, 403)]
-#[case::plans_notallowed(Endpoint::Plans, "1", 0, 403)]
-#[case::reviews_notallowed(Endpoint::Reviews, "1", 0, 403)]
+#[case::site_validation(Endpoint::Sites, true, 0, 422, false)]
+#[case::auds_validation(Endpoint::Auds, true, 0, 422, false)]
+#[case::ways_validation(Endpoint::Ways, true, 0, 422, false)]
+#[case::plans_validation(Endpoint::Plans, true, 0, 422, false)]
+#[case::reviews_validation(Endpoint::Reviews, true, 0, 422, false)]
+#[case::site_ok(Endpoint::Sites, true, 1, 200, false)]
+#[case::auds_ok(Endpoint::Auds, true, 1, 200, false)]
+#[case::ways_ok(Endpoint::Ways, true, 1, 200, false)]
+#[case::plans_ok(Endpoint::Plans, true, 1, 200, false)]
+#[case::reviews_ok(Endpoint::Reviews, true, 1, 200, false)]
+#[case::site_filter(Endpoint::Sites, true, 1, 200, true)]
+#[case::auds_filter(Endpoint::Auds, true, 1, 200, true)]
+#[case::ways_filter(Endpoint::Ways, true, 1, 200, true)]
+#[case::plans_filter(Endpoint::Plans, true, 1, 200, true)]
+#[case::reviews_filter(Endpoint::Reviews, true, 1, 200, true)]
+#[case::site_notallowed(Endpoint::Sites, false, 0, 403, false)]
+#[case::auds_notallowed(Endpoint::Auds, false, 0, 403, false)]
+#[case::ways_notallowed(Endpoint::Ways, false, 0, 403, false)]
+#[case::plans_notallowed(Endpoint::Plans, false, 0, 403, false)]
+#[case::reviews_notallowed(Endpoint::Reviews, false, 0, 403, false)]
 #[tokio::test]
 async fn get(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
     #[case] endpoint: Endpoint,
-    #[case] key: &'static str,
+    #[case] correct: bool,
     #[case] page: u64,
-    #[case] status: u16
-) {
-    assert!(prepare_connection.is_ok());
-    let db = prepare_connection.unwrap();
-    let app = match endpoint {
-        Endpoint::Sites => test::init_service(App::new().app_data(Data::new(db)).service(get_sites)),
-        Endpoint::Auds => test::init_service(App::new().app_data(Data::new(db)).service(get_auds)),
-        Endpoint::Ways => test::init_service(App::new().app_data(Data::new(db)).service(get_ways)),
-        Endpoint::Plans => test::init_service(App::new().app_data(Data::new(db)).service(get_plans)),
-        Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
-    }.await;
-    let req = test::TestRequest::get()
-        .uri(&format!("/{endpoint}?api_key={key}&page={page}"))
-        .to_request();
-    let resp = test::call_service(&app, req).await;
-    assert_eq!(resp.status().as_u16(), status);
-}
-
-
-#[rstest]
-#[case::site(Endpoint::Sites, false)]
-#[case::auds(Endpoint::Auds, false)]
-#[case::ways(Endpoint::Ways, false)]
-#[case::plans(Endpoint::Plans, false)]
-#[case::plans(Endpoint::Reviews, false)]
-#[case::site_filter(Endpoint::Sites, true)]
-#[case::auds_filter(Endpoint::Auds, true)]
-#[case::ways_filter(Endpoint::Ways, true)]
-#[case::plans_filter(Endpoint::Plans, true)]
-#[case::plans_filter(Endpoint::Reviews, true)]
-#[tokio::test]
-async fn check_value(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] endpoint: Endpoint,
+    #[case] status: u16,
     #[case] filter: bool
 ) {
     assert!(prepare_connection.is_ok());
@@ -158,12 +76,53 @@ async fn check_value(
         Endpoint::Plans => test::init_service(App::new().app_data(Data::new(db)).service(get_plans)),
         Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
     }.await;
+    let query = Filter {
+        api_key: if correct {
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string()
+        } else { "1".to_string() },
+        user_id: if filter {
+            Some(uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap())
+        } else { None },
+        size: 50,
+        page,
+    };
+    let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
-        .uri(&format!(
-            "/{endpoint}?api_key={}{}",
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-            if filter { "&user_id=11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec" } else { "" }
-        ))
+        .uri(&format!("/{endpoint}?{query}"))
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status().as_u16(), status);
+}
+
+#[rstest]
+#[case::site(Endpoint::Sites)]
+#[case::auds(Endpoint::Auds)]
+#[case::ways(Endpoint::Ways)]
+#[case::plans(Endpoint::Plans)]
+#[case::plans(Endpoint::Reviews)]
+#[tokio::test]
+async fn check_value(
+    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+    #[case] endpoint: Endpoint
+) {
+    assert!(prepare_connection.is_ok());
+    let db = prepare_connection.unwrap();
+    let app = match endpoint {
+        Endpoint::Sites => test::init_service(App::new().app_data(Data::new(db)).service(get_sites)),
+        Endpoint::Auds => test::init_service(App::new().app_data(Data::new(db)).service(get_auds)),
+        Endpoint::Ways => test::init_service(App::new().app_data(Data::new(db)).service(get_ways)),
+        Endpoint::Plans => test::init_service(App::new().app_data(Data::new(db)).service(get_plans)),
+        Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
+    }.await;
+    let query = Filter {
+        api_key: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string(),
+        user_id: None,
+        size: 50,
+        page: 1,
+    };
+    let query = serde_qs::to_string(&query).unwrap();
+    let req = test::TestRequest::get()
+        .uri(&format!("/{endpoint}?{query}"))
         .to_request();
     match endpoint {
         Endpoint::Sites => {

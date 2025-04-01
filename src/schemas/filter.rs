@@ -4,7 +4,7 @@ use validator::Validate;
 use chrono::NaiveDate;
 use utoipa::ToSchema;
 
-#[derive(Deserialize, Clone, ToSchema, Validate)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
 pub struct Filter {
     #[allow(dead_code)]
     #[schema(
