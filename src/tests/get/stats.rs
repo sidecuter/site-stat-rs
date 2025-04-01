@@ -133,15 +133,21 @@ async fn get(
 
 
 #[rstest]
-#[case::site(Endpoint::Sites)]
-#[case::auds(Endpoint::Auds)]
-#[case::ways(Endpoint::Ways)]
-#[case::plans(Endpoint::Plans)]
-#[case::plans(Endpoint::Reviews)]
+#[case::site(Endpoint::Sites, false)]
+#[case::auds(Endpoint::Auds, false)]
+#[case::ways(Endpoint::Ways, false)]
+#[case::plans(Endpoint::Plans, false)]
+#[case::plans(Endpoint::Reviews, false)]
+#[case::site_filter(Endpoint::Sites, true)]
+#[case::auds_filter(Endpoint::Auds, true)]
+#[case::ways_filter(Endpoint::Ways, true)]
+#[case::plans_filter(Endpoint::Plans, true)]
+#[case::plans_filter(Endpoint::Reviews, true)]
 #[tokio::test]
 async fn check_value(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] endpoint: Endpoint
+    #[case] endpoint: Endpoint,
+    #[case] filter: bool
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
@@ -154,8 +160,9 @@ async fn check_value(
     }.await;
     let req = test::TestRequest::get()
         .uri(&format!(
-            "/{endpoint}?api_key={}",
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+            "/{endpoint}?api_key={}{}",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            if filter { "&user_id=11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec" } else { "" }
         ))
         .to_request();
     match endpoint {
