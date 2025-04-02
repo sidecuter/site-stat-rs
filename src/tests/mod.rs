@@ -8,6 +8,7 @@ mod site;
 mod gets;
 mod aud;
 mod way;
+mod plan;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
