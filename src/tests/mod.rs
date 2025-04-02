@@ -7,6 +7,7 @@ mod user_id;
 mod site;
 mod gets;
 mod aud;
+mod way;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
