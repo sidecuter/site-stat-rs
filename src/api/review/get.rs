@@ -10,7 +10,7 @@ use crate::traits::Paginate;
     get,
     path = "/api/review/get",
     params(
-        ("api_key" = inline(String), Query, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+        ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("user_id" = inline(Option<uuid::Uuid>), Query, example = "84f332ed-fedc-48f6-9119-c6833932646f"),
         ("page" = inline(Option<u64>), Query, minimum = 1, example = "1"),
         ("size" = inline(Option<u64>), Query, maximum = 100, example = "50"),

@@ -68,18 +68,16 @@ async fn get(
     #[case] filter: bool
 ) {
     assert!(prepare_connection.is_ok());
-    let db = prepare_connection.unwrap();
+    let db = Data::new(prepare_connection.unwrap());
+    let app_state = Data::new(crate::app_state::AppState::new());
     let app = match endpoint {
-        Endpoint::Sites => test::init_service(App::new().app_data(Data::new(db)).service(get_sites)),
-        Endpoint::Auds => test::init_service(App::new().app_data(Data::new(db)).service(get_auds)),
-        Endpoint::Ways => test::init_service(App::new().app_data(Data::new(db)).service(get_ways)),
-        Endpoint::Plans => test::init_service(App::new().app_data(Data::new(db)).service(get_plans)),
-        Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
+        Endpoint::Sites => test::init_service(App::new().app_data(app_state).app_data(db).service(get_sites)),
+        Endpoint::Auds => test::init_service(App::new().app_data(app_state).app_data(db).service(get_auds)),
+        Endpoint::Ways => test::init_service(App::new().app_data(app_state).app_data(db).service(get_ways)),
+        Endpoint::Plans => test::init_service(App::new().app_data(app_state).app_data(db).service(get_plans)),
+        Endpoint::Reviews => test::init_service(App::new().app_data(app_state).app_data(db).service(get_reviews))
     }.await;
     let query = Filter {
-        api_key: if correct {
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string()
-        } else { "1".to_string() },
         user_id: if filter {
             Some(uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap())
         } else { None },
@@ -89,6 +87,11 @@ async fn get(
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
+        .insert_header(
+            (
+                "Api-Key",
+                if correct {"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"} else {"1"}
+            ))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), status);
@@ -115,7 +118,6 @@ async fn check_value(
         Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
     }.await;
     let query = Filter {
-        api_key: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string(),
         user_id: None,
         size: 50,
         page: 1,
@@ -123,6 +125,10 @@ async fn check_value(
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
+        .insert_header((
+            "Api-Key",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        ))
         .to_request();
     match endpoint {
         Endpoint::Sites => {
