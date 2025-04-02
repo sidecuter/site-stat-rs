@@ -6,6 +6,7 @@ mod swagger;
 mod user_id;
 mod site;
 mod gets;
+mod aud;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
