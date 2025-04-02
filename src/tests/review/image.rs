@@ -23,7 +23,10 @@ async fn get_image_endpoint() {
         .app_data(Data::new(AppState::default()))
         .service(get_image)
     ).await;
-    let req = test::TestRequest::get().uri(&format!("/image/{}", filename)).to_request();
+    let req = test::TestRequest::get()
+        .uri(&format!("/image/{}", filename))
+        .insert_header(("Api-Key", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde1"))
+        .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), 200);
     fs::remove_dir_all(filepath).unwrap()

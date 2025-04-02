@@ -48,7 +48,6 @@ async fn get_stat_endpoint(
     let db = prepare_connection.unwrap();
     let app = test::init_service(App::new().app_data(Data::new(db)).service(get_stat)).await;
     let query = FilterQuery {
-        api_key: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_string(),
         target, start_date, end_date
     };
     let query = serde_qs::to_string(&query).unwrap();
