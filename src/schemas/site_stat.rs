@@ -29,15 +29,6 @@ pub struct SiteStatisticsOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for SiteStatisticsIn {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            endpoint: Some("/app".to_string()),
-        }
-    }
-}
-
 impl Default for SiteStatisticsOut {
     fn default() -> Self {
         Self {

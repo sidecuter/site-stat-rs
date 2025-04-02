@@ -134,17 +134,6 @@ impl ReviewFormIn {
     }
 }
 
-impl Default for ReviewFormIn {
-    fn default() -> Self {
-        Self {
-            user_id: Text(Uuid::new_v4()),
-            text: Text(String::from("Some cool review")),
-            problem: Text(Problem::Other),
-            image: None
-        }
-    }
-}
-
 impl Default for ReviewIn {
     fn default() -> Self {
         Self {

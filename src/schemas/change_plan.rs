@@ -33,15 +33,6 @@ pub struct ChangePlanOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for ChangePlanIn {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            plan_id: "A-0".into(),
-        }
-    }
-}
-
 impl Default for ChangePlanOut {
     fn default() -> Self {
         Self {
