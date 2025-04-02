@@ -1,6 +1,6 @@
 // mod get;
 // mod stat;
-// mod review;
+mod review;
 mod helpers;
 mod swagger;
 mod user_id;
