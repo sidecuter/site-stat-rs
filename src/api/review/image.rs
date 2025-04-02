@@ -9,6 +9,7 @@ use std::path::Path;
     get,
     path = "/api/review/image/{filename}",
     params(
+        ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("filename" = String, Path, description = "Path to file", example = "e3f295a9311d490888ad4706ad39220b.png"),
     ),
     responses(

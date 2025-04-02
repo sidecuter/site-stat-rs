@@ -1,4 +1,4 @@
-use crate::schemas::validators::{API_KEY_RE, page_default, size_default};
+use crate::schemas::validators::{page_default, size_default};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 use chrono::NaiveDate;
@@ -6,13 +6,6 @@ use utoipa::ToSchema;
 
 #[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
 pub struct Filter {
-    #[allow(dead_code)]
-    #[schema(
-        pattern = r"^[0-9a-f]{64}$",
-        example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-    )]
-    #[validate(length(equal = 64), regex(path = *API_KEY_RE))]
-    pub api_key: String,
     pub user_id: Option<uuid::Uuid>,
     #[schema(example = 1, minimum = 1)]
     #[serde(default = "page_default")]
@@ -35,13 +28,6 @@ pub enum Target {
 
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Validate)]
 pub struct FilterQuery {
-    #[allow(dead_code)]
-    #[schema(
-        pattern = r"^[0-9a-f]{64}$",
-        example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-    )]
-    #[validate(length(equal = 64), regex(path = *API_KEY_RE))]
-    pub api_key: String,
     pub target: Target,
     pub start_date: Option<NaiveDate>,
     pub end_date: Option<NaiveDate>,

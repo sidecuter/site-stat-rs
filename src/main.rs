@@ -9,8 +9,9 @@ use actix_cors::Cors;
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
-use stat_api::{api, api_docs, app_state::AppState, errors::ApiError};
+use stat_api::{api, api_docs, errors::ApiError};
 use utoipa_swagger_ui::SwaggerUi;
+use stat_api::app_state::AppState;
 
 #[cfg(not(debug_assertions))]
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
@@ -43,7 +44,7 @@ async fn main() -> std::io::Result<()> {
             .with_max_level(tracing::Level::INFO)
             .init();
     }
-    let app_state = AppState::new();
+    let app_state = web::Data::new(AppState::default());
     let addr = format!("{}:{}", app_state.host, app_state.port);
     let pool = get_database_connection(&app_state.database_url).await;
     if !std::path::Path::new(&app_state.files_path).exists() {
@@ -70,7 +71,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(AppState::new()))
+            .app_data(app_state.clone())
             .wrap(Logger::default())
             .configure(api::init_routes)
             .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))

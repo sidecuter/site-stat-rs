@@ -9,7 +9,7 @@ use crate::errors::{ApiError, ApiResult};
     get,
     path = "/api/get/stat",
     params(
-        ("api_key" = inline(String), Query, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+        ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("target" = inline(crate::schemas::Target), Query),
         ("start_date" = inline(Option<chrono::NaiveDate>), Query, example = "2025-01-11"),
         ("end_date" = inline(Option<chrono::NaiveDate>), Query, example = "2025-01-12"),
