@@ -85,15 +85,8 @@ impl ReviewFormIn {
     }
 
     fn get_file_ext(mimetype: Mime) -> Option<String> {
-        static ALLOWED_TYPES: [&str; 5] = [
-            "png",
-            "jpeg",
-            "gif",
-            "heif",
-            "webp",
-        ];
         match mimetype.subtype().as_str() {
-            filetype if ALLOWED_TYPES.contains(&filetype) => Some(filetype.to_string()),
+            filetype if filetype.len() <= 4 => Some(filetype.to_string()),
             _ => None
         }
     }

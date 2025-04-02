@@ -23,7 +23,7 @@ use std::path::Path;
     ),
     tag = "Review"
 )]
-#[get("/image/{filename:[a-f0-9]{32}.(png|jpe?g|heif|gif|webp)}")]
+#[get("/image/{filename:[a-f0-9]{32}\\.\\w{3,4}}")]
 async fn get_image(
     state: web::Data<AppState>,
     filename: web::Path<String>
