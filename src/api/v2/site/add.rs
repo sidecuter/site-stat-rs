@@ -29,7 +29,7 @@ use sea_orm::{DatabaseConnection, IntoActiveModel, ActiveModelTrait};
     ),
     tag = "Site"
 )]
-#[put("add")]
+#[put("/add")]
 async fn add_stat_site(
     data: web::Json<SiteStatisticsIn>,
     db: web::Data<DatabaseConnection>,
