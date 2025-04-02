@@ -17,5 +17,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(aud::init_routes)
             .configure(way::init_routes)
             .configure(plan::init_routes)
+            .configure(review::init_routes)
     );
 }
