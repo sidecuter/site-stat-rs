@@ -15,5 +15,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(user_id::init_routes)
             .configure(site::init_routes)
             .configure(aud::init_routes)
+            .configure(way::init_routes)
     );
 }
