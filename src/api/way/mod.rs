@@ -1,7 +1,7 @@
 use actix_web::web;
 
-mod get;
-mod add;
+pub mod get;
+pub mod add;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
