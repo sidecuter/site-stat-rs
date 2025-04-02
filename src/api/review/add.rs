@@ -1,3 +1,5 @@
+#![allow(clippy::clone_on_copy)]
+
 use actix_multipart::form::MultipartForm;
 use crate::entity::user_id;
 use crate::errors::ApiResult;

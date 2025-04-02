@@ -7,7 +7,7 @@ use std::path::Path;
 
 #[utoipa::path(
     get,
-    path = "/api/review/image/{filename:.*}",
+    path = "/api/review/image/{filename}",
     params(
         ("filename" = String, Path, description = "Path to file", example = "e3f295a9311d490888ad4706ad39220b.png"),
     ),
@@ -23,7 +23,7 @@ use std::path::Path;
     ),
     tag = "Review"
 )]
-#[get("/image/{filename:.*}")]
+#[get("/image/{filename:[a-f0-9]{32}\\.\\w{3,4}}")]
 async fn get_image(
     state: web::Data<AppState>,
     filename: web::Path<String>

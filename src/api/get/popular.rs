@@ -4,7 +4,6 @@ use actix_web::{get, web};
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection,
     EntityTrait, QueryFilter, QuerySelect, QueryTrait,
-    Statement
 };
 use sea_orm::sea_query::*;
 use crate::entity::{select_aud, start_way};
@@ -54,7 +53,7 @@ async fn get_popular(
         .from_subquery(qr, Alias::new("tr"))
         .order_by_expr(Expr::col(Alias::new("CNT")).sum(), Order::Desc)
         .to_owned();
-    let stmt = Statement::from(db.get_database_backend().build(&result_query));
+    let stmt = db.get_database_backend().build(&result_query);
     let results = db.query_all(stmt).await?;
     Ok(Popular(results.into_iter().map(|val| {
         val.try_get_by_index::<String>(0).unwrap()

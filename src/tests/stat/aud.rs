@@ -37,8 +37,7 @@ async fn stat_aud_endpoint(
     let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        auditory_id: auditory_id.into(),
-        success,
+        auditory_id, success,
     };
     let req = test::TestRequest::put()
         .uri("/select-aud")

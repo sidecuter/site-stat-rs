@@ -4,7 +4,7 @@ use validator::Validate;
 use chrono::NaiveDate;
 use utoipa::ToSchema;
 
-#[derive(Deserialize, Clone, ToSchema, Validate)]
+#[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
 pub struct Filter {
     #[allow(dead_code)]
     #[schema(
@@ -33,8 +33,7 @@ pub enum Target {
     Plans,
 }
 
-#[derive(Deserialize, Clone, Debug, ToSchema, Validate)]
-#[serde(tag = "target")]
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Validate)]
 pub struct FilterQuery {
     #[allow(dead_code)]
     #[schema(

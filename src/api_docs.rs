@@ -20,6 +20,7 @@ use utoipa::OpenApi;
         // Review routes
         crate::api::review::add::add_review,
         crate::api::review::get::get_reviews,
+        crate::api::review::image::get_image,
     ),
     components (
         schemas (

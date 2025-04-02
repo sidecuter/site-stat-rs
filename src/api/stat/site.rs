@@ -34,6 +34,6 @@ async fn stat_site(
     data: web::Json<SiteStatisticsIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
-    user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
+    user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
 }

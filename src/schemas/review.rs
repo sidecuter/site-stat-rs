@@ -4,6 +4,7 @@ use std::{fmt::{Display, Formatter}, path::Path};
 use actix_web::{body::BoxBody, web, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
+use mime::Mime;
 use utoipa::ToSchema;
 use uuid::Uuid;
 use crate::errors::{ApiResult, ApiError};
@@ -79,17 +80,34 @@ impl Display for Problem {
 }
 
 impl ReviewFormIn {
+    fn create_filename() -> String {
+        Uuid::new_v4().to_string().replace("-", "")
+    }
+
+    fn get_file_ext(mimetype: Mime) -> Option<String> {
+        match mimetype.subtype().as_str() {
+            filetype if filetype.len() <= 4 => Some(filetype.to_string()),
+            _ => None
+        }
+    }
+
     pub async fn save_image(self, state: &AppState) -> ApiResult<Option<String>> {
         Ok(if let Some(img) = self.image {
-            if let Some(mime) = img.content_type {
+            if let Some(mime) = img.content_type.clone() {
                 if mime.type_() != mime::IMAGE {
                     Err(ApiError::UnsupportedMediaType("This endpoint accepts only images".to_owned()))?;
                 }
             } else {
                 Err(ApiError::UnprocessableData("File has no mime type".to_owned()))?;
             }
-            let img_id = Uuid::new_v4().to_string().replace("-", "");
-            let img_ext = format!(".{}", img.file_name.unwrap().split(".").last().unwrap());
+            let img_id = Self::create_filename();
+            let img_ext = if let Some(img_ext) = Self::get_file_ext(img.content_type.unwrap()) {
+                img_ext
+            } else {
+                Err(ApiError::UnsupportedMediaType(
+                    "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned()
+                ))?
+            };
             let img_name = format!("{img_id}{img_ext}");
             let path = Path::new(&state.files_path)
                 .join(img_name.clone())
@@ -113,17 +131,6 @@ impl ReviewFormIn {
         } else {
             None
         })
-    }
-}
-
-impl Default for ReviewFormIn {
-    fn default() -> Self {
-        Self {
-            user_id: Text(Uuid::new_v4()),
-            text: Text(String::from("Some cool review")),
-            problem: Text(Problem::Other),
-            image: None
-        }
     }
 }
 
@@ -158,18 +165,6 @@ impl From<review::Model> for ReviewOut {
             problem: value.problem_id.into(),
             image_name: value.image_name,
             creation_date: value.creation_date,
-        }
-    }
-}
-
-impl From<review::ActiveModel> for ReviewOut {
-    fn from(value: review::ActiveModel) -> Self {
-        Self {
-            user_id: value.user_id.unwrap(),
-            text: value.text.unwrap(),
-            problem: value.problem_id.unwrap().into(),
-            image_name: value.image_name.unwrap(),
-            creation_date: value.creation_date.unwrap(),
         }
     }
 }
