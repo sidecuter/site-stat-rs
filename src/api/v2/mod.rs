@@ -19,5 +19,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(plan::init_routes)
             .configure(stat::init_routes)
             .configure(review::init_routes)
+            .configure(popular::init_routes)
     );
 }
