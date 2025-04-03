@@ -1,3 +1,4 @@
+use actix_web::middleware::NormalizePath;
 use actix_web::web;
 
 pub mod user_id;
@@ -22,5 +23,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(review::init_routes)
             .configure(popular::init_routes)
             .service(healthcheck::get_status)
+            .wrap(NormalizePath::trim())
     );
 }
