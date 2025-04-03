@@ -8,6 +8,7 @@ pub mod plan;
 pub mod stat;
 pub mod review;
 pub mod popular;
+pub mod healthcheck;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -20,5 +21,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(stat::init_routes)
             .configure(review::init_routes)
             .configure(popular::init_routes)
+            .service(healthcheck::get_status)
     );
 }

@@ -21,6 +21,8 @@ use utoipa::OpenApi;
         crate::api::review::add::add_review,
         crate::api::review::get::get_reviews,
         crate::api::review::image::get_image,
+        // Healthcheck
+        crate::api::healthcheck::get_status,
     ),
     components (
         schemas (
@@ -53,6 +55,7 @@ use utoipa::OpenApi;
         (name = "Stat", description = "Statistics methods"),
         (name = "Review", description = "Endpoint for reviews"),
         (name = "Popular", description = "Methods for popular auditories"),
+        (name = "Healthcheck", description = "Methods for getting server status"),
     ),
 )]
 pub struct ApiDoc;
