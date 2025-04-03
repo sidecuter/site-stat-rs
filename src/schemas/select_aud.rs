@@ -36,17 +36,6 @@ pub struct SelectAuditoryOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for SelectAuditoryOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            auditory_id: "a-100".to_string(),
-            visit_date: chrono::Utc::now().naive_utc(),
-            success: true,
-        }
-    }
-}
-
 impl From<select_aud::Model> for SelectAuditoryOut {
     fn from(value: select_aud::Model) -> Self {
         Self {

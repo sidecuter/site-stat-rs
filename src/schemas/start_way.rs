@@ -38,17 +38,6 @@ pub struct StartWayOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for StartWayOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            start_id: "a-100".into(),
-            end_id: "a-101".into(),
-            visit_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<start_way::Model> for StartWayOut {
     fn from(value: start_way::Model) -> Self {
         Self {

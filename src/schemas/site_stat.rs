@@ -28,16 +28,6 @@ pub struct SiteStatisticsOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for SiteStatisticsOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            endpoint: Some("/app".to_string()),
-            visit_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<site_stat::Model> for SiteStatisticsOut {
     fn from(value: site_stat::Model) -> Self {
         Self {

@@ -145,18 +145,6 @@ impl Default for ReviewIn {
     }
 }
 
-impl Default for ReviewOut {
-    fn default() -> Self {
-        Self {
-            user_id: Uuid::new_v4(),
-            text: String::from("Some cool review"),
-            problem: Problem::Other,
-            image_name: Some(format!("{}.png", Uuid::new_v4().to_string().replace("-", ""))),
-            creation_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<review::Model> for ReviewOut {
     fn from(value: review::Model) -> Self {
         Self {
