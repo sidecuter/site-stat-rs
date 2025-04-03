@@ -108,7 +108,7 @@ impl ReviewFormIn {
                     "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned()
                 ))?
             };
-            let img_name = format!("{img_id}{img_ext}");
+            let img_name = format!("{img_id}.{img_ext}");
             let path = Path::new(&state.files_path)
                 .join(img_name.clone())
                 .to_str()
