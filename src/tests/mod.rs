@@ -1,4 +1,3 @@
-// mod get;
 mod review;
 mod helpers;
 mod swagger;
@@ -9,6 +8,7 @@ mod aud;
 mod way;
 mod plan;
 mod stat;
+mod popular;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
