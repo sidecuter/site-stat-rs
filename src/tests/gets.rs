@@ -1,8 +1,9 @@
-use crate::api::get::{
-    auds::get_auds,
-    plans::get_plans,
-    sites::get_sites,
-    ways::get_ways
+use crate::api::{
+    aud::get::get_auds,
+    plan::get::get_plans,
+    site::get::get_sites,
+    way::get::get_ways,
+    review::get::get_reviews
 };
 use crate::schemas::{
     Pagination, SiteStatisticsOut, SelectAuditoryOut,
@@ -12,9 +13,7 @@ use rstest::*;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use sea_orm::DatabaseConnection;
-use std::fmt::{Display, Formatter};
-use super::super::prepare_connection;
-use crate::api::review::get::get_reviews;
+use super::prepare_connection;
 
 enum Endpoint {
     Sites,
@@ -22,19 +21,6 @@ enum Endpoint {
     Ways,
     Plans,
     Reviews
-}
-
-impl Display for Endpoint {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let a = match self {
-            Endpoint::Sites => "sites",
-            Endpoint::Auds => "auds",
-            Endpoint::Ways => "ways",
-            Endpoint::Plans => "plans",
-            Endpoint::Reviews => "get",
-        };
-        write!(f, "{}", a)
-    }
 }
 
 #[rstest]
@@ -86,7 +72,7 @@ async fn get(
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
-        .uri(&format!("/{endpoint}?{query}"))
+        .uri(&format!("/get?{query}"))
         .insert_header(
             (
                 "Api-Key",
@@ -124,7 +110,7 @@ async fn check_value(
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
-        .uri(&format!("/{endpoint}?{query}"))
+        .uri(&format!("/get?{query}"))
         .insert_header((
             "Api-Key",
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"

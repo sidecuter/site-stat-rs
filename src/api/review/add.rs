@@ -12,7 +12,7 @@ use crate::schemas::review::ReviewFormIn;
 
 #[utoipa::path(
     post,
-    path = "/api/review/add",
+    path = "/v2/review/add",
     request_body(content = ReviewFormIn, content_type = "multipart/form-data"),
     responses(
         (

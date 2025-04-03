@@ -9,7 +9,7 @@ use crate::entity::{aud, user_id};
 
 #[utoipa::path(
     put,
-    path = "/api/stat/select-aud",
+    path = "/v2/aud/add",
     request_body = SelectAuditoryIn,
     responses(
         (
@@ -37,10 +37,10 @@ use crate::entity::{aud, user_id};
             example = json!(Status{status: "database error".to_string()})
         ),
     ),
-    tag = "Stat"
+    tag = "Aud"
 )]
-#[put("select-aud", wrap="build_rate_limits()")]
-async fn stat_aud(
+#[put("add", wrap="build_rate_limits()")]
+async fn add_stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
@@ -54,6 +54,6 @@ async fn stat_aud(
         db.get_ref(),
         "Auditory".to_string(),
     )
-    .await?;
+        .await?;
     data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
 }
