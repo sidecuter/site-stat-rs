@@ -1,7 +1,7 @@
 use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait, ActiveValue::Set};
 use actix_multipart::form::{tempfile::TempFile, MultipartForm, text::Text};
 use std::{fmt::{Display, Formatter}, path::Path};
-use actix_web::{body::BoxBody, web, Responder};
+use actix_web::web;
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use mime::Mime;
@@ -166,14 +166,6 @@ impl From<review::Model> for ReviewOut {
             image_name: value.image_name,
             creation_date: value.creation_date,
         }
-    }
-}
-
-impl Responder for ReviewOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 

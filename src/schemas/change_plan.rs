@@ -3,7 +3,6 @@ use sea_orm::{
     Select, QueryFilter, ColumnTrait,
     ActiveValue::Set
 };
-use actix_web::{body::BoxBody, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use validator::Validate;
@@ -50,14 +49,6 @@ impl From<change_plan::Model> for ChangePlanOut {
             plan_id: value.plan_id,
             visit_date: value.visit_date,
         }
-    }
-}
-
-impl Responder for ChangePlanOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
