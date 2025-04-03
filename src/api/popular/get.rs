@@ -10,7 +10,7 @@ use crate::entity::{select_aud, start_way};
 
 #[utoipa::path(
     get,
-    path = "/api/get/popular",
+    path = "/v2/popular/get",
     responses(
         (
             status = 200, description = "Paginated output for site visits", body = Popular
@@ -20,9 +20,9 @@ use crate::entity::{select_aud, start_way};
             example = json!(Status{status: "database error".to_string()})
         )
     ),
-    tag = "Get"
+    tag = "Popular"
 )]
-#[get("/popular")]
+#[get("/get")]
 async fn get_popular(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Popular> {

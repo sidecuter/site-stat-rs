@@ -1,6 +1,7 @@
+use std::borrow::Cow;
 use crate::schemas::validators::{page_default, size_default};
 use serde::{Deserialize, Serialize};
-use validator::Validate;
+use validator::{Validate, ValidationError};
 use chrono::NaiveDate;
 use utoipa::ToSchema;
 
@@ -27,8 +28,20 @@ pub enum Target {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Validate)]
+#[validate(schema(function = "validate_filter_query"))]
 pub struct FilterQuery {
     pub target: Target,
     pub start_date: Option<NaiveDate>,
     pub end_date: Option<NaiveDate>,
+}
+
+fn validate_filter_query(schema: &FilterQuery) -> Result<(), ValidationError> {
+    if let (Some(st_d), Some(end_d)) = (schema.start_date, schema.end_date) {
+        if st_d > end_d {
+            Err(
+                ValidationError::new("invalid_date_range")
+                    .with_message(Cow::from("start_date must be lesser than end_date"))
+            )   
+        } else { Ok(()) }
+    } else { Ok(()) }
 }

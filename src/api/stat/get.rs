@@ -7,7 +7,7 @@ use crate::errors::{ApiError, ApiResult};
 
 #[utoipa::path(
     get,
-    path = "/api/get/stat",
+    path = "/v2/stat/get",
     params(
         ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("target" = inline(crate::schemas::Target), Query),
@@ -24,9 +24,9 @@ use crate::errors::{ApiError, ApiResult};
             example = json!(Status{status: "database error".to_string()})
         )
     ),
-    tag = "Get"
+    tag = "Stat"
 )]
-#[get("/stat", wrap = "from_fn(api_key_middleware)")]
+#[get("/get", wrap = "from_fn(api_key_middleware)")]
 async fn get_stat(
     data: web::Query<FilterQuery>,
     db: web::Data<DatabaseConnection>,
