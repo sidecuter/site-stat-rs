@@ -9,6 +9,7 @@ mod way;
 mod plan;
 mod stat;
 mod popular;
+mod healthcheck;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
