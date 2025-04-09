@@ -1,6 +1,6 @@
 mod review;
 mod helpers;
-mod swagger;
+mod redoc;
 mod user_id;
 mod site;
 mod gets;
