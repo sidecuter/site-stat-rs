@@ -15,9 +15,10 @@ pub fn prepare_tmp_dir() -> String {
     let filepath = format!("/tmp/{}", Uuid::new_v4());
     std::env::set_var("FILES_PATH", filepath.clone());
     let appstate = AppState::new();
-    if !Path::new(&appstate.files_path).exists() {
-        fs::create_dir(appstate.files_path.clone()).unwrap();
-    };
+    let files_path = Path::new(&appstate.files_path).join("images");
+    if !files_path.exists() {
+        fs::create_dir_all(files_path).unwrap();
+    }
     filepath
 }
 

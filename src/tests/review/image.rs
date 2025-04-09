@@ -16,7 +16,9 @@ async fn get_image_endpoint() {
     let filename = format!("{}.png", Uuid::new_v4().to_string().replace("-", ""));
     let filepath = prepare_tmp_dir();
     {
-        let mut file = fs::File::create(Path::new(&filepath).join(filename.clone())).unwrap();
+        let mut file = fs::File::create(
+            Path::new(&filepath).join("images").join(filename.clone())
+        ).unwrap();
         file.write_all(BLACK_1X1_PNG).unwrap();
     }
     let app = test::init_service(App::new()
