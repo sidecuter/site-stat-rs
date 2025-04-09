@@ -11,9 +11,11 @@ pub struct AppState {
     pub port: String,
     pub admin_key: String,
     pub database_url: String,
-    pub files_path: String,
+    pub static_path: String,
     pub allowed_host: Option<String>,
     pub allowed_methods: Option<Vec<Method>>,
+    pub files_path: String,
+    pub front_path: String,
 }
 
 const METHODS_ARRAY: [&str; 9] = [
@@ -45,7 +47,9 @@ impl AppState {
         let admin_key = std::env::var("ADMIN_KEY").unwrap_or_else(|_|
             "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned()
         );
-        let files_path = std::env::var("FILES_PATH").unwrap_or_else(|_| "./static".to_owned());
+        let static_path = std::env::var("FILES_PATH").unwrap_or_else(|_| "./static".to_owned());
+        let files_path = std::path::Path::new(&static_path).join("images").to_str().unwrap().to_string();
+        let front_path = std::path::Path::new(&static_path).join("web").to_str().unwrap().to_string();
         let allowed_host = std::env::var("ALLOWED_HOST").ok();
         let allowed_methods = std::env::var("ALLOWED_METHODS").ok().map(|v|
             v
@@ -55,6 +59,16 @@ impl AppState {
                 .map(|v| Method::from_str(v).expect("Method should be allowed"))
                 .collect()
         );
-        Self { host, port, admin_key, database_url, files_path, allowed_host, allowed_methods }
+        Self {
+            host,
+            port,
+            admin_key,
+            database_url,
+            static_path,
+            files_path,
+            front_path,
+            allowed_host,
+            allowed_methods
+        }
     }
 }
