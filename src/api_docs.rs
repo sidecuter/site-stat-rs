@@ -1,28 +1,25 @@
-use actix_web::{get, HttpResponse, Responder};
 use utoipa::OpenApi;
 
 #[derive(OpenApi)]
 #[openapi(
     paths(
         // Get routes
-        crate::api::user_id::get::get_user_id,
-        crate::api::site::get::get_sites,
-        crate::api::aud::get::get_auds,
-        crate::api::way::get::get_ways,
-        crate::api::plan::get::get_plans,
-        crate::api::stat::get::get_stat,
-        crate::api::popular::get::get_popular,
+        crate::api::get::user_id::get_user_id,
+        crate::api::get::sites::get_sites,
+        crate::api::get::auds::get_auds,
+        crate::api::get::ways::get_ways,
+        crate::api::get::plans::get_plans,
+        crate::api::get::popular::get_popular,
+        crate::api::get::stat::get_stat,
         // Set routes
-        crate::api::site::add::add_stat_site,
-        crate::api::aud::add::add_stat_aud,
-        crate::api::way::add::add_stat_way,
-        crate::api::plan::add::add_stat_plan,
+        crate::api::stat::site::stat_site,
+        crate::api::stat::aud::stat_aud,
+        crate::api::stat::way::stat_way,
+        crate::api::stat::plan::stat_plan,
         // Review routes
         crate::api::review::add::add_review,
         crate::api::review::get::get_reviews,
         crate::api::review::image::get_image,
-        // Healthcheck
-        crate::api::healthcheck::get_status,
     ),
     components (
         schemas (
@@ -47,22 +44,9 @@ use utoipa::OpenApi;
         )
     ),
     tags (
-        (name = "UserId", description = "Methods for user_id"),
-        (name = "Site", description = "Methods for site visits stats"),
-        (name = "Aud", description = "Methods for auditory select stats"),
-        (name = "Way", description = "Methods for started ways stats"),
-        (name = "Plan", description = "Methods for changed plans stats"),
-        (name = "Stat", description = "Statistics methods"),
+        (name = "Get", description = "Getters for content"),
+        (name = "Stat", description = "Statistics insertion endpoints"),
         (name = "Review", description = "Endpoint for reviews"),
-        (name = "Popular", description = "Methods for popular auditories"),
-        (name = "Healthcheck", description = "Methods for getting server status"),
     ),
 )]
 pub struct ApiDoc;
-
-/// Return a json OpenAPI document
-#[get("/openapi.json")]
-pub async fn openapi_json() -> impl Responder {
-    let openapi = ApiDoc::openapi();
-    HttpResponse::Ok().json(openapi)
-}

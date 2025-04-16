@@ -55,9 +55,6 @@ async fn main() -> std::io::Result<()> {
         fs::create_dir(app_state.front_path.clone())?;
     }
     tracing::info!("Listening on http://{addr}");
-    // tracing::info!(
-    //     "OpenAPI document is available at http://{addr}/docs/openapi.json",
-    // );
     tracing::info!("Redoc UI is available at http://{addr}/redoc");
 
     HttpServer::new(move || {

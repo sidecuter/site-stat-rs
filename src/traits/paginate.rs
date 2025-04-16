@@ -6,7 +6,7 @@ pub trait Paginate<'db, E, M>
 where
     E: EntityTrait<Model = M>,
     M: FromQueryResult + Sized + Send + Sync + 'db,
-    Self: Serialize + Clone + From<M>
+    Self: Serialize + Clone + From<M> + Default
 {
     fn pagination(
         db: &DatabaseConnection,

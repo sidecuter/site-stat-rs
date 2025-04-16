@@ -3,6 +3,7 @@ use sea_orm::{
     Select, QueryFilter, ColumnTrait,
     ActiveValue::Set
 };
+use actix_web::{body::BoxBody, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use validator::Validate;
@@ -32,6 +33,16 @@ pub struct ChangePlanOut {
     pub visit_date: NaiveDateTime,
 }
 
+impl Default for ChangePlanOut {
+    fn default() -> Self {
+        Self {
+            user_id: uuid::Uuid::new_v4(),
+            plan_id: "A-0".into(),
+            visit_date: chrono::Utc::now().naive_utc(),
+        }
+    }
+}
+
 impl From<change_plan::Model> for ChangePlanOut {
     fn from(value: change_plan::Model) -> Self {
         Self {
@@ -39,6 +50,14 @@ impl From<change_plan::Model> for ChangePlanOut {
             plan_id: value.plan_id,
             visit_date: value.visit_date,
         }
+    }
+}
+
+impl Responder for ChangePlanOut {
+    type Body = BoxBody;
+
+    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        actix_web::HttpResponse::Ok().json(self)
     }
 }
 

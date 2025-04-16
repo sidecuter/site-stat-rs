@@ -6,7 +6,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 
 #[utoipa::path(
     get,
-    path = "/v2/user-id/get",
+    path = "/api/get/user-id",
     responses(
         (
             status = 200, description = "User id generated", body = UserId
@@ -16,9 +16,9 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
             example = json!(Status{status: "database error".to_string()})
         )
     ),
-    tag = "UserId"
+    tag = "Get"
 )]
-#[get("/get")]
+#[get("/user-id")]
 async fn get_user_id(db: web::Data<DatabaseConnection>) -> ApiResult<UserId> {
     UserId::default().into_active_model().insert(db.get_ref()).await.convert()
 }

@@ -3,6 +3,7 @@ use sea_orm::{
     Select, QueryFilter, ColumnTrait,
     ActiveValue::Set
 };
+use actix_web::{body::BoxBody, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use utoipa::ToSchema;
@@ -28,6 +29,16 @@ pub struct SiteStatisticsOut {
     pub visit_date: NaiveDateTime,
 }
 
+impl Default for SiteStatisticsOut {
+    fn default() -> Self {
+        Self {
+            user_id: uuid::Uuid::new_v4(),
+            endpoint: Some("/app".to_string()),
+            visit_date: chrono::Utc::now().naive_utc(),
+        }
+    }
+}
+
 impl From<site_stat::Model> for SiteStatisticsOut {
     fn from(value: site_stat::Model) -> Self {
         Self {
@@ -35,6 +46,14 @@ impl From<site_stat::Model> for SiteStatisticsOut {
             endpoint: value.endpoint,
             visit_date: value.visit_date,
         }
+    }
+}
+
+impl Responder for SiteStatisticsOut {
+    type Body = BoxBody;
+
+    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        actix_web::HttpResponse::Ok().json(self)
     }
 }
 

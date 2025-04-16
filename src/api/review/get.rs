@@ -8,7 +8,7 @@ use crate::traits::Paginate;
 
 #[utoipa::path(
     get,
-    path = "/v2/review/get",
+    path = "/api/review/get",
     params(
         ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("user_id" = inline(Option<uuid::Uuid>), Query, example = "84f332ed-fedc-48f6-9119-c6833932646f"),

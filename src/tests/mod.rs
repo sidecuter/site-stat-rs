@@ -1,15 +1,8 @@
+mod get;
+mod stat;
 mod review;
 mod helpers;
 mod redoc;
-mod user_id;
-mod site;
-mod gets;
-mod aud;
-mod way;
-mod plan;
-mod stat;
-mod popular;
-mod healthcheck;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
