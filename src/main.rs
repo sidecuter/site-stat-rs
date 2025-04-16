@@ -9,8 +9,9 @@ use actix_cors::Cors;
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
+use utoipa::OpenApi;
 use stat_api::{api, api_docs, errors::ApiError};
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_redoc::{Redoc, Servable};
 use stat_api::app_state::AppState;
 
 #[cfg(not(debug_assertions))]
@@ -50,11 +51,11 @@ async fn main() -> std::io::Result<()> {
     if !std::path::Path::new(&app_state.files_path).exists() {
         fs::create_dir(app_state.files_path.clone())?;
     }
+    if !std::path::Path::new(&app_state.front_path).exists() {
+        fs::create_dir(app_state.front_path.clone())?;
+    }
     tracing::info!("Listening on http://{addr}");
-    tracing::info!(
-        "OpenAPI document is available at http://{addr}/docs/openapi.json",
-    );
-    tracing::info!("Swagger UI is available at http://{addr}/docs/swagger/");
+    tracing::info!("Redoc UI is available at http://{addr}/redoc");
 
     HttpServer::new(move || {
         let cors = Cors::default();
@@ -76,12 +77,8 @@ async fn main() -> std::io::Result<()> {
             .configure(api::init_routes)
             .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
             .app_data(QueryConfig::default().error_handler(|err, _| ApiError::from(err).into()))
-            .service(
-                // OpenAPI document
-                web::scope("/docs").service(api_docs::openapi_json).service(
-                    SwaggerUi::new("/swagger/{_:.*}").url("/docs/openapi.json", Default::default()),
-                ),
-            )
+            .service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi()))
+            .service(actix_files::Files::new("/", &app_state.front_path).index_file("index.html"))
     })
         .bind(addr)?
         .run()

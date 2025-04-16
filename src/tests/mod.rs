@@ -2,7 +2,7 @@ mod get;
 mod stat;
 mod review;
 mod helpers;
-mod swagger;
+mod redoc;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
