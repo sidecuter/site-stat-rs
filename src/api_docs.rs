@@ -1,4 +1,3 @@
-use actix_web::{get, HttpResponse, Responder};
 use utoipa::OpenApi;
 
 #[derive(OpenApi)]
@@ -51,10 +50,3 @@ use utoipa::OpenApi;
     ),
 )]
 pub struct ApiDoc;
-
-/// Return a json OpenAPI document
-#[get("/openapi.json")]
-pub async fn openapi_json() -> impl Responder {
-    let openapi = ApiDoc::openapi();
-    HttpResponse::Ok().json(openapi)
-}
