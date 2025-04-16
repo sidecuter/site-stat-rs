@@ -8,7 +8,7 @@ use crate::traits::Paginate;
 
 #[utoipa::path(
     get,
-    path = "/v2/way/get",
+    path = "/api/get/ways",
     params(
         ("Api-Key" = inline(String), Header, minimum = 64, maximum = 64, example = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
         ("user_id" = inline(Option<uuid::Uuid>), Query, example = "84f332ed-fedc-48f6-9119-c6833932646f"),
@@ -32,9 +32,9 @@ use crate::traits::Paginate;
             example = json!(Status{status: "database error".to_string()})
         )
     ),
-    tag = "Way"
+    tag = "Get"
 )]
-#[get("/get", wrap = "from_fn(api_key_middleware)")]
+#[get("/ways", wrap = "from_fn(api_key_middleware)")]
 async fn get_ways(
     data: web::Query<Filter>,
     db: web::Data<DatabaseConnection>,

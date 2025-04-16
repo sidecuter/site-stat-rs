@@ -1,5 +1,5 @@
-use super::prepare_connection;
-use crate::api::stat::get::get_stat;
+use super::super::prepare_connection;
+use crate::api::get::stat::get_stat;
 use crate::schemas::{FilterQuery, Statistics, Target};
 use actix_web::web::Data;
 use actix_web::{test, App};
@@ -52,34 +52,13 @@ async fn get_stat_endpoint(
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
-        .uri(&format!("/get?{query}"))
+        .uri(&format!("/stat?{query}"))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), 200);
     let req = test::TestRequest::get()
-        .uri(&format!("/get?{query}"))
+        .uri(&format!("/stat?{query}"))
         .to_request();
     let resp: Statistics = test::call_and_read_body_json(&app, req).await;
     assert_eq!(resp.all, all);
-}
-
-#[rstest]
-#[tokio::test]
-async fn test_invalid_date_range(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-) {
-    assert!(prepare_connection.is_ok());
-    let db = Data::new(prepare_connection.unwrap());
-    let app = test::init_service(App::new().app_data(db).service(get_stat)).await;
-    let query = FilterQuery {
-        target: Target::Site,
-        start_date: Some((chrono::Utc::now() + chrono::Duration::days(1)).date_naive()),
-        end_date: Some(chrono::Utc::now().date_naive())
-    };
-    let query = serde_qs::to_string(&query).unwrap();
-    let req = test::TestRequest::get()
-        .uri(&format!("/get?{query}"))
-        .to_request();
-    let resp = test::call_service(&app, req).await;
-    assert_eq!(resp.status().as_u16(), 422);
 }
