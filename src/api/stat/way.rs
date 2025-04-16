@@ -8,7 +8,7 @@ use crate::entity::{aud, user_id};
 
 #[utoipa::path(
     put,
-    path = "/v2/way/add",
+    path = "/api/stat/start-way",
     request_body = StartWayIn,
     responses(
         (
@@ -36,10 +36,10 @@ use crate::entity::{aud, user_id};
             example = json!(Status{status: "database error".to_string()})
         ),
     ),
-    tag = "Way"
+    tag = "Stat"
 )]
-#[put("/add")]
-async fn add_stat_way(
+#[put("start-way")]
+async fn stat_way(
     data: web::Json<StartWayIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
@@ -53,12 +53,12 @@ async fn add_stat_way(
         db.get_ref(),
         "Start auditory".to_string(),
     )
-        .await?;
+    .await?;
     aud::Entity::filter(
         data.end_id.to_string(),
         db.get_ref(),
         "End auditory".to_string(),
     )
-        .await?;
+    .await?;
     data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
 }

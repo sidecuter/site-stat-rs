@@ -16,30 +16,19 @@ pub struct Pagination<T: Serialize + Clone> {
     pub total: u64,
 }
 
-impl<T: Serialize + Clone> Pagination<T> {
+impl<T: Default + Serialize + Clone> Pagination<T> {
     pub fn builder() -> PaginationBuilder<T> {
         PaginationBuilder::default()
     }
 }
 
+#[derive(Default)]
 pub struct PaginationBuilder<T> {
     pub items: Vec<T>,
     pub pages: u64,
     pub page: u64,
     pub size: u64,
     pub total: u64,
-}
-
-impl<T: Serialize + Clone> Default for PaginationBuilder<T> {
-    fn default() -> Self {
-        Self {
-            items: Vec::new(),
-            page: Default::default(),
-            size: Default::default(),
-            pages: Default::default(),
-            total: Default::default(),
-        }
-    }
 }
 
 impl<T: Serialize + Clone> PaginationBuilder<T> {

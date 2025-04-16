@@ -1,7 +1,7 @@
 use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait, ActiveValue::Set};
 use actix_multipart::form::{tempfile::TempFile, MultipartForm, text::Text};
 use std::{fmt::{Display, Formatter}, path::Path};
-use actix_web::web;
+use actix_web::{body::BoxBody, web, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use mime::Mime;
@@ -108,7 +108,7 @@ impl ReviewFormIn {
                     "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned()
                 ))?
             };
-            let img_name = format!("{img_id}.{img_ext}");
+            let img_name = format!("{img_id}{img_ext}");
             let path = Path::new(&state.files_path)
                 .join(img_name.clone())
                 .to_str()
@@ -145,6 +145,18 @@ impl Default for ReviewIn {
     }
 }
 
+impl Default for ReviewOut {
+    fn default() -> Self {
+        Self {
+            user_id: Uuid::new_v4(),
+            text: String::from("Some cool review"),
+            problem: Problem::Other,
+            image_name: Some(format!("{}.png", Uuid::new_v4().to_string().replace("-", ""))),
+            creation_date: chrono::Utc::now().naive_utc(),
+        }
+    }
+}
+
 impl From<review::Model> for ReviewOut {
     fn from(value: review::Model) -> Self {
         Self {
@@ -154,6 +166,14 @@ impl From<review::Model> for ReviewOut {
             image_name: value.image_name,
             creation_date: value.creation_date,
         }
+    }
+}
+
+impl Responder for ReviewOut {
+    type Body = BoxBody;
+
+    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        actix_web::HttpResponse::Ok().json(self)
     }
 }
 

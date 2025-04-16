@@ -3,6 +3,7 @@ use sea_orm::{
     Select, QueryFilter, ColumnTrait,
     ActiveValue::Set
 };
+use actix_web::{body::BoxBody, Responder};
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use validator::Validate;
@@ -38,6 +39,17 @@ pub struct StartWayOut {
     pub visit_date: NaiveDateTime,
 }
 
+impl Default for StartWayOut {
+    fn default() -> Self {
+        Self {
+            user_id: uuid::Uuid::new_v4(),
+            start_id: "a-100".into(),
+            end_id: "a-101".into(),
+            visit_date: chrono::Utc::now().naive_utc(),
+        }
+    }
+}
+
 impl From<start_way::Model> for StartWayOut {
     fn from(value: start_way::Model) -> Self {
         Self {
@@ -46,6 +58,14 @@ impl From<start_way::Model> for StartWayOut {
             end_id: value.end_id,
             visit_date: value.visit_date,
         }
+    }
+}
+
+impl Responder for StartWayOut {
+    type Body = BoxBody;
+
+    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        actix_web::HttpResponse::Ok().json(self)
     }
 }
 

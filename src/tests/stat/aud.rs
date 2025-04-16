@@ -1,6 +1,6 @@
 use std::net::{IpAddr, SocketAddr};
-use super::prepare_connection;
-use crate::api::aud::add::add_stat_aud;
+use super::super::prepare_connection;
+use crate::api::stat::aud::stat_aud;
 use crate::schemas::{SelectAuditoryIn, Status};
 use actix_web::web::Data;
 use actix_web::{test, App};
@@ -34,20 +34,20 @@ async fn stat_aud_endpoint(
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
-    let app = test::init_service(App::new().app_data(Data::new(db)).service(add_stat_aud)).await;
+    let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
         auditory_id, success,
     };
     let req = test::TestRequest::put()
-        .uri("/add")
+        .uri("/select-aud")
         .set_json(payload.clone())
         .peer_addr(SocketAddr::new(IpAddr::from([192, 168, 1, 1]), 55050))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), status_code);
     let req = test::TestRequest::put()
-        .uri("/add")
+        .uri("/select-aud")
         .set_json(payload.clone())
         .peer_addr(SocketAddr::new(IpAddr::from([192, 168, 1, 2]), 55050))
         .to_request();
@@ -62,7 +62,7 @@ async fn test_429_stat_aud_endpoint (
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
-    let app = test::init_service(App::new().app_data(Data::new(db)).service(add_stat_aud)).await;
+    let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1").unwrap(),
         auditory_id: "a-100".into(),
@@ -71,7 +71,7 @@ async fn test_429_stat_aud_endpoint (
     let mut status: u16 = 200;
     for _ in 0..2 {
         let req = test::TestRequest::put()
-            .uri("/add")
+            .uri("/select-aud")
             .set_json(payload.clone())
             .peer_addr(SocketAddr::new(IpAddr::from([192, 168, 1, 10]), 55050))
             .to_request();
@@ -87,14 +87,14 @@ async fn test_422_stat_aud_endpoint(
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
-    let app = test::init_service(App::new().app_data(Data::new(db)).service(add_stat_aud)).await;
+    let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1").unwrap(),
         auditory_id: "a-".into(),
         success: true,
     };
     let req = test::TestRequest::put()
-        .uri("/add")
+        .uri("/select-aud")
         .set_json(payload.clone())
         .peer_addr(SocketAddr::new(IpAddr::from([192, 168, 1, 1]), 55050))
         .to_request();
