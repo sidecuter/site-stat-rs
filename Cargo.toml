@@ -25,6 +25,8 @@ mime = "0.3.17"
 validator = { version = "0.20.0", features = ["derive"] }
 actix-cors = "0.7.1"
 utoipa-redoc = { version = "6.0.0", features = ["actix-web"] }
+reqwest = { version = "0.12.15", default-features = false, features = ["rustls-tls", "json"] }
+actix-rt = "2.10.0"
 
 [dev-dependencies]
 rstest = "0.25.0"
