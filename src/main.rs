@@ -72,6 +72,13 @@ async fn main() -> std::io::Result<()> {
         let mut interval = time::interval(Duration::from_secs(600));
         loop {
             interval.tick().await;
+            let new_entry = match parse_data().await {
+                Ok(v) => v,
+                Err(e) => {
+                    tracing::warn!("Unable to parse navigationData: {e}");
+                    continue;
+                }
+            };
             let mut entry = match entry_src.data_entry.lock() {
                 Ok(v) => v,
                 Err(e) => {
@@ -79,14 +86,6 @@ async fn main() -> std::io::Result<()> {
                     continue;
                 }
             };
-            // let new_entry = match parse_data().await {
-            //     Ok(v) => v,
-            //     Err(e) => {
-            //         tracing::warn!("Unable to parse navigationData: {e}");
-            //         continue;
-            //     }
-            // };
-            let new_entry = parse_data().await.unwrap();
             entry.locations = new_entry.locations;
             entry.corpuses = new_entry.corpuses;
             entry.plans = new_entry.plans;
