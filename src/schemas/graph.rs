@@ -1,11 +1,16 @@
 use std::sync::Arc;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::cmp::Reverse;
+use std::str::FromStr;
 use std::time::Instant;
+use actix_web::{HttpRequest, HttpResponse, Responder};
+use actix_web::body::BoxBody;
 use serde::Serialize;
+use utoipa::{PartialSchema, ToSchema};
+use utoipa::openapi::{ObjectBuilder, RefOr, Schema};
 use crate::schemas::data::{CorpusData, LocationData, PlanData};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum VertexType {
     Hallway,
@@ -27,8 +32,12 @@ impl VertexType {
             VertexType::Lift => "lift",
         }
     }
+}
 
-    pub fn from_str(s: &str) -> Result<Self, String> {
+impl FromStr for VertexType {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "hallway" => Ok(VertexType::Hallway),
             "entrancesToAu" => Ok(VertexType::EntrancesToAu),
@@ -41,29 +50,44 @@ impl VertexType {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, ToSchema)]
 pub struct Vertex {
     pub id: String,
     pub x: f32,
     pub y: f32,
     #[serde(rename(serialize = "type"))]
+    #[schema(rename = "type")]
     pub type_: VertexType,
+    #[serde(skip_serializing)]
     pub neighbor_data: Vec<(String, f32)>,
     #[serde(skip_serializing)]
     pub plan: Arc<PlanData>,
 }
 
-#[derive(Debug)]
-pub struct Step {
-    pub plan: Arc<PlanData>,
-    pub way: Vec<Arc<Vertex>>,
-    pub distance: f32,
-}
-
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct ShortestWay {
     pub way: Vec<Arc<Vertex>>,
     pub distance: i32,
+}
+
+impl PartialSchema for ShortestWay {
+    fn schema() -> RefOr<Schema> {
+        RefOr::T(Schema::Object(
+            ObjectBuilder::new()
+                .property("way", Vec::<Vertex>::schema())
+                .property("distance", i32::schema())
+                .build()
+        ))
+    }
+}
+
+impl ToSchema for ShortestWay {}
+
+impl Responder for ShortestWay {
+    type Body = BoxBody;
+    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
+        HttpResponse::Ok().json(self)
+    }
 }
 
 pub struct Graph {
@@ -153,8 +177,12 @@ impl Graph {
         }
     }
 
-    pub fn find_vertex_by_id(&self, id: &str) -> Arc<Vertex> {
-        Arc::clone(&self.vertexes[id])
+    pub fn find_vertex_by_id(&self, id: &str) -> Option<Arc<Vertex>> {
+        Some(Arc::clone(self.vertexes.get(id)?))
+    }
+
+    pub fn has_vertex(&self, id: &str) -> bool {
+        self.vertexes.contains_key(id)
     }
 
     pub fn get_shortest_way_from_to(&self, start: &str, end: &str) -> ShortestWay {
