@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, MutexGuard};
 use reqwest::StatusCode;
 use crate::schemas::dto::{GraphDto, DataDto, LocationDto};
 use crate::schemas::graph::Graph;
@@ -96,7 +96,7 @@ pub async fn parse_data() -> Result<DataEntry, Box<dyn std::error::Error>> {
                 way_to_svg: dto.way_to_svg.clone(),
                 graph: dto.graph.clone().unwrap_or_default(),
                 entrances: dto.entrances.as_ref().map_or_else(
-                    || vec![],
+                    Vec::new,
                     |v| v.iter().map(|e| PlanEntrance(e.0.clone(), e.1.clone())).collect()
                 ),
                 corpus,
@@ -119,7 +119,7 @@ fn parse_location(dto: &LocationDto) -> LocationData {
         available: dto.available,
         address: dto.address.clone(),
         crossings: dto.crossings.as_ref().map_or_else(
-            || vec![],
+            Vec::new,
             |v| v.iter()
                 .map(|c| Crossing(c.0.clone(), c.1.clone(), c.2))
                 .collect()
@@ -128,7 +128,11 @@ fn parse_location(dto: &LocationDto) -> LocationData {
 }
 
 pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>> {
-    let response = reqwest::get(url)
+    let client = reqwest::Client::new();
+    let response = client
+        .get(url)
+        .header(reqwest::header::USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5666.197 Safari/537.36")
+        .send()
         .await?;
 
     match response.status() {
@@ -141,7 +145,7 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
 }
 
 pub async fn get_graph(
-    data: &DataEntry,
+    data: MutexGuard<'_, DataEntry>,
     loc_id: &str
 ) -> Option<Graph> {
     // Находим нужную локацию
