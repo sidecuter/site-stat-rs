@@ -1,17 +1,17 @@
 use serde::Deserialize;
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct DataDto {
+pub struct DataDto {
     pub locations: Vec<LocationDto>,
     pub corpuses: Vec<CourpusDto>,
     pub plans: Vec<PlanDto>
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct CrossingDto(pub String, pub String, pub f32);
+pub struct CrossingDto(pub String, pub String, pub f32);
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct LocationDto {
+pub struct LocationDto {
     pub id: String,
     pub title: String,
     pub short: String,
@@ -21,7 +21,7 @@ pub(crate) struct LocationDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct CourpusDto {
+pub struct CourpusDto {
     pub id: String,
     #[serde(rename(deserialize = "locationId"))]
     pub location_id: String,
@@ -31,10 +31,10 @@ pub(crate) struct CourpusDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct EntranceDto(pub String, pub String);
+pub struct EntranceDto(pub String, pub String);
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct PlanDto {
+pub struct PlanDto {
     pub id: String,
     #[serde(rename(deserialize = "corpusId"))]
     pub corpus_id: String,
@@ -48,7 +48,7 @@ pub(crate) struct PlanDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct NearestDto {
+pub struct NearestDto {
     #[serde(default)]
     pub enter: String,
     pub wm: Option<String>,
@@ -57,10 +57,10 @@ pub(crate) struct NearestDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct NeighborDto(pub String, pub f32);
+pub struct NeighborDto(pub String, pub f32);
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub(crate) struct GraphDto {
+pub struct GraphDto {
     pub id: String,
     pub x: f32,
     pub y: f32,
