@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use crate::schemas::validators::{page_default, size_default};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -31,4 +32,38 @@ pub struct FilterQuery {
     pub target: Target,
     pub start_date: Option<NaiveDate>,
     pub end_date: Option<NaiveDate>,
+}
+
+#[derive(Deserialize, Clone, Debug, Default)]
+pub enum Location {
+    #[default]
+    #[serde(rename = "campus_BS")]
+    CampusBS,
+    #[serde(rename = "campus_AV")]
+    CampusAV,
+    #[serde(rename = "campus_PR")]
+    CampusPR,
+    #[serde(rename = "campus_PK")]
+    CampusPK,
+    #[serde(rename = "campus_M")]
+    CampusM,
+}
+
+impl Display for Location {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", match self {
+            Location::CampusBS => "BS",
+            Location::CampusAV => "AV",
+            Location::CampusPR => "PR",
+            Location::CampusPK => "PK",
+            Location::CampusM => "M"
+        })
+    }
+}
+
+#[derive(Deserialize, Clone, Default, Debug)]
+pub struct FilterRoute {
+    pub from_p: String,
+    pub to_p: String,
+    pub loc: Location
 }
