@@ -3,7 +3,7 @@ use serde::Deserialize;
 #[derive(Clone, Deserialize, Debug, Default)]
 pub struct DataDto {
     pub locations: Vec<LocationDto>,
-    pub corpuses: Vec<CourpusDto>,
+    pub corpuses: Vec<CorpusDto>,
     pub plans: Vec<PlanDto>
 }
 
@@ -21,7 +21,7 @@ pub struct LocationDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
-pub struct CourpusDto {
+pub struct CorpusDto {
     pub id: String,
     #[serde(rename(deserialize = "locationId"))]
     pub location_id: String,

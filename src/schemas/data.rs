@@ -1,7 +1,7 @@
+use std::collections::HashMap;
 use std::sync::{Arc, MutexGuard};
-use reqwest::StatusCode;
-use crate::schemas::dto::{GraphDto, DataDto, LocationDto};
 use crate::schemas::graph::Graph;
+use crate::schemas::dto::{GraphDto, DataDto, LocationDto, CorpusDto, PlanDto};
 
 #[derive(Clone, Default, Debug)]
 pub struct DataEntry {
@@ -28,7 +28,7 @@ pub struct CorpusData {
     pub id: String,
     pub title: String,
     pub available: bool,
-    pub location: Arc<LocationData>,  // Shared владение
+    pub location: Arc<LocationData>,
     pub stairs: Vec<Vec<String>>,
 }
 
@@ -54,55 +54,9 @@ pub async fn parse_data() -> Result<DataEntry, Box<dyn std::error::Error>> {
     const DATA_URL: &str = "https://mospolynavigation.github.io/polyna-preprocess/locationsV2.json";
 
     let data_dto = fetch_data(DATA_URL).await?;
-
-    // 1. Создаем все локации и оборачиваем в Arc
-    let locations: Vec<Arc<LocationData>> = data_dto.locations
-        .iter()
-        .map(|dto| Arc::new(parse_location(dto)))
-        .collect();
-
-    // 2. Создаем корпуса с shared ссылками на локации
-    let corpuses: Vec<Arc<CorpusData>> = data_dto.corpuses
-        .iter()
-        .map(|dto| {
-            let location = locations.iter()
-                .find(|loc| loc.id == dto.location_id)
-                .expect("Location not found")
-                .clone();  // Клонируем Arc
-
-            Arc::new(CorpusData {
-                id: dto.id.clone(),
-                title: dto.title.clone(),
-                location,
-                available: dto.available,
-                stairs: dto.stairs.clone().unwrap_or_default(),
-            })
-        })
-        .collect();
-
-    // 3. Создаем планы с shared ссылками на корпуса
-    let plans: Vec<Arc<PlanData>> = data_dto.plans
-        .iter()
-        .map(|dto| {
-            let corpus = corpuses.iter()
-                .find(|c| c.id == dto.corpus_id)
-                .expect("Corpus not found")
-                .clone();  // Клонируем Arc
-
-            Arc::new(PlanData {
-                id: dto.id.clone(),
-                floor: dto.floor.parse().expect("Invalid floor format"),
-                available: dto.available,
-                way_to_svg: dto.way_to_svg.clone(),
-                graph: dto.graph.clone().unwrap_or_default(),
-                entrances: dto.entrances.as_ref().map_or_else(
-                    Vec::new,
-                    |v| v.iter().map(|e| PlanEntrance(e.0.clone(), e.1.clone())).collect()
-                ),
-                corpus,
-            })
-        })
-        .collect();
+    let locations = parse_locations(&data_dto.locations);
+    let corpuses = parse_corpuses(&data_dto.corpuses, &locations);
+    let plans = parse_plans(&data_dto.plans, &corpuses);
 
     Ok(DataEntry {
         locations,
@@ -111,20 +65,60 @@ pub async fn parse_data() -> Result<DataEntry, Box<dyn std::error::Error>> {
     })
 }
 
-fn parse_location(dto: &LocationDto) -> LocationData {
-    LocationData {
-        id: dto.id.clone(),
-        title: dto.title.clone(),
-        short: dto.short.clone(),
-        available: dto.available,
-        address: dto.address.clone(),
-        crossings: dto.crossings.as_ref().map_or_else(
-            Vec::new,
-            |v| v.iter()
-                .map(|c| Crossing(c.0.clone(), c.1.clone(), c.2))
-                .collect()
-        ),
-    }
+fn parse_locations(locations_dto: &[LocationDto]) -> Vec<Arc<LocationData>> {
+    locations_dto.iter()
+        .map(|dto| Arc::new(LocationData {
+            id: dto.id.clone(),
+            title: dto.title.clone(),
+            short: dto.short.clone(),
+            available: dto.available,
+            address: dto.address.clone(),
+            crossings: dto.crossings.as_deref().map_or_else(Vec::new, |v|
+                v.iter().map(|c| Crossing(c.0.clone(), c.1.clone(), c.2)).collect()
+            )
+        }))
+            .collect()
+}
+
+fn parse_corpuses(corpuses_dto: &[CorpusDto], locations: &[Arc<LocationData>]) -> Vec<Arc<CorpusData>> {
+    let location_map: HashMap<_, _> = locations.iter()
+        .map(|loc| (loc.id.as_str(), loc))
+        .collect();
+
+    corpuses_dto.iter()
+        .filter_map(|dto| {
+            let location = location_map.get(dto.location_id.as_str())?;
+            Some(Arc::new(CorpusData {
+                id: dto.id.clone(),
+                title: dto.title.clone(),
+                available: dto.available,
+                location: Arc::clone(location),
+                stairs: dto.stairs.clone().unwrap_or_default(),
+            }))
+        })
+        .collect()
+}
+
+fn parse_plans(plans_dto: &[PlanDto], corpuses: &[Arc<CorpusData>]) -> Vec<Arc<PlanData>> {
+    let corpus_map: HashMap<_, _> = corpuses.iter()
+        .map(|corpus| (corpus.id.as_str(), corpus))
+        .collect();
+
+    plans_dto.iter()
+        .filter_map(|dto| {
+            let corpus = corpus_map.get(dto.corpus_id.as_str())?;
+            Some(Arc::new(PlanData {
+                id: dto.id.clone(),
+                floor: dto.floor.parse().ok()?,
+                available: dto.available,
+                way_to_svg: dto.way_to_svg.clone(),
+                graph: dto.graph.clone().unwrap_or_default(),
+                entrances: dto.entrances.as_deref().map_or_else(Vec::new, |v|
+                    v.iter().map(|e| PlanEntrance(e.0.clone(), e.1.clone())).collect()),
+                corpus: Arc::clone(corpus),
+            }))
+        })
+        .collect()
 }
 
 pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>> {
@@ -134,13 +128,10 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
         .header(reqwest::header::USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.5666.197 Safari/537.36")
         .send()
         .await?;
-
-    match response.status() {
-        StatusCode::OK => response.json::<DataDto>()
-            .await.map_err(|e| e.into()),
-        status => Err(
-            format!("Request failed with status: {status}").into(),
-        ),
+    
+    match response.error_for_status_ref() { 
+        Ok(_) => response.json().await.map_err(Into::into),
+        Err(e) => Err(format!("Request failed with status: {e}").into())
     }
 }
 
@@ -148,26 +139,17 @@ pub async fn get_graph(
     data: MutexGuard<'_, DataEntry>,
     loc_id: &str
 ) -> Option<Graph> {
-    // Находим нужную локацию
-    let location = data.locations.iter()
-        .find(|loc| loc.id == loc_id)
-        .map(Arc::clone)?;
+    let location = data.locations.iter().find(|loc| loc.id == loc_id)?;
 
-    // Фильтруем планы для данной локации
-    let plans: Vec<Arc<PlanData>> = data.plans.iter()
+    let plans = data.plans.iter()
         .filter(|plan| plan.corpus.location.id == loc_id)
-        .map(Arc::clone)
+        .cloned()
         .collect();
 
-    // Фильтруем корпуса для данной локации
-    let corpuses: Vec<Arc<CorpusData>> = data.corpuses.iter()
+    let corpuses = data.corpuses.iter()
         .filter(|corpus| corpus.location.id == loc_id)
-        .map(Arc::clone)
+        .cloned()
         .collect();
 
-    Some(Graph::new(
-        location,
-        plans,
-        corpuses,
-    ))
+    Some(Graph::new(location.clone(), plans, corpuses))
 }
