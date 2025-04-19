@@ -4,6 +4,7 @@ use chrono::NaiveDateTime;
 use serde::Serialize;
 use utoipa::ToSchema;
 use crate::entity::user_id;
+use crate::impl_responder;
 
 #[derive(ToSchema, Debug, Serialize, Clone)]
 pub struct UserId {
@@ -31,14 +32,6 @@ impl From<user_id::Model> for UserId {
     }
 }
 
-impl Responder for UserId {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
-    }
-}
-
 impl IntoActiveModel<user_id::ActiveModel> for UserId {
     fn into_active_model(self) -> user_id::ActiveModel {
         user_id::ActiveModel {
@@ -47,3 +40,5 @@ impl IntoActiveModel<user_id::ActiveModel> for UserId {
         }
     }
 }
+
+impl_responder!(UserId);

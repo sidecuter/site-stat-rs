@@ -10,6 +10,7 @@ use validator::Validate;
 use utoipa::ToSchema;
 use crate::schemas::validators::AUD_RE;
 use crate::entity::start_way;
+use crate::{impl_paginate, impl_responder};
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
@@ -39,17 +40,6 @@ pub struct StartWayOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for StartWayOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            start_id: "a-100".into(),
-            end_id: "a-101".into(),
-            visit_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<start_way::Model> for StartWayOut {
     fn from(value: start_way::Model) -> Self {
         Self {
@@ -58,14 +48,6 @@ impl From<start_way::Model> for StartWayOut {
             end_id: value.end_id,
             visit_date: value.visit_date,
         }
-    }
-}
-
-impl Responder for StartWayOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
@@ -81,15 +63,5 @@ impl IntoActiveModel<start_way::ActiveModel> for StartWayIn {
     }
 }
 
-impl Paginate<'_, start_way::Entity, start_way::Model> for StartWayOut {
-    fn get_query(filter: &Filter) -> Select<start_way::Entity> {
-        if let Some(user_id) = filter.user_id {
-            start_way::Entity::find()
-                .filter(start_way::Column::UserId.eq(user_id))
-                .order_by_asc(start_way::Column::Id)
-        } else {
-            start_way::Entity::find()
-                .order_by_asc(start_way::Column::UserId)
-        }
-    }
-}
+impl_paginate!(StartWayOut, start_way);
+impl_responder!(StartWayOut);

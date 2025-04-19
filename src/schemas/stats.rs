@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use utoipa::ToSchema;
+use crate::impl_responder;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
 pub struct Statistics {
@@ -10,14 +11,6 @@ pub struct Statistics {
     pub count: u64,
     pub all: u64,
     pub period: Period,
-}
-
-impl Responder for Statistics {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
-    }
 }
 
 impl Default for Statistics {
@@ -30,3 +23,5 @@ impl Default for Statistics {
         }
     }
 }
+
+impl_responder!(Statistics);

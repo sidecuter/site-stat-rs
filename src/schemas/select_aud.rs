@@ -10,6 +10,7 @@ use validator::Validate;
 use utoipa::ToSchema;
 use crate::schemas::validators::AUD_RE;
 use crate::entity::select_aud;
+use crate::{impl_paginate, impl_responder};
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
@@ -37,17 +38,6 @@ pub struct SelectAuditoryOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for SelectAuditoryOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            auditory_id: "a-100".to_string(),
-            visit_date: chrono::Utc::now().naive_utc(),
-            success: true,
-        }
-    }
-}
-
 impl From<select_aud::Model> for SelectAuditoryOut {
     fn from(value: select_aud::Model) -> Self {
         Self {
@@ -56,14 +46,6 @@ impl From<select_aud::Model> for SelectAuditoryOut {
             visit_date: value.visit_date,
             success: value.success,
         }
-    }
-}
-
-impl Responder for SelectAuditoryOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
@@ -79,15 +61,5 @@ impl IntoActiveModel<select_aud::ActiveModel> for SelectAuditoryIn {
     }
 }
 
-impl Paginate<'_, select_aud::Entity, select_aud::Model> for SelectAuditoryOut {
-    fn get_query(filter: &Filter) -> Select<select_aud::Entity> {
-        if let Some(user_id) = filter.user_id {
-            select_aud::Entity::find()
-                .filter(select_aud::Column::UserId.eq(user_id))
-                .order_by_asc(select_aud::Column::Id)
-        } else {
-            select_aud::Entity::find()
-                .order_by_asc(select_aud::Column::Id)
-        }
-    }
-}
+impl_paginate!(SelectAuditoryOut, select_aud);
+impl_responder!(SelectAuditoryOut);

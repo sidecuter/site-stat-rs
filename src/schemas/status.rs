@@ -3,6 +3,7 @@ use actix_web::body::BoxBody;
 use actix_web::Responder;
 use std::str::FromStr;
 use utoipa::ToSchema;
+use crate::impl_responder;
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Eq, PartialEq)]
 pub struct Status {
@@ -18,14 +19,6 @@ impl Default for Status {
     }
 }
 
-impl Responder for Status {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
-    }
-}
-
 impl FromStr for Status {
     type Err = ();
 
@@ -35,3 +28,5 @@ impl FromStr for Status {
         })
     }
 }
+
+impl_responder!(Status);

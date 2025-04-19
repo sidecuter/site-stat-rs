@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, HttpResponse, Responder};
+use actix_web::Responder;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use ordered_float::OrderedFloat;
 use actix_web::body::BoxBody;
@@ -9,6 +9,7 @@ use std::sync::Arc;
 use serde::Serialize;
 use utoipa::{PartialSchema, ToSchema};
 use utoipa::openapi::{ObjectBuilder, RefOr, Schema};
+use crate::impl_responder;
 use crate::schemas::data::{CorpusData, LocationData, PlanData};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, ToSchema)]
@@ -83,13 +84,6 @@ impl PartialSchema for ShortestWay {
 }
 
 impl ToSchema for ShortestWay {}
-
-impl Responder for ShortestWay {
-    type Body = BoxBody;
-    fn respond_to(self, _req: &HttpRequest) -> HttpResponse<Self::Body> {
-        HttpResponse::Ok().json(self)
-    }
-}
 
 pub struct Graph {
     pub location: Arc<LocationData>,
@@ -255,3 +249,5 @@ impl Graph {
         path
     }
 }
+
+impl_responder!(ShortestWay);

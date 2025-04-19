@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 use utoipa::ToSchema;
 use crate::entity::site_stat;
+use crate::{impl_paginate, impl_responder};
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
@@ -29,16 +30,6 @@ pub struct SiteStatisticsOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for SiteStatisticsOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            endpoint: Some("/app".to_string()),
-            visit_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<site_stat::Model> for SiteStatisticsOut {
     fn from(value: site_stat::Model) -> Self {
         Self {
@@ -46,14 +37,6 @@ impl From<site_stat::Model> for SiteStatisticsOut {
             endpoint: value.endpoint,
             visit_date: value.visit_date,
         }
-    }
-}
-
-impl Responder for SiteStatisticsOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
@@ -68,15 +51,5 @@ impl IntoActiveModel<site_stat::ActiveModel> for SiteStatisticsIn {
     }
 }
 
-impl Paginate<'_, site_stat::Entity, site_stat::Model> for SiteStatisticsOut {
-    fn get_query(filter: &Filter) -> Select<site_stat::Entity> {
-        if let Some(user_id) = filter.user_id {
-            site_stat::Entity::find()
-                .filter(site_stat::Column::UserId.eq(user_id))
-                .order_by_asc(site_stat::Column::Id)
-        } else {
-            site_stat::Entity::find()
-                .order_by_asc(site_stat::Column::UserId)
-        }
-    }
-}
+impl_paginate!(SiteStatisticsOut, site_stat);
+impl_responder!(SiteStatisticsOut);

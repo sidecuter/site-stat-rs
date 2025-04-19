@@ -7,6 +7,7 @@ pub mod middleware;
 pub mod schemas;
 pub mod traits;
 pub mod mut_state;
+mod macros;
 
 #[cfg(test)]
 mod tests;

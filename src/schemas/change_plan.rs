@@ -10,6 +10,7 @@ use validator::Validate;
 use utoipa::ToSchema;
 use crate::schemas::validators::PLAN_RE;
 use crate::entity::change_plan;
+use crate::{impl_paginate, impl_responder};
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
@@ -19,7 +20,7 @@ pub struct ChangePlanIn {
     pub user_id: uuid::Uuid,
     #[schema(example = "A-0")]
     #[validate(length(min = 3, max=4), regex(path = *PLAN_RE))]
-    pub plan_id: String,
+    pub plan_id: String
 }
 
 #[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Validate)]
@@ -33,16 +34,6 @@ pub struct ChangePlanOut {
     pub visit_date: NaiveDateTime,
 }
 
-impl Default for ChangePlanOut {
-    fn default() -> Self {
-        Self {
-            user_id: uuid::Uuid::new_v4(),
-            plan_id: "A-0".into(),
-            visit_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<change_plan::Model> for ChangePlanOut {
     fn from(value: change_plan::Model) -> Self {
         Self {
@@ -50,14 +41,6 @@ impl From<change_plan::Model> for ChangePlanOut {
             plan_id: value.plan_id,
             visit_date: value.visit_date,
         }
-    }
-}
-
-impl Responder for ChangePlanOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
@@ -72,15 +55,5 @@ impl IntoActiveModel<change_plan::ActiveModel> for ChangePlanIn {
     }
 }
 
-impl Paginate<'_, change_plan::Entity, change_plan::Model> for ChangePlanOut {
-    fn get_query(filter: &Filter) -> Select<change_plan::Entity> {
-        if let Some(user_id) = filter.user_id {
-            change_plan::Entity::find()
-                .filter(change_plan::Column::UserId.eq(user_id))
-                .order_by_asc(change_plan::Column::Id)
-        } else {
-            change_plan::Entity::find()
-                .order_by_asc(change_plan::Column::Id)
-        }
-    }
-}
+impl_paginate!(ChangePlanOut, change_plan);
+impl_responder!(ChangePlanOut);
