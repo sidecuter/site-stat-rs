@@ -177,10 +177,6 @@ impl Graph {
         }
     }
 
-    pub fn find_vertex_by_id(&self, id: &str) -> Option<Arc<Vertex>> {
-        Some(Arc::clone(self.vertexes.get(id)?))
-    }
-
     pub fn has_vertex(&self, id: &str) -> bool {
         self.vertexes.contains_key(id)
     }
@@ -191,86 +187,83 @@ impl Graph {
             "hallway", "lift", "stair", "corpusTransition", "crossingSpace"
         ].into_iter().collect();
 
-        let valid_ids: HashSet<_> = self.vertexes
-            .iter()
-            .filter(|(vid, v)| {
+        let mut id_to_index = HashMap::new();
+        let mut index_to_id = Vec::new();
+
+        let valid_ids: Vec<_> = self.vertexes.iter()
+            .filter(|(id, v)| {
                 allowed_types.contains(v.type_.as_str()) ||
-                    *vid == start || *vid == end ||
-                    vid.contains("crossing")
+                    *id == start || *id == end ||
+                    id.contains("crossing")
             })
-            .map(|(vid, _)| vid.clone())
+            .map(|(id, _)| id.clone())
             .collect();
 
-        let mut distances: HashMap<String, f32> = valid_ids.iter()
-            .map(|vid| (vid.clone(), f32::INFINITY))
-            .collect();
-        distances.insert(start.to_string(), 0.0);
+        for (index, id) in valid_ids.iter().enumerate() {
+            id_to_index.insert(id.clone(), index);
+            index_to_id.push(id.clone());
+        }
+
+        if !id_to_index.contains_key(start) || !id_to_index.contains_key(end) {
+            return ShortestWay { way: Vec::new(), distance: i32::MAX };
+        }
+
+        let start_idx = id_to_index[start];
+        let end_idx = id_to_index[end];
+
+        let mut distances = vec![f32::INFINITY; valid_ids.len()];
+        distances[start_idx] = 0.0;
 
         let mut heap = BinaryHeap::new();
-        heap.push(Reverse((0, start.to_string())));
+        heap.push(Reverse((0, start_idx)));
 
-        let mut previous: HashMap<String, Option<String>> = HashMap::new();
-        let mut visited = HashSet::new();
+        let mut previous: Vec<Option<usize>> = vec![None; valid_ids.len()];
+        let mut visited = vec![false; valid_ids.len()];
 
-        while let Some(Reverse((_, current_id))) = heap.pop() {
-            if current_id == end {
-                break;
-            }
+        while let Some(Reverse((current_dist, current_idx))) = heap.pop() {
+            if current_idx == end_idx { break; }
+            if visited[current_idx] { continue; }
+            visited[current_idx] = true;
 
-            if visited.contains(&current_id) {
-                continue;
-            }
-            visited.insert(current_id.clone());
-
-            let current = match self.vertexes.get(&current_id) {
+            let current_id = &index_to_id[current_idx];
+            let current = match self.vertexes.get(current_id) {
                 Some(v) => v,
                 None => continue,
             };
 
-            for (neighbor, dist) in &current.neighbor_data {
-                if !valid_ids.contains(neighbor) {
-                    continue;
-                }
+            for (neighbor_id, dist) in &current.neighbor_data {
+                let neighbor_idx = match id_to_index.get(neighbor_id) {
+                    Some(&idx) => idx,
+                    None => continue,
+                };
 
-                let new_dist = distances[&current_id] + dist;
-                let neighbor_dist = distances.entry(neighbor.clone())
-                    .or_insert(f32::INFINITY);
-
-                if new_dist < *neighbor_dist {
-                    *neighbor_dist = new_dist;
-                    previous.insert(neighbor.clone(), Some(current_id.clone()));
-                    heap.push(Reverse((new_dist.floor() as i32, neighbor.clone())));
+                let new_dist = current_dist + *dist as i32;
+                if (new_dist as f32) < distances[neighbor_idx] {
+                    distances[neighbor_idx] = new_dist as f32;
+                    previous[neighbor_idx] = Some(current_idx);
+                    heap.push(Reverse((new_dist, neighbor_idx)));
                 }
             }
         }
 
         let mut path = Vec::new();
-        let mut current = end.to_string();
-        while let Some(Some(prev)) = previous.get(&current) {
-            path.push(current.clone());
-            current = prev.clone();
+        let mut current_idx = end_idx;
+        while let Some(prev_idx) = previous[current_idx] {
+            path.push(index_to_id[current_idx].clone());
+            current_idx = prev_idx;
         }
         path.push(start.to_string());
-        path.reverse();
 
-        let way: Vec<Arc<Vertex>> = path.iter()
+        let way: Vec<Arc<Vertex>> = path.iter().rev()
             .filter_map(|id| self.vertexes.get(id).map(Arc::clone))
             .collect();
 
-        let distance = distances.get(end)
+        let distance = distances.get(end_idx)
             .map(|d| d.floor() as i32)
             .unwrap_or(i32::MAX);
 
-        let duration = start_time.elapsed();
-        println!("The task took {:.4} seconds to complete.", duration.as_secs_f64());
+        println!("The task took {:.4} seconds", start_time.elapsed().as_secs_f64());
 
         ShortestWay { way, distance }
-    }
-
-    pub fn get_distance_between_vertexes(&self, v1: &Vertex, v2_id: &str) -> f32 {
-        v1.neighbor_data.iter()
-            .find(|(id, _)| id == v2_id)
-            .expect("Neighbor not found")
-            .1
     }
 }
