@@ -1,7 +1,5 @@
 use crate::impl_responder;
 use crate::schemas::Period;
-use actix_web::body::BoxBody;
-use actix_web::Responder;
 use serde::Serialize;
 use utoipa::ToSchema;
 

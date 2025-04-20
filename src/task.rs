@@ -8,9 +8,12 @@ pub async fn start_data_refresh_task(state: web::Data<AppStateMutable>, interval
     let mut interval = time::interval(interval);
     loop {
         interval.tick().await;
-        if let Err(e) = refresh_data(&state).await {
-            tracing::warn!("Refresh failed: {}", e);
-        }
+        let _ = refresh_data(&state)
+            .await
+            .map_err(|e| {
+                tracing::error!("Refresh failed: {}", e);
+            })
+            .map(|_| tracing::info!("Data refreshed"));
     }
 }
 

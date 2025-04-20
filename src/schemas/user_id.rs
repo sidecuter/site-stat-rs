@@ -1,6 +1,5 @@
 use crate::entity::user_id;
 use crate::impl_responder;
-use actix_web::{body::BoxBody, Responder};
 use chrono::NaiveDateTime;
 use sea_orm::{ActiveValue::Set, IntoActiveModel};
 use serde::Serialize;
