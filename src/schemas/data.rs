@@ -55,10 +55,8 @@ pub struct PlanData {
     pub corpus: Arc<CorpusData>
 }
 
-pub async fn parse_data() -> Result<DataEntry, Box<dyn std::error::Error>> {
-    const DATA_URL: &str = "https://mospolynavigation.github.io/polyna-preprocess/locationsV2.json";
-
-    let data_dto = fetch_data(DATA_URL).await?;
+pub async fn parse_data(url: &str) -> Result<DataEntry, Box<dyn std::error::Error>> {
+    let data_dto = fetch_data(url).await?;
     let locations = parse_locations(&data_dto.locations);
     let corpuses = parse_corpuses(&data_dto.corpuses, &locations);
     let plans = parse_plans(&data_dto.plans, &corpuses);
@@ -141,7 +139,11 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
 }
 
 pub async fn get_graphs() -> Result<HashMap<String, Graph>, Box<dyn std::error::Error>> {
-    let data = parse_data().await?;
+    #[cfg(not(test))]
+    const DATA_URL: &str = "https://mospolynavigation.github.io/polyna-preprocess/locationsV2.json";
+    #[cfg(test)]
+    const DATA_URL: &str = "http://127.0.0.1:8081/locationsV2.json";
+    let data = parse_data(DATA_URL).await?;
     Ok(data.locations.iter()
         .filter(|&loc| loc.available)
         .map(|location| {

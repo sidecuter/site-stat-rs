@@ -3,6 +3,7 @@ mod stat;
 mod review;
 mod helpers;
 mod redoc;
+mod fetchers;
 
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
