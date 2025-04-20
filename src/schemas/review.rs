@@ -5,7 +5,7 @@ use crate::schemas::Filter;
 use crate::traits::Paginate;
 use crate::{impl_paginate, impl_responder};
 use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
-use actix_web::{body::BoxBody, web, Responder};
+use actix_web::web;
 use chrono::NaiveDateTime;
 use mime::Mime;
 use sea_orm::{
@@ -120,7 +120,7 @@ impl ReviewFormIn {
                     "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned(),
                 ))?
             };
-            let img_name = format!("{img_id}{img_ext}");
+            let img_name = format!("{img_id}.{img_ext}");
             let path = Path::new(&state.files_path)
                 .join(img_name.clone())
                 .to_str()

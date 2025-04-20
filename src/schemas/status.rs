@@ -1,6 +1,4 @@
 use crate::impl_responder;
-use actix_web::body::BoxBody;
-use actix_web::Responder;
 use serde::Serialize;
 use std::str::FromStr;
 use utoipa::ToSchema;

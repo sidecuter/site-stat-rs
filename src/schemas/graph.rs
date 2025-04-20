@@ -1,7 +1,5 @@
 use crate::impl_responder;
 use crate::schemas::data::{CorpusData, LocationData, PlanData};
-use actix_web::body::BoxBody;
-use actix_web::Responder;
 use ordered_float::OrderedFloat;
 use serde::Serialize;
 use std::cmp::Reverse;
