@@ -43,7 +43,8 @@ async fn stat_way_endpoint(
     let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_way)).await;
     let payload = StartWayIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        start_id, end_id,
+        start_id,
+        end_id,
     };
     let req = test::TestRequest::put()
         .uri("/start-way")
@@ -62,7 +63,7 @@ async fn stat_way_endpoint(
 #[rstest]
 #[tokio::test]
 async fn test_422_stat_way_endpoint(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>
+    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();

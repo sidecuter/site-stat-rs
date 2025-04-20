@@ -1,12 +1,12 @@
+use crate::entity::{select_aud, start_way};
 use crate::errors::ApiResult;
 use crate::schemas::{Popular, Status};
 use actix_web::{get, web};
-use sea_orm::{
-    ColumnTrait, ConnectionTrait, DatabaseConnection,
-    EntityTrait, QueryFilter, QuerySelect, QueryTrait,
-};
 use sea_orm::sea_query::*;
-use crate::entity::{select_aud, start_way};
+use sea_orm::{
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QuerySelect,
+    QueryTrait,
+};
 
 #[utoipa::path(
     get,
@@ -23,9 +23,7 @@ use crate::entity::{select_aud, start_way};
     tag = "Get"
 )]
 #[get("/popular")]
-async fn get_popular(
-    db: web::Data<DatabaseConnection>,
-) -> ApiResult<Popular> {
+async fn get_popular(db: web::Data<DatabaseConnection>) -> ApiResult<Popular> {
     let qr = select_aud::Entity::find()
         .select_only()
         .column_as(select_aud::Column::AuditoryId, "ID")
@@ -34,19 +32,26 @@ async fn get_popular(
         .group_by(select_aud::Column::AuditoryId)
         .into_query()
         .unions([
-            (UnionType::All, start_way::Entity::find()
-                .select_only()
-                .column_as(start_way::Column::StartId, "ID")
-                .expr_as(start_way::Column::StartId.count().mul(3), "CNT")
-                .group_by(start_way::Column::StartId)
-                .into_query()),
-            (UnionType::All, start_way::Entity::find()
-                .select_only()
-                .column_as(start_way::Column::EndId, "ID")
-                .expr_as(start_way::Column::EndId.count().mul(3), "CNT")
-                .group_by(start_way::Column::EndId)
-                .into_query())
-        ]).to_owned();
+            (
+                UnionType::All,
+                start_way::Entity::find()
+                    .select_only()
+                    .column_as(start_way::Column::StartId, "ID")
+                    .expr_as(start_way::Column::StartId.count().mul(3), "CNT")
+                    .group_by(start_way::Column::StartId)
+                    .into_query(),
+            ),
+            (
+                UnionType::All,
+                start_way::Entity::find()
+                    .select_only()
+                    .column_as(start_way::Column::EndId, "ID")
+                    .expr_as(start_way::Column::EndId.count().mul(3), "CNT")
+                    .group_by(start_way::Column::EndId)
+                    .into_query(),
+            ),
+        ])
+        .to_owned();
     let result_query = Query::select()
         .column(Alias::new("ID"))
         .group_by_col(Alias::new("ID"))
@@ -55,7 +60,10 @@ async fn get_popular(
         .to_owned();
     let stmt = db.get_database_backend().build(&result_query);
     let results = db.query_all(stmt).await?;
-    Ok(Popular(results.into_iter().map(|val| {
-        val.try_get_by_index::<String>(0).unwrap()
-    }).collect()))
+    Ok(Popular(
+        results
+            .into_iter()
+            .map(|val| val.try_get_by_index::<String>(0).unwrap())
+            .collect(),
+    ))
 }

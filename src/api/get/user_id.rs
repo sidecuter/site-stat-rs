@@ -20,5 +20,9 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 )]
 #[get("/user-id")]
 async fn get_user_id(db: web::Data<DatabaseConnection>) -> ApiResult<UserId> {
-    UserId::default().into_active_model().insert(db.get_ref()).await.convert()
+    UserId::default()
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .convert()
 }

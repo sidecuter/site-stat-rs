@@ -1,6 +1,6 @@
-use sea_orm_migration::{prelude::*, schema::*};
 use crate::m20220101_000001_create_table::UserId;
 use crate::m20250323_195737_create_problem_table::Problem;
+use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -26,16 +26,16 @@ impl MigrationTrait for Migration {
                             .from(Review::Table, Review::UserId)
                             .to(UserId::Table, UserId::UserId)
                             .on_update(ForeignKeyAction::Cascade)
-                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .foreign_key(
                         ForeignKey::create()
                             .from(Review::Table, Review::ProblemId)
                             .to(Problem::Table, Problem::Id)
                             .on_delete(ForeignKeyAction::Cascade)
-                            .on_update(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
                     )
-                    .to_owned()
+                    .to_owned(),
             )
             .await
     }
@@ -57,5 +57,5 @@ pub enum Review {
     ProblemId,
     Text,
     ImageName,
-    CreationDate
+    CreationDate,
 }

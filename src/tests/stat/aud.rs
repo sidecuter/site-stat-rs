@@ -1,4 +1,3 @@
-use std::net::{IpAddr, SocketAddr};
 use super::super::prepare_connection;
 use crate::api::stat::aud::stat_aud;
 use crate::schemas::{SelectAuditoryIn, Status};
@@ -6,6 +5,7 @@ use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
 use sea_orm::DatabaseConnection;
+use std::net::{IpAddr, SocketAddr};
 
 #[rstest]
 #[case::insert_correct("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec", "a-100", true, "OK", 200)]
@@ -37,7 +37,8 @@ async fn stat_aud_endpoint(
     let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        auditory_id, success,
+        auditory_id,
+        success,
     };
     let req = test::TestRequest::put()
         .uri("/select-aud")
@@ -57,7 +58,7 @@ async fn stat_aud_endpoint(
 
 #[rstest]
 #[tokio::test]
-async fn test_429_stat_aud_endpoint (
+async fn test_429_stat_aud_endpoint(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
 ) {
     assert!(prepare_connection.is_ok());

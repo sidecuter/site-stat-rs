@@ -1,5 +1,5 @@
 use crate::entity::{plan, user_id};
-use crate::errors::{ApiResult, ApiError};
+use crate::errors::{ApiError, ApiResult};
 use crate::schemas::{ChangePlanIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
@@ -41,7 +41,7 @@ async fn stat_plan(
 ) -> ApiResult<Status> {
     match data.validate() {
         Ok(_) => Ok(()),
-        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     plan::Entity::filter(
@@ -50,5 +50,9 @@ async fn stat_plan(
         "Changed plan".to_string(),
     )
     .await?;
-    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
+    data.to_owned()
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .status_ok()
 }

@@ -14,7 +14,11 @@ impl MigrationTrait for Migration {
                     .table(Problem::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Problem::Id).string().not_null().primary_key())
+                        ColumnDef::new(Problem::Id)
+                            .string()
+                            .not_null()
+                            .primary_key(),
+                    )
                     .to_owned(),
             )
             .await
@@ -31,5 +35,5 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 pub enum Problem {
     Table,
-    Id
+    Id,
 }

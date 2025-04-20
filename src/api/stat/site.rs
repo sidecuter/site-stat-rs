@@ -3,7 +3,7 @@ use crate::errors::ApiResult;
 use crate::schemas::{SiteStatisticsIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
 use actix_web::{put, web};
-use sea_orm::{DatabaseConnection, IntoActiveModel, ActiveModelTrait};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 
 #[utoipa::path(
     put,
@@ -35,5 +35,9 @@ async fn stat_site(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
-    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
+    data.to_owned()
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .status_ok()
 }

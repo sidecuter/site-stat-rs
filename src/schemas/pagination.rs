@@ -1,6 +1,6 @@
-use serde::Serialize;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
+use serde::Serialize;
 use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, Clone, ToSchema)]
@@ -18,13 +18,7 @@ pub struct Pagination<T: Serialize + Clone> {
 }
 
 impl<T: Serialize + Clone> Pagination<T> {
-    pub fn new(
-        items: Vec<T>,
-        page: u64,
-        size: u64,
-        total: u64,
-        pages: u64
-    ) -> Self {
+    pub fn new(items: Vec<T>, page: u64, size: u64, total: u64, pages: u64) -> Self {
         Self {
             items,
             pages,

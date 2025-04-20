@@ -1,7 +1,7 @@
 use crate::schemas::FilterQuery;
+use actix_web::web::Query;
 use chrono::{NaiveDateTime, NaiveTime};
 use serde::Serialize;
-use actix_web::web::Query;
 use utoipa::ToSchema;
 
 #[derive(Serialize, ToSchema, Debug, Clone)]

@@ -1,10 +1,10 @@
-use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
-use actix_web::{put, web};
-use validator::Validate;
-use crate::traits::{ConversionToStatusTrait, FilterTrait};
-use crate::schemas::{StartWayIn, Status};
-use crate::errors::{ApiError, ApiResult};
 use crate::entity::{aud, user_id};
+use crate::errors::{ApiError, ApiResult};
+use crate::schemas::{StartWayIn, Status};
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
+use actix_web::{put, web};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use validator::Validate;
 
 #[utoipa::path(
     put,
@@ -45,7 +45,7 @@ async fn stat_way(
 ) -> ApiResult<Status> {
     match data.validate() {
         Ok(_) => Ok(()),
-        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     aud::Entity::filter(
@@ -60,5 +60,9 @@ async fn stat_way(
         "End auditory".to_string(),
     )
     .await?;
-    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
+    data.to_owned()
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .status_ok()
 }

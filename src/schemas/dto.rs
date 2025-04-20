@@ -4,7 +4,7 @@ use serde::Deserialize;
 pub struct DataDto {
     pub locations: Vec<LocationDto>,
     pub corpuses: Vec<CorpusDto>,
-    pub plans: Vec<PlanDto>
+    pub plans: Vec<PlanDto>,
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
@@ -15,9 +15,9 @@ pub struct LocationDto {
     pub id: String,
     pub title: String,
     pub short: String,
-    pub  available: bool,
-    pub  address: String,
-    pub crossings: Option<Vec<CrossingDto>>
+    pub available: bool,
+    pub address: String,
+    pub crossings: Option<Vec<CrossingDto>>,
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
@@ -27,7 +27,7 @@ pub struct CorpusDto {
     pub location_id: String,
     pub title: String,
     pub available: bool,
-    pub stairs: Option<Vec<Vec<String>>>
+    pub stairs: Option<Vec<Vec<String>>>,
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
@@ -39,12 +39,12 @@ pub struct PlanDto {
     #[serde(rename(deserialize = "corpusId"))]
     pub corpus_id: String,
     pub floor: String,
-    pub  available: bool,
+    pub available: bool,
     #[serde(rename(deserialize = "wayToSvg"), default)]
     pub way_to_svg: String,
     pub graph: Option<Vec<GraphDto>>,
-    pub  entrances: Option<Vec<EntranceDto>>,
-    pub  nearest: NearestDto
+    pub entrances: Option<Vec<EntranceDto>>,
+    pub nearest: NearestDto,
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
@@ -52,7 +52,7 @@ pub struct NearestDto {
     #[serde(default)]
     pub enter: String,
     pub wm: Option<String>,
-    pub  ww: Option<String>,
+    pub ww: Option<String>,
     pub ws: Option<String>,
 }
 
@@ -69,5 +69,5 @@ pub struct GraphDto {
     #[serde(rename(deserialize = "type"))]
     pub type_: String,
     #[serde(rename(deserialize = "neighborData"))]
-    pub neighbor_data: Vec<NeighborDto>
+    pub neighbor_data: Vec<NeighborDto>,
 }

@@ -1,18 +1,23 @@
-use sea_orm::{EntityTrait, IntoActiveModel, QueryOrder, Select, QueryFilter, ColumnTrait, ActiveValue::Set};
-use actix_multipart::form::{tempfile::TempFile, MultipartForm, text::Text};
-use std::{fmt::{Display, Formatter}, path::Path};
-use actix_web::{body::BoxBody, web, Responder};
-use serde::{Deserialize, Serialize};
+use crate::app_state::AppState;
+use crate::entity::review;
+use crate::errors::{ApiError, ApiResult};
+use crate::schemas::Filter;
+use crate::traits::Paginate;
+use crate::{impl_paginate, impl_responder};
+use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
+use actix_web::web;
 use chrono::NaiveDateTime;
 use mime::Mime;
+use sea_orm::{
+    ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Select,
+};
+use serde::{Deserialize, Serialize};
+use std::{
+    fmt::{Display, Formatter},
+    path::Path,
+};
 use utoipa::ToSchema;
 use uuid::Uuid;
-use crate::errors::{ApiResult, ApiError};
-use crate::app_state::AppState;
-use crate::traits::Paginate;
-use crate::schemas::Filter;
-use crate::entity::review;
-use crate::{impl_paginate, impl_responder};
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]
@@ -20,7 +25,7 @@ pub enum Problem {
     Way,
     Work,
     Plan,
-    Other
+    Other,
 }
 
 #[derive(ToSchema, Debug, MultipartForm)]
@@ -33,7 +38,7 @@ pub struct ReviewFormIn {
     pub problem: Text<Problem>,
     #[multipart(limit = "20 MiB")]
     #[schema(value_type = Option<String>, format = Binary, content_media_type = "application/octet-stream")]
-    pub image: Option<TempFile>
+    pub image: Option<TempFile>,
 }
 
 #[derive(Debug, Clone)]
@@ -65,7 +70,7 @@ impl From<String> for Problem {
             "plan" => Problem::Plan,
             "other" => Problem::Other,
             "work" => Problem::Work,
-            _ => panic!("Unexpected behavior")
+            _ => panic!("Unexpected behavior"),
         }
     }
 }
@@ -88,9 +93,12 @@ impl ReviewFormIn {
     }
 
     fn get_file_ext(mimetype: Mime) -> Option<String> {
-        match mimetype.subtype().as_str() {
-            filetype if filetype.len() <= 4 => Some(filetype.to_string()),
-            _ => None
+        static ALLOWED_TYPES: [&str; 5] = ["png", "jpeg", "heif", "gif", "webp"];
+        match mimetype.subtype().as_str().to_lowercase() {
+            filetype if filetype.len() <= 4 && ALLOWED_TYPES.contains(&filetype.as_str()) => {
+                Some(filetype.to_string())
+            }
+            _ => None,
         }
     }
 
@@ -98,38 +106,45 @@ impl ReviewFormIn {
         Ok(if let Some(img) = self.image {
             if let Some(mime) = img.content_type.clone() {
                 if mime.type_() != mime::IMAGE {
-                    Err(ApiError::UnsupportedMediaType("This endpoint accepts only images".to_owned()))?;
+                    Err(ApiError::UnsupportedMediaType(
+                        "This endpoint accepts only images".to_owned(),
+                    ))?;
                 }
             } else {
-                Err(ApiError::UnprocessableData("File has no mime type".to_owned()))?;
+                Err(ApiError::UnprocessableData(
+                    "File has no mime type".to_owned(),
+                ))?;
             }
             let img_id = Self::create_filename();
             let img_ext = if let Some(img_ext) = Self::get_file_ext(img.content_type.unwrap()) {
                 img_ext
             } else {
                 Err(ApiError::UnsupportedMediaType(
-                    "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned()
+                    "Only support this 5 image types: png, jpeg, heif, gif, webp".to_owned(),
                 ))?
             };
-            let img_name = format!("{img_id}{img_ext}");
+            let img_name = format!("{img_id}.{img_ext}");
             let path = Path::new(&state.files_path)
                 .join(img_name.clone())
                 .to_str()
-                .ok_or(ApiError::UnprocessableData("File name is not a valid UTF-8 sequence".to_owned()))?
+                .ok_or(ApiError::UnprocessableData(
+                    "File name is not a valid UTF-8 sequence".to_owned(),
+                ))?
                 .to_owned();
             tracing::info!("saving to {path}");
-            let mut target_file = web::block(|| {
-                if Path::new(&path).exists() {
-                    std::fs::remove_file(path.clone()).unwrap();
-                };
-                std::fs::File::create(path)
-            }).await??;
-            let mut img_file = web::block(move || {
-               img.file.reopen()
-            }).await??;
             web::block(move || {
+                if Path::new(&path).exists() {
+                    std::fs::remove_file(path.clone())?;
+                };
+                let mut target_file = std::fs::File::create(path)?;
+                let mut img_file = img.file.reopen()?;
                 std::io::copy(&mut img_file, &mut target_file)
-            }).await??;
+            })
+            .await?
+            .map_err(|e: std::io::Error| {
+                tracing::error!("{e}");
+                e
+            })?;
             Some(img_name)
         } else {
             None

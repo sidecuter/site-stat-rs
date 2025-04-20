@@ -1,14 +1,14 @@
 #![allow(clippy::clone_on_copy)]
 
-use actix_multipart::form::MultipartForm;
+use crate::app_state::AppState;
 use crate::entity::user_id;
 use crate::errors::ApiResult;
+use crate::schemas::review::ReviewFormIn;
 use crate::schemas::{ReviewIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
+use actix_multipart::form::MultipartForm;
 use actix_web::{post, web};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
-use crate::app_state::AppState;
-use crate::schemas::review::ReviewFormIn;
 
 #[utoipa::path(
     post,
@@ -49,5 +49,9 @@ async fn add_review(
     };
     let image_name = data.save_image(&state).await?;
     review_in.image_name = image_name;
-    review_in.into_active_model().insert(db.get_ref()).await.status_ok()
+    review_in
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .status_ok()
 }

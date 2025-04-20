@@ -1,9 +1,7 @@
+use crate::impl_responder;
 use serde::Serialize;
-use actix_web::body::BoxBody;
-use actix_web::Responder;
 use std::str::FromStr;
 use utoipa::ToSchema;
-use crate::impl_responder;
 
 #[derive(Serialize, ToSchema, Debug, Clone, Eq, PartialEq)]
 #[cfg_attr(test, derive(serde::Deserialize))]

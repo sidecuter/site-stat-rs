@@ -9,6 +9,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
         web::scope("/review")
             .service(add::add_review)
             .service(get::get_reviews)
-            .service(image::get_image)
+            .service(image::get_image),
     );
 }

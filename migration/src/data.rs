@@ -486,6 +486,4 @@ pub const PLANS: [&str; 22] = [
     "V-5", "N-0", "N-1", "N-2", "N-3", "N-4", "N-5", "ND-1", "ND-2",
 ];
 
-pub const PROBLEMS: [&str; 4] = [
-    "way", "plan", "work", "other"
-];
+pub const PROBLEMS: [&str; 4] = ["way", "plan", "work", "other"];
