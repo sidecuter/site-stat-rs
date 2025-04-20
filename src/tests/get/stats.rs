@@ -1,27 +1,21 @@
-use crate::api::get::{
-    auds::get_auds,
-    plans::get_plans,
-    sites::get_sites,
-    ways::get_ways
-};
+use super::super::prepare_connection;
+use crate::api::get::{auds::get_auds, plans::get_plans, sites::get_sites, ways::get_ways};
+use crate::api::review::get::get_reviews;
 use crate::schemas::{
-    Pagination, SiteStatisticsOut, SelectAuditoryOut,
-    StartWayOut, ChangePlanOut, ReviewOut, Filter
+    ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
 };
-use rstest::*;
 use actix_web::web::Data;
 use actix_web::{test, App};
+use rstest::*;
 use sea_orm::DatabaseConnection;
 use std::fmt::{Display, Formatter};
-use super::super::prepare_connection;
-use crate::api::review::get::get_reviews;
 
 enum Endpoint {
     Sites,
     Auds,
     Ways,
     Plans,
-    Reviews
+    Reviews,
 }
 
 impl Display for Endpoint {
@@ -65,33 +59,64 @@ async fn get(
     #[case] correct: bool,
     #[case] page: u64,
     #[case] status: u16,
-    #[case] filter: bool
+    #[case] filter: bool,
 ) {
     assert!(prepare_connection.is_ok());
     let db = Data::new(prepare_connection.unwrap());
     let app_state = Data::new(crate::app_state::AppState::new());
     let app = match endpoint {
-        Endpoint::Sites => test::init_service(App::new().app_data(app_state).app_data(db).service(get_sites)),
-        Endpoint::Auds => test::init_service(App::new().app_data(app_state).app_data(db).service(get_auds)),
-        Endpoint::Ways => test::init_service(App::new().app_data(app_state).app_data(db).service(get_ways)),
-        Endpoint::Plans => test::init_service(App::new().app_data(app_state).app_data(db).service(get_plans)),
-        Endpoint::Reviews => test::init_service(App::new().app_data(app_state).app_data(db).service(get_reviews))
-    }.await;
+        Endpoint::Sites => test::init_service(
+            App::new()
+                .app_data(app_state)
+                .app_data(db)
+                .service(get_sites),
+        ),
+        Endpoint::Auds => test::init_service(
+            App::new()
+                .app_data(app_state)
+                .app_data(db)
+                .service(get_auds),
+        ),
+        Endpoint::Ways => test::init_service(
+            App::new()
+                .app_data(app_state)
+                .app_data(db)
+                .service(get_ways),
+        ),
+        Endpoint::Plans => test::init_service(
+            App::new()
+                .app_data(app_state)
+                .app_data(db)
+                .service(get_plans),
+        ),
+        Endpoint::Reviews => test::init_service(
+            App::new()
+                .app_data(app_state)
+                .app_data(db)
+                .service(get_reviews),
+        ),
+    }
+    .await;
     let query = Filter {
         user_id: if filter {
             Some(uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap())
-        } else { None },
+        } else {
+            None
+        },
         size: 50,
         page,
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
-        .insert_header(
-            (
-                "Api-Key",
-                if correct {"0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"} else {"1"}
-            ))
+        .insert_header((
+            "Api-Key",
+            if correct {
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+            } else {
+                "1"
+            },
+        ))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), status);
@@ -106,17 +131,24 @@ async fn get(
 #[tokio::test]
 async fn check_value(
     #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] endpoint: Endpoint
+    #[case] endpoint: Endpoint,
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
     let app = match endpoint {
-        Endpoint::Sites => test::init_service(App::new().app_data(Data::new(db)).service(get_sites)),
+        Endpoint::Sites => {
+            test::init_service(App::new().app_data(Data::new(db)).service(get_sites))
+        }
         Endpoint::Auds => test::init_service(App::new().app_data(Data::new(db)).service(get_auds)),
         Endpoint::Ways => test::init_service(App::new().app_data(Data::new(db)).service(get_ways)),
-        Endpoint::Plans => test::init_service(App::new().app_data(Data::new(db)).service(get_plans)),
-        Endpoint::Reviews => test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
-    }.await;
+        Endpoint::Plans => {
+            test::init_service(App::new().app_data(Data::new(db)).service(get_plans))
+        }
+        Endpoint::Reviews => {
+            test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
+        }
+    }
+    .await;
     let query = Filter {
         user_id: None,
         size: 50,
@@ -127,26 +159,28 @@ async fn check_value(
         .uri(&format!("/{endpoint}?{query}"))
         .insert_header((
             "Api-Key",
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         ))
         .to_request();
     match endpoint {
         Endpoint::Sites => {
-            let resp: Pagination<SiteStatisticsOut> = test::call_and_read_body_json(&app, req).await;
+            let resp: Pagination<SiteStatisticsOut> =
+                test::call_and_read_body_json(&app, req).await;
             assert_eq!(resp.total, 1);
-        },
+        }
         Endpoint::Auds => {
-            let resp: Pagination<SelectAuditoryOut> = test::call_and_read_body_json(&app, req).await;
+            let resp: Pagination<SelectAuditoryOut> =
+                test::call_and_read_body_json(&app, req).await;
             assert_eq!(resp.total, 1);
-        },
+        }
         Endpoint::Ways => {
             let resp: Pagination<StartWayOut> = test::call_and_read_body_json(&app, req).await;
             assert_eq!(resp.total, 1);
-        },
+        }
         Endpoint::Plans => {
             let resp: Pagination<ChangePlanOut> = test::call_and_read_body_json(&app, req).await;
             assert_eq!(resp.total, 1);
-        },
+        }
         Endpoint::Reviews => {
             let resp: Pagination<ReviewOut> = test::call_and_read_body_json(&app, req).await;
             assert_eq!(resp.total, 1);

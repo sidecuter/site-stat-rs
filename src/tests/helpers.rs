@@ -1,5 +1,5 @@
-use std::fs;
-use std::path::Path;
+use crate::app_state::AppState;
+use crate::schemas::Problem;
 use actix_web::http::header;
 use actix_web::http::header::HeaderMap;
 use actix_web::web::{BufMut, Bytes, BytesMut};
@@ -7,9 +7,9 @@ use mime::Mime;
 use rand::distr::{Alphanumeric, SampleString};
 use rand::rng;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
+use std::fs;
+use std::path::Path;
 use uuid::Uuid;
-use crate::app_state::AppState;
-use crate::schemas::Problem;
 
 pub fn prepare_tmp_dir() -> String {
     let filepath = format!("/tmp/{}", Uuid::new_v4());
@@ -27,16 +27,16 @@ pub async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         creation_date: Set(chrono::Utc::now().naive_utc()),
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     crate::entity::site_stat::ActiveModel {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
         endpoint: Set(None),
         ..Default::default()
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     crate::entity::select_aud::ActiveModel {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
@@ -44,8 +44,8 @@ pub async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std
         success: Set(true),
         ..Default::default()
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     crate::entity::start_way::ActiveModel {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
@@ -53,16 +53,16 @@ pub async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std
         end_id: Set("a-101".into()),
         ..Default::default()
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     crate::entity::change_plan::ActiveModel {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         visit_date: Set(chrono::Utc::now().naive_utc()),
         plan_id: Set("A-0".into()),
         ..Default::default()
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     crate::entity::review::ActiveModel {
         user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
         creation_date: Set(chrono::Utc::now().naive_utc()),
@@ -70,8 +70,8 @@ pub async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std
         problem_id: Set("way".to_owned()),
         ..Default::default()
     }
-        .insert(db)
-        .await?;
+    .insert(db)
+    .await?;
     Ok(())
 }
 
@@ -81,34 +81,18 @@ const HYPHENS: &[u8] = b"--";
 const BOUNDARY_PREFIX: &str = "------------------------";
 
 pub const BLACK_1X1_PNG: &[u8] = &[
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-    0x00, 0x00, 0x00, 0x0D,
-    0x49, 0x48, 0x44, 0x52,
-    0x00, 0x00, 0x00, 0x01,
-    0x00, 0x00, 0x00, 0x01,
-    0x08,
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-    0x8C, 0x69, 0x82, 0x8A,
-    0x00, 0x00, 0x00, 0x0C,
-    0x49, 0x44, 0x41, 0x54,
-    0x78, 0x01,
-    0x01, 0x02, 0x00, 0xFD,
-    0xFF, 0x00, 0x00, 0x01,
-    0x00, 0x01,
-    0x9A, 0x1C, 0x21, 0xBC,
-    0x00, 0x00, 0x00, 0x00,
-    0x49, 0x45, 0x4E, 0x44,
-    0xAE, 0x42, 0x60, 0x82,
+    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x8C, 0x69, 0x82,
+    0x8A, 0x00, 0x00, 0x00, 0x0C, 0x49, 0x44, 0x41, 0x54, 0x78, 0x01, 0x01, 0x02, 0x00, 0xFD, 0xFF,
+    0x00, 0x00, 0x01, 0x00, 0x01, 0x9A, 0x1C, 0x21, 0xBC, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E,
+    0x44, 0xAE, 0x42, 0x60, 0x82,
 ];
 
 pub fn generate_multipart_payload(
     user_id: String,
     problem: Problem,
     text: String,
-    file: Option<(String, Bytes, Option<Mime>)>
+    file: Option<(String, Bytes, Option<Mime>)>,
 ) -> (Bytes, HeaderMap) {
     let boundary = Alphanumeric.sample_string(&mut rng(), 32);
     let boundary_str = [BOUNDARY_PREFIX, &boundary].concat();
@@ -157,7 +141,9 @@ pub fn generate_multipart_payload(
     let mut headers = HeaderMap::new();
     headers.insert(
         header::CONTENT_TYPE,
-        format!("multipart/form-data; boundary=\"{boundary_str}\"").parse().unwrap()
+        format!("multipart/form-data; boundary=\"{boundary_str}\"")
+            .parse()
+            .unwrap(),
     );
     let bytes = buf.freeze();
     (bytes, headers)

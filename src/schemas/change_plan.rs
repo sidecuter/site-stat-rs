@@ -1,18 +1,16 @@
-use sea_orm::{
-    EntityTrait, IntoActiveModel, QueryOrder,
-    Select, QueryFilter, ColumnTrait,
-    ActiveValue::Set
-};
-use actix_web::{body::BoxBody, Responder};
-use serde::{Deserialize, Serialize};
-use chrono::NaiveDateTime;
-use validator::Validate;
-use utoipa::ToSchema;
-use crate::schemas::validators::PLAN_RE;
 use crate::entity::change_plan;
-use crate::{impl_paginate, impl_responder};
-use crate::traits::Paginate;
+use crate::schemas::validators::PLAN_RE;
 use crate::schemas::Filter;
+use crate::traits::Paginate;
+use crate::{impl_paginate, impl_responder};
+use actix_web::{body::BoxBody, Responder};
+use chrono::NaiveDateTime;
+use sea_orm::{
+    ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Select,
+};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use validator::Validate;
 
 #[derive(Deserialize, ToSchema, Debug, Clone, Validate)]
 #[cfg_attr(test, derive(serde::Serialize))]
@@ -21,7 +19,7 @@ pub struct ChangePlanIn {
     pub user_id: uuid::Uuid,
     #[schema(example = "A-0")]
     #[validate(length(min = 3, max=4), regex(path = *PLAN_RE))]
-    pub plan_id: String
+    pub plan_id: String,
 }
 
 #[derive(Serialize, ToSchema, Debug, Clone, Validate)]

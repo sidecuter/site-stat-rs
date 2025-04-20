@@ -1,6 +1,6 @@
-use sea_orm_migration::prelude::*;
-use crate::m20250323_195737_create_problem_table::Problem;
 use crate::data::PROBLEMS;
+use crate::m20250323_195737_create_problem_table::Problem;
+use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

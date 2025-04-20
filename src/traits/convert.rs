@@ -1,7 +1,4 @@
-use crate::{
-    errors::ApiResult,
-    schemas::Status,
-};
+use crate::{errors::ApiResult, schemas::Status};
 use actix_web::Responder;
 use sea_orm::{DbErr, ModelTrait};
 

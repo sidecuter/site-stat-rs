@@ -2,8 +2,8 @@ use actix_web::middleware::NormalizePath;
 use actix_web::web;
 
 pub mod get;
-pub mod stat;
 pub mod review;
+pub mod stat;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(

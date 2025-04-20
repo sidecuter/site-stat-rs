@@ -1,9 +1,9 @@
+use crate::impl_responder;
 use crate::schemas::Period;
-use serde::Serialize;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
+use serde::Serialize;
 use utoipa::ToSchema;
-use crate::impl_responder;
 
 #[derive(Serialize, ToSchema, Debug, Clone)]
 #[cfg_attr(test, derive(serde::Deserialize))]
@@ -20,7 +20,7 @@ impl Default for Statistics {
             unique: 0,
             count: 10,
             all: 100,
-            period: Period(None)
+            period: Period(None),
         }
     }
 }

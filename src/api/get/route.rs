@@ -1,9 +1,9 @@
 use crate::errors::{ApiError, ApiResult};
-use crate::schemas::Status;
-use actix_web::{get, web};
 use crate::mut_state::AppStateMutable;
 use crate::schemas::filter::FilterRoute;
 use crate::schemas::graph::ShortestWay;
+use crate::schemas::Status;
+use actix_web::{get, web};
 
 #[utoipa::path(
     get,
@@ -62,14 +62,18 @@ use crate::schemas::graph::ShortestWay;
 #[get("/route")]
 async fn get_route(
     query: web::Query<FilterRoute>,
-    app_state: web::Data<AppStateMutable>
+    app_state: web::Data<AppStateMutable>,
 ) -> ApiResult<ShortestWay> {
     let graphs_lock = app_state.data_entry.lock()?;
     let graph = graphs_lock
         .get(&query.loc.to_string())
-        .ok_or(ApiError::InternalError("Campus is not available now".to_string()))?;
+        .ok_or(ApiError::InternalError(
+            "Campus is not available now".to_string(),
+        ))?;
     if !graph.has_vertex(&query.from_p) || !graph.has_vertex(&query.to_p) {
-        Err(ApiError::NotFound("You are trying to get a route along non-existent vertex".to_string()))?
+        Err(ApiError::NotFound(
+            "You are trying to get a route along non-existent vertex".to_string(),
+        ))?
     }
     Ok(graph.get_shortest_way_from_to(&query.from_p, &query.to_p))
 }

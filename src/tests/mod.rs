@@ -1,14 +1,14 @@
+mod fetchers;
 mod get;
-mod stat;
-mod review;
 mod helpers;
 mod redoc;
-mod fetchers;
+mod review;
+mod stat;
 
+use self::helpers::prepare_database;
 use migration::{Migrator, MigratorTrait};
 use rstest::fixture;
 use sea_orm::{Database, DatabaseConnection};
-use self::helpers::prepare_database;
 
 #[fixture]
 async fn prepare_connection() -> Result<DatabaseConnection, Box<dyn std::error::Error>> {

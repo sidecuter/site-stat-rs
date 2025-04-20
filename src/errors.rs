@@ -1,13 +1,13 @@
-use std::sync::PoisonError;
 use crate::schemas::Status;
+use actix_web::error::BlockingError;
 use actix_web::{
     body::BoxBody,
     error::{JsonPayloadError, QueryPayloadError},
     http::{header::ContentType, StatusCode},
     HttpRequest, HttpResponse, Responder, ResponseError,
 };
-use actix_web::error::BlockingError;
 use sea_orm::DbErr;
+use std::sync::PoisonError;
 
 #[derive(Debug, thiserror::Error, Clone)]
 pub enum ApiError {
@@ -26,7 +26,7 @@ pub enum ApiError {
     #[error("Too many requests, retry in {0}s")]
     TooManyRequests(String),
     #[error("{0}")]
-    UnsupportedMediaType(String)
+    UnsupportedMediaType(String),
 }
 
 impl ResponseError for ApiError {
@@ -39,7 +39,7 @@ impl ResponseError for ApiError {
             ApiError::PathNotFound(_) => StatusCode::NOT_FOUND,
             ApiError::NotAllowed(_) => StatusCode::FORBIDDEN,
             ApiError::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
-            ApiError::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE
+            ApiError::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE,
         }
     }
 

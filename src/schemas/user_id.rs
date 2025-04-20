@@ -1,10 +1,10 @@
-use sea_orm::{IntoActiveModel, ActiveValue::Set};
-use actix_web::{body::BoxBody, Responder};
-use chrono::NaiveDateTime;
-use serde::Serialize;
-use utoipa::ToSchema;
 use crate::entity::user_id;
 use crate::impl_responder;
+use actix_web::{body::BoxBody, Responder};
+use chrono::NaiveDateTime;
+use sea_orm::{ActiveValue::Set, IntoActiveModel};
+use serde::Serialize;
+use utoipa::ToSchema;
 
 #[derive(ToSchema, Debug, Serialize, Clone)]
 pub struct UserId {

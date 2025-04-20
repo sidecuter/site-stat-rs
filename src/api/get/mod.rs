@@ -1,11 +1,11 @@
 pub mod auds;
 pub mod plans;
+pub mod popular;
+pub mod route;
 pub mod sites;
 pub mod stat;
 pub mod user_id;
 pub mod ways;
-pub mod popular;
-pub mod route;
 
 use actix_web::web;
 

@@ -1,10 +1,10 @@
-use actix_web::{get, web, middleware::from_fn};
+use crate::errors::{ApiError, ApiResult};
+use crate::middleware::api_key_middleware;
+use crate::schemas::{Filter, Pagination, SelectAuditoryOut, Status};
+use crate::traits::Paginate;
+use actix_web::{get, middleware::from_fn, web};
 use sea_orm::DatabaseConnection;
 use validator::Validate;
-use crate::schemas::{Filter, Pagination, SelectAuditoryOut, Status};
-use crate::middleware::api_key_middleware;
-use crate::errors::{ApiError, ApiResult};
-use crate::traits::Paginate;
 
 #[utoipa::path(
     get,
@@ -41,7 +41,7 @@ async fn get_auds(
 ) -> ApiResult<Pagination<SelectAuditoryOut>> {
     match data.validate() {
         Ok(_) => Ok(()),
-        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(SelectAuditoryOut::pagination(db.get_ref(), &data).await?)
 }

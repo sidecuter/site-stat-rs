@@ -42,13 +42,15 @@ async fn get_stat_endpoint(
     #[case] target: Target,
     #[case] all: u64,
     #[case] start_date: Option<NaiveDate>,
-    #[case] end_date: Option<NaiveDate>
+    #[case] end_date: Option<NaiveDate>,
 ) {
     assert!(prepare_connection.is_ok());
     let db = prepare_connection.unwrap();
     let app = test::init_service(App::new().app_data(Data::new(db)).service(get_stat)).await;
     let query = FilterQuery {
-        target, start_date, end_date
+        target,
+        start_date,
+        end_date,
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()

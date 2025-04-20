@@ -1,6 +1,6 @@
+use crate::app_state::AppState;
 use actix_cors::Cors;
 use actix_web::web;
-use crate::app_state::AppState;
 
 pub fn create_cors(app_state: &web::Data<AppState>) -> Cors {
     let cors = Cors::default();

@@ -1,11 +1,11 @@
-use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
-use actix_web::{put, web};
-use validator::Validate;
-use crate::traits::{ConversionToStatusTrait, FilterTrait};
-use crate::schemas::{SelectAuditoryIn, Status};
-use crate::middleware::build_rate_limits;
-use crate::errors::{ApiError, ApiResult};
 use crate::entity::{aud, user_id};
+use crate::errors::{ApiError, ApiResult};
+use crate::middleware::build_rate_limits;
+use crate::schemas::{SelectAuditoryIn, Status};
+use crate::traits::{ConversionToStatusTrait, FilterTrait};
+use actix_web::{put, web};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
+use validator::Validate;
 
 #[utoipa::path(
     put,
@@ -39,14 +39,14 @@ use crate::entity::{aud, user_id};
     ),
     tag = "Stat"
 )]
-#[put("select-aud", wrap="build_rate_limits()")]
+#[put("select-aud", wrap = "build_rate_limits()")]
 async fn stat_aud(
     data: web::Json<SelectAuditoryIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     match data.validate() {
         Ok(_) => Ok(()),
-        Err(e) => Err(ApiError::UnprocessableData(e.to_string()))
+        Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     aud::Entity::filter(
@@ -55,5 +55,9 @@ async fn stat_aud(
         "Auditory".to_string(),
     )
     .await?;
-    data.to_owned().into_active_model().insert(db.get_ref()).await.status_ok()
+    data.to_owned()
+        .into_active_model()
+        .insert(db.get_ref())
+        .await
+        .status_ok()
 }

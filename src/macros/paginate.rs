@@ -8,8 +8,7 @@ macro_rules! impl_paginate {
                         .filter($module::Column::UserId.eq(user_id))
                         .order_by_asc($module::Column::Id)
                 } else {
-                    $module::Entity::find()
-                        .order_by_asc($module::Column::Id)
+                    $module::Entity::find().order_by_asc($module::Column::Id)
                 }
             }
         }

@@ -1,16 +1,16 @@
-use actix_web::Responder;
-use std::collections::{BinaryHeap, HashMap, HashSet};
-use ordered_float::OrderedFloat;
-use actix_web::body::BoxBody;
-use std::time::Instant;
-use std::cmp::Reverse;
-use std::str::FromStr;
-use std::sync::Arc;
-use serde::Serialize;
-use utoipa::{PartialSchema, ToSchema};
-use utoipa::openapi::{ObjectBuilder, RefOr, Schema};
 use crate::impl_responder;
 use crate::schemas::data::{CorpusData, LocationData, PlanData};
+use actix_web::body::BoxBody;
+use actix_web::Responder;
+use ordered_float::OrderedFloat;
+use serde::Serialize;
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::str::FromStr;
+use std::sync::Arc;
+use std::time::Instant;
+use utoipa::openapi::{ObjectBuilder, RefOr, Schema};
+use utoipa::{PartialSchema, ToSchema};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, ToSchema)]
 #[cfg_attr(test, derive(bincode::Decode))]
@@ -80,7 +80,7 @@ impl PartialSchema for ShortestWay {
             ObjectBuilder::new()
                 .property("way", Vec::<Vertex>::schema())
                 .property("distance", i32::schema())
-                .build()
+                .build(),
         ))
     }
 }
@@ -120,17 +120,21 @@ impl Graph {
             .filter(|plan| plan.corpus.location.id == self.location.id)
             .for_each(|plan| {
                 plan.graph.iter().for_each(|raw_vertex| {
-                    self.vertexes.insert(raw_vertex.id.clone(), Arc::new(Vertex {
-                        id: raw_vertex.id.clone(),
-                        x: raw_vertex.x,
-                        y: raw_vertex.y,
-                        type_: VertexType::from_str(&raw_vertex.type_).unwrap(),
-                        neighbor_data: raw_vertex.neighbor_data
-                            .iter()
-                            .map(|n| (n.0.clone(), n.1))
-                            .collect(),
-                        plan: Arc::clone(plan),
-                    }));
+                    self.vertexes.insert(
+                        raw_vertex.id.clone(),
+                        Arc::new(Vertex {
+                            id: raw_vertex.id.clone(),
+                            x: raw_vertex.x,
+                            y: raw_vertex.y,
+                            type_: VertexType::from_str(&raw_vertex.type_).unwrap(),
+                            neighbor_data: raw_vertex
+                                .neighbor_data
+                                .iter()
+                                .map(|n| (n.0.clone(), n.1))
+                                .collect(),
+                            plan: Arc::clone(plan),
+                        }),
+                    );
                 })
             });
     }
@@ -145,9 +149,11 @@ impl Graph {
                         let stair1 = &pair[0];
                         let stair2 = &pair[1];
                         Arc::make_mut(self.vertexes.get_mut(stair1).unwrap())
-                            .neighbor_data.push((stair2.clone(), 1085.));
+                            .neighbor_data
+                            .push((stair2.clone(), 1085.));
                         Arc::make_mut(self.vertexes.get_mut(stair2).unwrap())
-                            .neighbor_data.push((stair1.clone(), 916.));
+                            .neighbor_data
+                            .push((stair1.clone(), 916.));
                     })
                 })
             });
@@ -159,9 +165,11 @@ impl Graph {
             let c2 = &crossing.1;
             let dist = crossing.2;
             Arc::make_mut(self.vertexes.get_mut(c1).unwrap())
-                .neighbor_data.push((c2.clone(), dist));
+                .neighbor_data
+                .push((c2.clone(), dist));
             Arc::make_mut(self.vertexes.get_mut(c2).unwrap())
-                .neighbor_data.push((c1.clone(), dist));
+                .neighbor_data
+                .push((c1.clone(), dist));
         })
     }
 
@@ -189,8 +197,12 @@ impl Graph {
 
         // Основной цикл Дейкстры
         while let Some(Reverse((OrderedFloat(dist), idx))) = heap.pop() {
-            if idx == end_idx { break; }
-            if visited[idx] { continue; }
+            if idx == end_idx {
+                break;
+            }
+            if visited[idx] {
+                continue;
+            }
             visited[idx] = true;
 
             for (neighbor_id, edge_dist) in &index_to_vertex[idx].neighbor_data {
@@ -205,7 +217,10 @@ impl Graph {
             }
         }
 
-        println!("The task took {:.4} seconds", start_time.elapsed().as_secs_f64());
+        println!(
+            "The task took {:.4} seconds",
+            start_time.elapsed().as_secs_f64()
+        );
 
         // Формирование результата
         ShortestWay {
@@ -214,8 +229,19 @@ impl Graph {
         }
     }
 
-    fn prepare_valid_vertices(&self, start: &str, end: &str) -> (HashMap<String, usize>, Vec<Arc<Vertex>>) {
-        let allowed_types: HashSet<&str> = ["hallway", "lift", "stair", "corpusTransition", "crossingSpace"].into();
+    fn prepare_valid_vertices(
+        &self,
+        start: &str,
+        end: &str,
+    ) -> (HashMap<String, usize>, Vec<Arc<Vertex>>) {
+        let allowed_types: HashSet<&str> = [
+            "hallway",
+            "lift",
+            "stair",
+            "corpusTransition",
+            "crossingSpace",
+        ]
+        .into();
 
         let mut mapping = HashMap::new();
         let mut vertices = Vec::new();

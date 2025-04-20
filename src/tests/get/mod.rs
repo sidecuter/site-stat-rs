@@ -1,5 +1,5 @@
-mod stat;
-mod user;
 mod popular;
-mod stats;
 mod route;
+mod stat;
+mod stats;
+mod user;

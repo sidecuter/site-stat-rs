@@ -1,9 +1,9 @@
-use std::fmt::{Display, Formatter};
 use crate::schemas::validators::{page_default, size_default};
-use serde::{Deserialize};
-use validator::Validate;
 use chrono::NaiveDate;
+use serde::Deserialize;
+use std::fmt::{Display, Formatter};
 use utoipa::ToSchema;
+use validator::Validate;
 
 #[derive(Deserialize, Clone, ToSchema, Validate)]
 #[cfg_attr(test, derive(serde::Serialize))]
@@ -55,13 +55,17 @@ pub enum Location {
 
 impl Display for Location {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            Location::CampusBS => "BS",
-            Location::CampusAV => "AV",
-            Location::CampusPR => "PR",
-            Location::CampusPK => "PK",
-            Location::CampusM => "M"
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                Location::CampusBS => "BS",
+                Location::CampusAV => "AV",
+                Location::CampusPR => "PR",
+                Location::CampusPK => "PK",
+                Location::CampusM => "M",
+            }
+        )
     }
 }
 
@@ -74,7 +78,7 @@ impl From<&str> for Location {
             "campus_PR" => Self::CampusPR,
             "campus_PK" => Self::CampusPK,
             "campus_M" => Self::CampusM,
-            _ => panic!("No such campus")
+            _ => panic!("No such campus"),
         }
     }
 }
@@ -84,5 +88,5 @@ impl From<&str> for Location {
 pub struct FilterRoute {
     pub from_p: String,
     pub to_p: String,
-    pub loc: Location
+    pub loc: Location,
 }
