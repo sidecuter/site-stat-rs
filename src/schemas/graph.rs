@@ -13,6 +13,7 @@ use crate::impl_responder;
 use crate::schemas::data::{CorpusData, LocationData, PlanData};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, ToSchema)]
+#[cfg_attr(test, derive(bincode::Decode))]
 #[serde(rename_all = "camelCase")]
 pub enum VertexType {
     Hallway,
@@ -53,6 +54,7 @@ impl FromStr for VertexType {
 }
 
 #[derive(Debug, Clone, Serialize, ToSchema)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct Vertex {
     pub id: String,
     pub x: f32,
@@ -85,6 +87,8 @@ impl PartialSchema for ShortestWay {
 
 impl ToSchema for ShortestWay {}
 
+#[derive(Clone, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct Graph {
     pub location: Arc<LocationData>,
     pub plans: Vec<Arc<PlanData>>,
