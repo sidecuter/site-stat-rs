@@ -6,7 +6,7 @@ pub trait Paginate<'db, E, M>
 where
     E: EntityTrait<Model = M>,
     M: FromQueryResult + Sized + Send + Sync + 'db,
-    Self: Serialize + Clone + From<M> + Default
+    Self: Serialize + Clone + From<M>
 {
     fn pagination(
         db: &DatabaseConnection,
@@ -33,12 +33,12 @@ where
         total: u64,
         pages: u64,
     ) -> Pagination<Self> {
-        Pagination::builder()
-            .items(items)
-            .total(total)
-            .pages(pages)
-            .size(data.size)
-            .page(data.page)
-            .build()
+        Pagination::new(
+            items,
+            data.page,
+            data.size,
+            total,
+            pages
+        )
     }
 }

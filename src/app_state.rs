@@ -3,6 +3,7 @@ use std::iter::Iterator;
 use std::str::FromStr;
 use std::string::ToString;
 use std::sync::LazyLock;
+use std::time::Duration;
 use actix_web::http::Method;
 
 #[derive(Clone, Debug)]
@@ -16,6 +17,7 @@ pub struct AppState {
     pub allowed_methods: Option<Vec<Method>>,
     pub files_path: String,
     pub front_path: String,
+    pub data_refresh_interval: Duration,
 }
 
 const METHODS_ARRAY: [&str; 9] = [
@@ -59,6 +61,12 @@ impl AppState {
                 .map(|v| Method::from_str(v).expect("Method should be allowed"))
                 .collect()
         );
+        let data_refresh_interval = std::env::var("REFRESH_INTERVAL")
+            .ok()
+            .map_or(Duration::from_secs(600), |v|
+                Duration::from_secs(
+                    v.parse::<u64>().expect("Refresh interval should be integer")
+                ));
         Self {
             host,
             port,
@@ -68,7 +76,8 @@ impl AppState {
             files_path,
             front_path,
             allowed_host,
-            allowed_methods
+            allowed_methods,
+            data_refresh_interval
         }
     }
 }

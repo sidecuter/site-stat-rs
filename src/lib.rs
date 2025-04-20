@@ -6,6 +6,10 @@ pub mod errors;
 pub mod middleware;
 pub mod schemas;
 pub mod traits;
+pub mod mut_state;
+pub mod task;
+pub mod cors;
+mod macros;
 
 #[cfg(test)]
 mod tests;

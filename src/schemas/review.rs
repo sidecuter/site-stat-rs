@@ -12,6 +12,7 @@ use crate::app_state::AppState;
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 use crate::entity::review;
+use crate::{impl_paginate, impl_responder};
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]
@@ -43,10 +44,12 @@ pub struct ReviewIn {
     pub image_name: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, ToSchema, Debug, Clone)]
+#[cfg_attr(test, derive(serde::Deserialize))]
 pub struct ReviewOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: Uuid,
+    #[schema(example = "Some cool review")]
     pub text: String,
     pub problem: Problem,
     #[schema(example = "0b696946f48a47b0b0ddd93276d29d65.png")]
@@ -145,18 +148,6 @@ impl Default for ReviewIn {
     }
 }
 
-impl Default for ReviewOut {
-    fn default() -> Self {
-        Self {
-            user_id: Uuid::new_v4(),
-            text: String::from("Some cool review"),
-            problem: Problem::Other,
-            image_name: Some(format!("{}.png", Uuid::new_v4().to_string().replace("-", ""))),
-            creation_date: chrono::Utc::now().naive_utc(),
-        }
-    }
-}
-
 impl From<review::Model> for ReviewOut {
     fn from(value: review::Model) -> Self {
         Self {
@@ -166,14 +157,6 @@ impl From<review::Model> for ReviewOut {
             image_name: value.image_name,
             creation_date: value.creation_date,
         }
-    }
-}
-
-impl Responder for ReviewOut {
-    type Body = BoxBody;
-
-    fn respond_to(self, _: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
-        actix_web::HttpResponse::Ok().json(self)
     }
 }
 
@@ -190,15 +173,5 @@ impl IntoActiveModel<review::ActiveModel> for ReviewIn {
     }
 }
 
-impl Paginate<'_, review::Entity, review::Model> for ReviewOut {
-    fn get_query(filter: &Filter) -> Select<review::Entity> {
-        if let Some(user_id) = filter.user_id {
-            review::Entity::find()
-                .filter(review::Column::UserId.eq(user_id))
-                .order_by_asc(review::Column::Id)
-        } else {
-            review::Entity::find()
-                .order_by_asc(review::Column::UserId)
-        }
-    }
-}
+impl_paginate!(ReviewOut, review);
+impl_responder!(ReviewOut);
