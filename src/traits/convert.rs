@@ -18,13 +18,21 @@ impl<T: Responder + From<W>, W: ModelTrait> ConversionTrait<T> for Result<W, DbE
     type Output = ApiResult<T>;
 
     fn convert(self) -> Self::Output {
-        self.map_err(|e| e.into()).map(|v| v.into())
+        self.map_err(|e| {
+            tracing::error!("{e}");
+            e.into()
+        })
+        .map(|v| v.into())
     }
 }
 
 impl<W: ModelTrait> ConversionToStatusTrait for Result<W, DbErr> {
     type Output = ApiResult<Status>;
     fn status_ok(self) -> Self::Output {
-        self.map_err(|e| e.into()).map(|_| Status::default())
+        self.map_err(|e| {
+            tracing::error!("{e}");
+            e.into()
+        })
+        .map(|_| Status::default())
     }
 }

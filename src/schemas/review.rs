@@ -93,8 +93,11 @@ impl ReviewFormIn {
     }
 
     fn get_file_ext(mimetype: Mime) -> Option<String> {
-        match mimetype.subtype().as_str() {
-            filetype if filetype.len() <= 4 => Some(filetype.to_string()),
+        static ALLOWED_TYPES: [&str; 5] = ["png", "jpeg", "heif", "gif", "webp"];
+        match mimetype.subtype().as_str().to_lowercase() {
+            filetype if filetype.len() <= 4 && ALLOWED_TYPES.contains(&filetype.as_str()) => {
+                Some(filetype.to_string())
+            }
             _ => None,
         }
     }
@@ -129,15 +132,19 @@ impl ReviewFormIn {
                 ))?
                 .to_owned();
             tracing::info!("saving to {path}");
-            let mut target_file = web::block(|| {
+            web::block(move || {
                 if Path::new(&path).exists() {
-                    std::fs::remove_file(path.clone()).unwrap();
+                    std::fs::remove_file(path.clone())?;
                 };
-                std::fs::File::create(path)
+                let mut target_file = std::fs::File::create(path)?;
+                let mut img_file = img.file.reopen()?;
+                std::io::copy(&mut img_file, &mut target_file)
             })
-            .await??;
-            let mut img_file = web::block(move || img.file.reopen()).await??;
-            web::block(move || std::io::copy(&mut img_file, &mut target_file)).await??;
+            .await?
+            .map_err(|e: std::io::Error| {
+                tracing::error!("{e}");
+                e
+            })?;
             Some(img_name)
         } else {
             None
