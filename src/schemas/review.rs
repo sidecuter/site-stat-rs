@@ -44,7 +44,8 @@ pub struct ReviewIn {
     pub image_name: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, ToSchema, Debug, Clone)]
+#[cfg_attr(test, derive(serde::Deserialize))]
 pub struct ReviewOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: Uuid,

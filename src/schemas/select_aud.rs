@@ -14,7 +14,8 @@ use crate::{impl_paginate, impl_responder};
 use crate::traits::Paginate;
 use crate::schemas::Filter;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Validate)]
+#[derive(Deserialize, ToSchema, Debug, Clone, Validate)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct SelectAuditoryIn {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,
@@ -25,7 +26,8 @@ pub struct SelectAuditoryIn {
     pub success: bool,
 }
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Validate)]
+#[derive(Serialize, ToSchema, Debug, Clone, Validate)]
+#[cfg_attr(test, derive(serde::Deserialize))]
 pub struct SelectAuditoryOut {
     #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
     pub user_id: uuid::Uuid,

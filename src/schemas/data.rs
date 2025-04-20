@@ -11,9 +11,11 @@ pub struct DataEntry {
 }
 
 #[derive(Clone, Default, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct Crossing(pub String, pub String, pub f32);
 
 #[derive(Clone, Default, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct LocationData {
     pub id: String,
     pub title: String,
@@ -24,6 +26,7 @@ pub struct LocationData {
 }
 
 #[derive(Clone, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct CorpusData {
     pub id: String,
     pub title: String,
@@ -37,9 +40,11 @@ type RoomId = String;
 type CircleId = Id;
 
 #[derive(Clone, Default, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct PlanEntrance(pub RoomId, pub CircleId);
 
 #[derive(Clone, Debug)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct PlanData {
     pub id: String,
     pub floor: u8,

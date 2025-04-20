@@ -57,9 +57,11 @@ pub struct NearestDto {
 }
 
 #[derive(Clone, Deserialize, Debug, Default)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct NeighborDto(pub String, pub f32);
 
 #[derive(Clone, Deserialize, Debug, Default)]
+#[cfg_attr(test, derive(bincode::Decode))]
 pub struct GraphDto {
     pub id: String,
     pub x: f32,

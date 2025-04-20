@@ -1,10 +1,11 @@
 use crate::schemas::FilterQuery;
 use chrono::{NaiveDateTime, NaiveTime};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use actix_web::web::Query;
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone)]
+#[derive(Serialize, ToSchema, Debug, Clone)]
+#[cfg_attr(test, derive(serde::Deserialize))]
 pub struct Period(pub Option<(NaiveDateTime, NaiveDateTime)>);
 
 impl From<&Query<FilterQuery>> for Period {

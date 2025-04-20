@@ -1,11 +1,12 @@
 use std::fmt::{Display, Formatter};
 use crate::schemas::validators::{page_default, size_default};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use validator::Validate;
 use chrono::NaiveDate;
 use utoipa::ToSchema;
 
-#[derive(Serialize, Deserialize, Clone, ToSchema, Validate)]
+#[derive(Deserialize, Clone, ToSchema, Validate)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct Filter {
     pub user_id: Option<uuid::Uuid>,
     #[schema(example = 1, minimum = 1)]
@@ -18,8 +19,9 @@ pub struct Filter {
     pub size: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, ToSchema)]
+#[derive(Deserialize, Debug, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub enum Target {
     Site,
     Auds,
@@ -27,7 +29,8 @@ pub enum Target {
     Plans,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, Validate)]
+#[derive(Deserialize, Clone, Debug, ToSchema, Validate)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct FilterQuery {
     pub target: Target,
     pub start_date: Option<NaiveDate>,
@@ -35,6 +38,7 @@ pub struct FilterQuery {
 }
 
 #[derive(Deserialize, Clone, Debug, Default)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub enum Location {
     #[default]
     #[serde(rename = "campus_BS")]
@@ -61,7 +65,22 @@ impl Display for Location {
     }
 }
 
+#[cfg(test)]
+impl From<&str> for Location {
+    fn from(value: &str) -> Self {
+        match value {
+            "campus_BS" => Self::CampusBS,
+            "campus_AV" => Self::CampusAV,
+            "campus_PR" => Self::CampusPR,
+            "campus_PK" => Self::CampusPK,
+            "campus_M" => Self::CampusM,
+            _ => panic!("No such campus")
+        }
+    }
+}
+
 #[derive(Deserialize, Clone, Default, Debug)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct FilterRoute {
     pub from_p: String,
     pub to_p: String,

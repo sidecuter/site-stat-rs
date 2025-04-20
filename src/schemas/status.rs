@@ -1,11 +1,12 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use actix_web::body::BoxBody;
 use actix_web::Responder;
 use std::str::FromStr;
 use utoipa::ToSchema;
 use crate::impl_responder;
 
-#[derive(Serialize, Deserialize, ToSchema, Debug, Clone, Eq, PartialEq)]
+#[derive(Serialize, ToSchema, Debug, Clone, Eq, PartialEq)]
+#[cfg_attr(test, derive(serde::Deserialize))]
 pub struct Status {
     #[schema(example = "OK")]
     pub status: String,
