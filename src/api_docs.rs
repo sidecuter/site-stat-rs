@@ -11,6 +11,7 @@ use utoipa::OpenApi;
         crate::api::get::plans::get_plans,
         crate::api::get::popular::get_popular,
         crate::api::get::stat::get_stat,
+        crate::api::get::route::get_route,
         // Set routes
         crate::api::stat::site::stat_site,
         crate::api::stat::aud::stat_aud,
@@ -41,6 +42,9 @@ use utoipa::OpenApi;
             crate::schemas::review::ReviewOut,
             crate::schemas::popular::Popular,
             crate::schemas::period::Period,
+            crate::schemas::graph::VertexType,
+            crate::schemas::graph::Vertex,
+            crate::schemas::graph::ShortestWay
         )
     ),
     tags (

@@ -1,3 +1,4 @@
+use std::sync::PoisonError;
 use crate::schemas::Status;
 use actix_web::{
     body::BoxBody,
@@ -100,6 +101,12 @@ impl From<BlockingError> for ApiError {
 
 impl From<std::io::Error> for ApiError {
     fn from(value: std::io::Error) -> Self {
+        Self::InternalError(value.to_string())
+    }
+}
+
+impl<T> From<PoisonError<T>> for ApiError {
+    fn from(value: PoisonError<T>) -> Self {
         Self::InternalError(value.to_string())
     }
 }

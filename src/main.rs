@@ -1,11 +1,12 @@
 use std::fs;
+use std::sync::Mutex;
 use actix_web::{
     self,
     middleware::Logger,
     web::{self, JsonConfig, QueryConfig},
     App, HttpServer,
 };
-use actix_cors::Cors;
+use actix_rt::spawn;
 #[cfg(not(debug_assertions))]
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
@@ -13,6 +14,9 @@ use utoipa::OpenApi;
 use stat_api::{api, api_docs, errors::ApiError};
 use utoipa_redoc::{Redoc, Servable};
 use stat_api::app_state::AppState;
+use stat_api::cors::create_cors;
+use stat_api::mut_state::AppStateMutable;
+use stat_api::task::start_data_refresh_task;
 
 #[cfg(not(debug_assertions))]
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
@@ -54,32 +58,27 @@ async fn main() -> std::io::Result<()> {
     if !std::path::Path::new(&app_state.front_path).exists() {
         fs::create_dir(app_state.front_path.clone())?;
     }
+    let data_entries = web::Data::new(AppStateMutable {
+        data_entry: Mutex::new(Default::default())
+    });
+
     tracing::info!("Listening on http://{addr}");
     tracing::info!("Redoc UI is available at http://{addr}/redoc");
 
-    HttpServer::new(move || {
-        let cors = Cors::default();
-        let cors = if let Some(host) = &app_state.allowed_host {
-            cors.allowed_origin(&host.clone())
-        } else {
-            cors
-        };
-        let cors = if let Some(methods) = &app_state.allowed_methods {
-            cors.allowed_methods(methods.clone())
-        } else {
-            cors
-        };
-        App::new()
-            .wrap(cors)
-            .app_data(web::Data::new(pool.clone()))
-            .app_data(app_state.clone())
-            .wrap(Logger::default())
-            .configure(api::init_routes)
-            .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
-            .app_data(QueryConfig::default().error_handler(|err, _| ApiError::from(err).into()))
-            .service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi()))
-            .service(actix_files::Files::new("/", &app_state.front_path).index_file("index.html"))
-    })
+    spawn(start_data_refresh_task(data_entries.clone(), app_state.data_refresh_interval));
+
+    HttpServer::new(move || App::new()
+        .wrap(create_cors(&app_state))
+        .app_data(data_entries.clone())
+        .app_data(web::Data::new(pool.clone()))
+        .app_data(app_state.clone())
+        .wrap(Logger::default())
+        .configure(api::init_routes)
+        .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
+        .app_data(QueryConfig::default().error_handler(|err, _| ApiError::from(err).into()))
+        .service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi()))
+        .service(actix_files::Files::new("/", &app_state.front_path).index_file("index.html"))
+    )
         .bind(addr)?
         .run()
         .await

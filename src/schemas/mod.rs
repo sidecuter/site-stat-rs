@@ -12,6 +12,9 @@ pub mod user_id;
 pub(crate) mod validators;
 pub mod review;
 pub mod popular;
+pub(crate) mod dto;
+pub mod graph;
+pub mod data;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
