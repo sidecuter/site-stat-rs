@@ -2,7 +2,7 @@ use std::time::Duration;
 use actix_rt::time;
 use actix_web::web;
 use crate::mut_state::AppStateMutable;
-use crate::schemas::data::parse_data;
+use crate::schemas::data::get_graphs;
 
 pub async fn start_data_refresh_task(
     state: web::Data<AppStateMutable>,
@@ -18,7 +18,7 @@ pub async fn start_data_refresh_task(
 }
 
 async fn refresh_data(state: &web::Data<AppStateMutable>) -> Result<(), Box<dyn std::error::Error>> {
-    let new_entry = parse_data().await?;
+    let new_entry = get_graphs().await?;
     let mut entry = state.data_entry.lock()
         .map_err(|v| format!("{v}"))?;
     *entry = new_entry;

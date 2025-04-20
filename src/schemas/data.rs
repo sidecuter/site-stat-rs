@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::sync::{Arc, MutexGuard};
+use std::sync::Arc;
 use crate::schemas::graph::Graph;
 use crate::schemas::dto::{GraphDto, DataDto, LocationDto, CorpusDto, PlanDto};
 
@@ -135,21 +135,22 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
     }
 }
 
-pub async fn get_graph(
-    data: MutexGuard<'_, DataEntry>,
-    loc_id: &str
-) -> Option<Graph> {
-    let location = data.locations.iter().find(|loc| loc.id == loc_id)?;
+pub async fn get_graphs() -> Result<HashMap<String, Graph>, Box<dyn std::error::Error>> {
+    let data = parse_data().await?;
+    Ok(data.locations.iter()
+        .filter(|&loc| loc.available)
+        .map(|location| {
+            let plans = data.plans.iter()
+                .filter(|plan| plan.corpus.location.id == location.id)
+                .cloned()
+                .collect();
 
-    let plans = data.plans.iter()
-        .filter(|plan| plan.corpus.location.id == loc_id)
-        .cloned()
-        .collect();
-
-    let corpuses = data.corpuses.iter()
-        .filter(|corpus| corpus.location.id == loc_id)
-        .cloned()
-        .collect();
-
-    Some(Graph::new(location.clone(), plans, corpuses))
+            let corpuses = data.corpuses.iter()
+                .filter(|corpus| corpus.location.id == location.id)
+                .cloned()
+                .collect();
+            (location.id.clone(), Graph::new(location.clone(), plans, corpuses))
+        })
+        .collect()
+    )
 }
