@@ -23,7 +23,7 @@ fn shared_state() -> Data<AppStateMutable> {
 #[case::route("m-3301", "m-3501", "campus_M", 200)]
 #[case::route("m-3301", "m-3501", "campus_BS", 500)]
 #[case::route("m-3301", "m-3101", "campus_M", 404)]
-#[tokio::test]
+#[actix_web::test]
 async fn get_route_endpoint(
     shared_state: &Data<AppStateMutable>,
     #[case] start: &str,

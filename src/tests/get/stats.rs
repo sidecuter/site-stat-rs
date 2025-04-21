@@ -67,7 +67,7 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
 #[case::ways_filter(Endpoint::Ways, true)]
 #[case::plans_filter(Endpoint::Plans, true)]
 #[case::reviews_filter(Endpoint::Reviews, true)]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_get(
     #[case] endpoint: Endpoint,
     #[case] filter: bool
@@ -98,7 +98,7 @@ async fn test_200_get(
 #[case::ways_validation(Endpoint::Ways)]
 #[case::plans_validation(Endpoint::Plans)]
 #[case::reviews_validation(Endpoint::Reviews)]
-#[tokio::test]
+#[actix_web::test]
 async fn test_422_get(
     #[case] endpoint: Endpoint
 ) {
@@ -128,7 +128,7 @@ async fn test_422_get(
 #[case::ways_notallowed(Endpoint::Ways)]
 #[case::plans_notallowed(Endpoint::Plans)]
 #[case::reviews_notallowed(Endpoint::Reviews)]
-#[tokio::test]
+#[actix_web::test]
 async fn test_403_get(
     #[case] endpoint: Endpoint,
 ) {
@@ -155,7 +155,7 @@ async fn test_403_get(
 #[case::ways(Endpoint::Ways)]
 #[case::plans(Endpoint::Plans)]
 #[case::plans(Endpoint::Reviews)]
-#[tokio::test]
+#[actix_web::test]
 async fn check_value(
     #[case] endpoint: Endpoint,
 ) {

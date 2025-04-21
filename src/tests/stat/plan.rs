@@ -7,7 +7,7 @@ use sea_orm::{DbBackend, MockDatabase};
 use rstest::*;
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_stat_plan() {
     let db = Data::new(
         add_exec_row(add_change_plan(add_plan(add_user_id(MockDatabase::new(DbBackend::Sqlite)))))
@@ -27,7 +27,7 @@ async fn test_200_stat_plan() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_plan_user() {
     let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
@@ -44,7 +44,7 @@ async fn test_404_stat_plan_user() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_plan_plan() {
     let db = Data::new(
         add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
@@ -63,7 +63,7 @@ async fn test_404_stat_plan_plan() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_429_stat_plan_endpoint() {
     let app = test::init_service(App::new().app_data(get_db()).service(stat_plan)).await;
     let payload = ChangePlanIn {

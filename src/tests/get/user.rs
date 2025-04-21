@@ -6,7 +6,7 @@ use rstest::*;
 use sea_orm::{DbBackend, MockDatabase};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn get_user_endpoint() {
     let db = Data::new(
         add_exec_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),

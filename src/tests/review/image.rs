@@ -11,7 +11,7 @@ use std::path::Path;
 use uuid::Uuid;
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn get_image_endpoint() {
     let filename = format!("{}.png", Uuid::new_v4().to_string().replace("-", ""));
     let filepath = prepare_tmp_dir();

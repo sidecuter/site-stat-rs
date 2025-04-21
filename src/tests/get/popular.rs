@@ -6,7 +6,7 @@ use rstest::*;
 use sea_orm::{DbBackend, MockDatabase, Value};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn get_popular_endpoint() {
     let mut map = BTreeMap::new();
     map.insert("ID".to_string(), Value::String(Some(Box::new("a-100".to_string()))));

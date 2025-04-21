@@ -8,7 +8,7 @@ use sea_orm::{DbBackend, MockDatabase};
 use std::net::{IpAddr, SocketAddr};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_stat_aud_endpoint() {
     let db = Data::new(
         add_exec_row(add_select_add(add_aud(
@@ -33,7 +33,7 @@ async fn test_200_stat_aud_endpoint() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_aud_endpoint_user() {
     let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
@@ -52,7 +52,7 @@ async fn test_404_stat_aud_endpoint_user() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_aud_endpoint_aud() {
     let db = Data::new(
         add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
@@ -73,7 +73,7 @@ async fn test_404_stat_aud_endpoint_aud() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_429_stat_aud_endpoint() {
     let app = test::init_service(App::new().app_data(get_db()).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
@@ -94,7 +94,7 @@ async fn test_429_stat_aud_endpoint() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_422_stat_aud_endpoint() {
     let app = test::init_service(App::new().app_data(get_db()).service(stat_aud)).await;
     let payload = SelectAuditoryIn {

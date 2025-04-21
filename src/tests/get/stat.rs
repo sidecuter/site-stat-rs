@@ -36,7 +36,7 @@ use crate::tests::db::add_count;
     Some(chrono::Utc::now().date_naive()),
     Some(chrono::Utc::now().date_naive())
 )]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_get_stat(
     #[case] target: Target,
     #[case] start_date: Option<NaiveDate>,

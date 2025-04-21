@@ -3339,7 +3339,6 @@ dependencies = [
  "serde",
  "serde_qs",
  "thiserror",
- "tokio",
  "tracing",
  "tracing-subscriber",
  "utoipa",

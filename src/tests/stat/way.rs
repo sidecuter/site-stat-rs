@@ -7,7 +7,7 @@ use rstest::*;
 use sea_orm::{DbBackend, MockDatabase};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_stat_way() {
     let db = Data::new(
         add_exec_row(add_start_way(add_aud(
@@ -31,7 +31,7 @@ async fn test_200_stat_way() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_way_user() {
     let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
@@ -49,7 +49,7 @@ async fn test_404_stat_way_user() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_way_start() {
     let db = Data::new(
         add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
@@ -69,7 +69,7 @@ async fn test_404_stat_way_start() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_way_end() {
     let db = Data::new(
         add_empty_row(add_aud(
@@ -93,7 +93,7 @@ async fn test_404_stat_way_end() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_422_stat_way_endpoint() {
     let app = test::init_service(App::new().app_data(get_db()).service(stat_way)).await;
     let payload = StartWayIn {

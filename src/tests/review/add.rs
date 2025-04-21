@@ -10,7 +10,7 @@ use std::fs;
 use crate::tests::db::{add_empty_row, add_exec_row, add_review, add_user_id};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_add_review() {
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
@@ -35,7 +35,7 @@ async fn test_200_add_review() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_add_review_with_image() {
     let filepath = prepare_tmp_dir();
     let db = Data::new(
@@ -66,7 +66,7 @@ async fn test_200_add_review_with_image() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_add_review_user() {
     let db = Data::new(
         add_empty_row(MockDatabase::new(DbBackend::Sqlite))
@@ -91,7 +91,7 @@ async fn test_404_add_review_user() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_415_add_review() {
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
@@ -120,7 +120,7 @@ async fn test_415_add_review() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_422_add_review() {
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))

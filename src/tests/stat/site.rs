@@ -8,7 +8,7 @@ use sea_orm::{DbBackend, MockDatabase};
 use utoipa::gen::serde_json::json;
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_200_stat_site() {
     let db = Data::new(
         add_exec_row(add_site(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
@@ -28,7 +28,7 @@ async fn test_200_stat_site() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_404_stat_site_user() {
     let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
@@ -45,7 +45,7 @@ async fn test_404_stat_site_user() {
 }
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_400_stat_site() {
     let app = test::init_service(App::new().app_data(get_db()).service(stat_site)).await;
     let req = test::TestRequest::put()
