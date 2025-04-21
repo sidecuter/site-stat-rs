@@ -12,7 +12,6 @@ use crate::tests::db::{add_empty_row, add_exec_row, add_review, add_user_id};
 #[rstest]
 #[tokio::test]
 async fn test_200_add_review() {
-    let filepath = prepare_tmp_dir();
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
             .into_connection()
@@ -33,7 +32,6 @@ async fn test_200_add_review() {
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), 200);
-    fs::remove_dir_all(filepath).unwrap()
 }
 
 #[rstest]
@@ -70,7 +68,6 @@ async fn test_200_add_review_with_image() {
 #[rstest]
 #[tokio::test]
 async fn test_404_add_review_user() {
-    let filepath = prepare_tmp_dir();
     let db = Data::new(
         add_empty_row(MockDatabase::new(DbBackend::Sqlite))
             .into_connection()
@@ -91,13 +88,11 @@ async fn test_404_add_review_user() {
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), 404);
-    fs::remove_dir_all(filepath).unwrap()
 }
 
 #[rstest]
 #[tokio::test]
 async fn test_415_add_review() {
-    let filepath = prepare_tmp_dir();
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
             .into_connection()
@@ -122,13 +117,11 @@ async fn test_415_add_review() {
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), 415);
-    fs::remove_dir_all(filepath).unwrap()
 }
 
 #[rstest]
 #[tokio::test]
 async fn test_422_add_review() {
-    let filepath = prepare_tmp_dir();
     let db = Data::new(
         add_exec_row(add_review(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
             .into_connection()
@@ -153,5 +146,4 @@ async fn test_422_add_review() {
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status(), 422);
-    fs::remove_dir_all(filepath).unwrap()
 }
