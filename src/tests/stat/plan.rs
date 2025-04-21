@@ -1,17 +1,21 @@
 use crate::api::stat::plan::stat_plan;
 use crate::schemas::ChangePlanIn;
-use crate::tests::db::{add_change_plan, add_empty_row, add_exec_row, add_plan, add_user_id, get_db};
+use crate::tests::db::{
+    add_change_plan, add_empty_row, add_exec_row, add_plan, add_user_id, get_db,
+};
 use actix_web::web::Data;
 use actix_web::{test, App};
-use sea_orm::{DbBackend, MockDatabase};
 use rstest::*;
+use sea_orm::{DbBackend, MockDatabase};
 
 #[rstest]
 #[actix_web::test]
 async fn test_200_stat_plan() {
     let db = Data::new(
-        add_exec_row(add_change_plan(add_plan(add_user_id(MockDatabase::new(DbBackend::Sqlite)))))
-            .into_connection(),
+        add_exec_row(add_change_plan(add_plan(add_user_id(MockDatabase::new(
+            DbBackend::Sqlite,
+        )))))
+        .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
     let payload = ChangePlanIn {

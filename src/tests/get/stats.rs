@@ -1,15 +1,17 @@
 use crate::api::get::{auds::get_auds, plans::get_plans, sites::get_sites, ways::get_ways};
 use crate::api::review::get::get_reviews;
+use crate::app_state::AppState;
 use crate::schemas::{
     ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
+};
+use crate::tests::db::{
+    add_change_plan, add_count, add_review, add_select_add, add_site, add_start_way, get_db,
 };
 use actix_web::web::Data;
 use actix_web::{test, web, App};
 use rstest::*;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase};
 use std::fmt::{Display, Formatter};
-use crate::app_state::AppState;
-use crate::tests::db::{add_change_plan, add_count, add_review, add_select_add, add_site, add_start_way, get_db};
 
 #[derive(Copy, Clone)]
 enum Endpoint {
@@ -68,15 +70,22 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
 #[case::plans_filter(Endpoint::Plans, true)]
 #[case::reviews_filter(Endpoint::Reviews, true)]
 #[actix_web::test]
-async fn test_200_get(
-    #[case] endpoint: Endpoint,
-    #[case] filter: bool
-) {
+async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
     let db = get_db_filled(endpoint);
     let app_state = Data::new(AppState::new());
-    let app = test::init_service(App::new().app_data(app_state).app_data(db).configure(get_service)).await;
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
     let query = Filter {
-        user_id: if filter { Some(Default::default()) } else { None },
+        user_id: if filter {
+            Some(Default::default())
+        } else {
+            None
+        },
         size: 50,
         page: 1,
     };
@@ -85,7 +94,7 @@ async fn test_200_get(
         .uri(&format!("/{endpoint}?{query}"))
         .insert_header((
             "Api-Key",
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         ))
         .to_request();
     let resp = test::call_service(&app, req).await;
@@ -99,12 +108,16 @@ async fn test_200_get(
 #[case::plans_validation(Endpoint::Plans)]
 #[case::reviews_validation(Endpoint::Reviews)]
 #[actix_web::test]
-async fn test_422_get(
-    #[case] endpoint: Endpoint
-) {
+async fn test_422_get(#[case] endpoint: Endpoint) {
     let db = get_db();
     let app_state = Data::new(AppState::new());
-    let app = test::init_service(App::new().app_data(app_state).app_data(db).configure(get_service)).await;
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
     let query = Filter {
         user_id: Default::default(),
         size: 50,
@@ -115,7 +128,7 @@ async fn test_422_get(
         .uri(&format!("/{endpoint}?{query}"))
         .insert_header((
             "Api-Key",
-            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         ))
         .to_request();
     let resp = test::call_service(&app, req).await;
@@ -129,12 +142,16 @@ async fn test_422_get(
 #[case::plans_notallowed(Endpoint::Plans)]
 #[case::reviews_notallowed(Endpoint::Reviews)]
 #[actix_web::test]
-async fn test_403_get(
-    #[case] endpoint: Endpoint,
-) {
+async fn test_403_get(#[case] endpoint: Endpoint) {
     let db = get_db();
     let app_state = Data::new(AppState::new());
-    let app = test::init_service(App::new().app_data(app_state).app_data(db).configure(get_service)).await;
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
     let query = Filter {
         user_id: Default::default(),
         size: 50,
@@ -156,12 +173,16 @@ async fn test_403_get(
 #[case::plans(Endpoint::Plans)]
 #[case::plans(Endpoint::Reviews)]
 #[actix_web::test]
-async fn check_value(
-    #[case] endpoint: Endpoint,
-) {
+async fn check_value(#[case] endpoint: Endpoint) {
     let db = get_db_filled(endpoint);
     let app_state = Data::new(AppState::new());
-    let app = test::init_service(App::new().app_data(app_state).app_data(db).configure(get_service)).await;
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
     let query = Filter {
         user_id: None,
         size: 50,

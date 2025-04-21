@@ -1,7 +1,7 @@
-use std::collections::BTreeMap;
 use crate::entity::{aud, change_plan, plan, review, select_aud, site_stat, start_way, user_id};
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow, Value};
+use std::collections::BTreeMap;
 
 pub fn get_db() -> Data<DatabaseConnection> {
     Data::new(MockDatabase::new(DbBackend::Sqlite).into_connection())
@@ -32,9 +32,12 @@ pub fn add_plan(mock_database: MockDatabase) -> MockDatabase {
 }
 
 pub fn add_aud(mock_database: MockDatabase, count: usize) -> MockDatabase {
-    mock_database.append_query_results(vec![[aud::Model {
-        id: Default::default(),
-    }]; count])
+    mock_database.append_query_results(vec![
+        [aud::Model {
+            id: Default::default(),
+        }];
+        count
+    ])
 }
 
 pub fn add_count(mock_database: MockDatabase, quantity: usize) -> MockDatabase {

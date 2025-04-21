@@ -11,8 +11,7 @@ use utoipa::gen::serde_json::json;
 #[actix_web::test]
 async fn test_200_stat_site() {
     let db = Data::new(
-        add_exec_row(add_site(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
-            .into_connection(),
+        add_exec_row(add_site(add_user_id(MockDatabase::new(DbBackend::Sqlite)))).into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
