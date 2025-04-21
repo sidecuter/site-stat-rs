@@ -64,12 +64,6 @@ impl From<DbErr> for ApiError {
     }
 }
 
-impl From<uuid::Error> for ApiError {
-    fn from(value: uuid::Error) -> Self {
-        Self::InternalError(value.to_string())
-    }
-}
-
 impl From<QueryPayloadError> for ApiError {
     fn from(err: QueryPayloadError) -> Self {
         match err {

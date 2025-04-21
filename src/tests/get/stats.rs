@@ -1,15 +1,19 @@
-use super::super::prepare_connection;
 use crate::api::get::{auds::get_auds, plans::get_plans, sites::get_sites, ways::get_ways};
 use crate::api::review::get::get_reviews;
+use crate::app_state::AppState;
 use crate::schemas::{
     ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
 };
+use crate::tests::db::{
+    add_change_plan, add_count, add_review, add_select_add, add_site, add_start_way, get_db,
+};
 use actix_web::web::Data;
-use actix_web::{test, App};
+use actix_web::{test, web, App};
 use rstest::*;
-use sea_orm::DatabaseConnection;
+use sea_orm::{DatabaseConnection, DbBackend, MockDatabase};
 use std::fmt::{Display, Formatter};
 
+#[derive(Copy, Clone)]
 enum Endpoint {
     Sites,
     Auds,
@@ -31,95 +35,135 @@ impl Display for Endpoint {
     }
 }
 
+pub fn get_service(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("")
+            .service(get_sites)
+            .service(get_auds)
+            .service(get_ways)
+            .service(get_plans)
+            .service(get_reviews),
+    );
+}
+
+fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
+    let mut mock = MockDatabase::new(DbBackend::Sqlite);
+    mock = match endpoint {
+        Endpoint::Sites => add_site(add_count(mock, 2)),
+        Endpoint::Auds => add_select_add(add_count(mock, 2)),
+        Endpoint::Ways => add_start_way(add_count(mock, 2)),
+        Endpoint::Plans => add_change_plan(add_count(mock, 2)),
+        Endpoint::Reviews => add_review(add_count(mock, 2)),
+    };
+    Data::new(mock.into_connection())
+}
+
 #[rstest]
-#[case::site_validation(Endpoint::Sites, true, 0, 422, false)]
-#[case::auds_validation(Endpoint::Auds, true, 0, 422, false)]
-#[case::ways_validation(Endpoint::Ways, true, 0, 422, false)]
-#[case::plans_validation(Endpoint::Plans, true, 0, 422, false)]
-#[case::reviews_validation(Endpoint::Reviews, true, 0, 422, false)]
-#[case::site_ok(Endpoint::Sites, true, 1, 200, false)]
-#[case::auds_ok(Endpoint::Auds, true, 1, 200, false)]
-#[case::ways_ok(Endpoint::Ways, true, 1, 200, false)]
-#[case::plans_ok(Endpoint::Plans, true, 1, 200, false)]
-#[case::reviews_ok(Endpoint::Reviews, true, 1, 200, false)]
-#[case::site_filter(Endpoint::Sites, true, 1, 200, true)]
-#[case::auds_filter(Endpoint::Auds, true, 1, 200, true)]
-#[case::ways_filter(Endpoint::Ways, true, 1, 200, true)]
-#[case::plans_filter(Endpoint::Plans, true, 1, 200, true)]
-#[case::reviews_filter(Endpoint::Reviews, true, 1, 200, true)]
-#[case::site_notallowed(Endpoint::Sites, false, 0, 403, false)]
-#[case::auds_notallowed(Endpoint::Auds, false, 0, 403, false)]
-#[case::ways_notallowed(Endpoint::Ways, false, 0, 403, false)]
-#[case::plans_notallowed(Endpoint::Plans, false, 0, 403, false)]
-#[case::reviews_notallowed(Endpoint::Reviews, false, 0, 403, false)]
-#[tokio::test]
-async fn get(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] endpoint: Endpoint,
-    #[case] correct: bool,
-    #[case] page: u64,
-    #[case] status: u16,
-    #[case] filter: bool,
-) {
-    assert!(prepare_connection.is_ok());
-    let db = Data::new(prepare_connection.unwrap());
-    let app_state = Data::new(crate::app_state::AppState::new());
-    let app = match endpoint {
-        Endpoint::Sites => test::init_service(
-            App::new()
-                .app_data(app_state)
-                .app_data(db)
-                .service(get_sites),
-        ),
-        Endpoint::Auds => test::init_service(
-            App::new()
-                .app_data(app_state)
-                .app_data(db)
-                .service(get_auds),
-        ),
-        Endpoint::Ways => test::init_service(
-            App::new()
-                .app_data(app_state)
-                .app_data(db)
-                .service(get_ways),
-        ),
-        Endpoint::Plans => test::init_service(
-            App::new()
-                .app_data(app_state)
-                .app_data(db)
-                .service(get_plans),
-        ),
-        Endpoint::Reviews => test::init_service(
-            App::new()
-                .app_data(app_state)
-                .app_data(db)
-                .service(get_reviews),
-        ),
-    }
+#[case::site_ok(Endpoint::Sites, false)]
+#[case::auds_ok(Endpoint::Auds, false)]
+#[case::ways_ok(Endpoint::Ways, false)]
+#[case::plans_ok(Endpoint::Plans, false)]
+#[case::reviews_ok(Endpoint::Reviews, false)]
+#[case::site_filter(Endpoint::Sites, true)]
+#[case::auds_filter(Endpoint::Auds, true)]
+#[case::ways_filter(Endpoint::Ways, true)]
+#[case::plans_filter(Endpoint::Plans, true)]
+#[case::reviews_filter(Endpoint::Reviews, true)]
+#[actix_web::test]
+async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
+    let db = get_db_filled(endpoint);
+    let app_state = Data::new(AppState::new());
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
     .await;
     let query = Filter {
         user_id: if filter {
-            Some(uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap())
+            Some(Default::default())
         } else {
             None
         },
         size: 50,
-        page,
+        page: 1,
     };
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
         .insert_header((
             "Api-Key",
-            if correct {
-                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-            } else {
-                "1"
-            },
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         ))
         .to_request();
     let resp = test::call_service(&app, req).await;
-    assert_eq!(resp.status().as_u16(), status);
+    assert_eq!(resp.status().as_u16(), 200);
+}
+
+#[rstest]
+#[case::site_validation(Endpoint::Sites)]
+#[case::auds_validation(Endpoint::Auds)]
+#[case::ways_validation(Endpoint::Ways)]
+#[case::plans_validation(Endpoint::Plans)]
+#[case::reviews_validation(Endpoint::Reviews)]
+#[actix_web::test]
+async fn test_422_get(#[case] endpoint: Endpoint) {
+    let db = get_db();
+    let app_state = Data::new(AppState::new());
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
+    let query = Filter {
+        user_id: Default::default(),
+        size: 50,
+        page: 0,
+    };
+    let query = serde_qs::to_string(&query).unwrap();
+    let req = test::TestRequest::get()
+        .uri(&format!("/{endpoint}?{query}"))
+        .insert_header((
+            "Api-Key",
+            "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        ))
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status().as_u16(), 422);
+}
+
+#[rstest]
+#[case::site_notallowed(Endpoint::Sites)]
+#[case::auds_notallowed(Endpoint::Auds)]
+#[case::ways_notallowed(Endpoint::Ways)]
+#[case::plans_notallowed(Endpoint::Plans)]
+#[case::reviews_notallowed(Endpoint::Reviews)]
+#[actix_web::test]
+async fn test_403_get(#[case] endpoint: Endpoint) {
+    let db = get_db();
+    let app_state = Data::new(AppState::new());
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
+    .await;
+    let query = Filter {
+        user_id: Default::default(),
+        size: 50,
+        page: 1,
+    };
+    let query = serde_qs::to_string(&query).unwrap();
+    let req = test::TestRequest::get()
+        .uri(&format!("/{endpoint}?{query}"))
+        .insert_header(("Api-Key", "1"))
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status().as_u16(), 403);
 }
 
 #[rstest]
@@ -128,26 +172,16 @@ async fn get(
 #[case::ways(Endpoint::Ways)]
 #[case::plans(Endpoint::Plans)]
 #[case::plans(Endpoint::Reviews)]
-#[tokio::test]
-async fn check_value(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] endpoint: Endpoint,
-) {
-    assert!(prepare_connection.is_ok());
-    let db = prepare_connection.unwrap();
-    let app = match endpoint {
-        Endpoint::Sites => {
-            test::init_service(App::new().app_data(Data::new(db)).service(get_sites))
-        }
-        Endpoint::Auds => test::init_service(App::new().app_data(Data::new(db)).service(get_auds)),
-        Endpoint::Ways => test::init_service(App::new().app_data(Data::new(db)).service(get_ways)),
-        Endpoint::Plans => {
-            test::init_service(App::new().app_data(Data::new(db)).service(get_plans))
-        }
-        Endpoint::Reviews => {
-            test::init_service(App::new().app_data(Data::new(db)).service(get_reviews))
-        }
-    }
+#[actix_web::test]
+async fn check_value(#[case] endpoint: Endpoint) {
+    let db = get_db_filled(endpoint);
+    let app_state = Data::new(AppState::new());
+    let app = test::init_service(
+        App::new()
+            .app_data(app_state)
+            .app_data(db)
+            .configure(get_service),
+    )
     .await;
     let query = Filter {
         user_id: None,

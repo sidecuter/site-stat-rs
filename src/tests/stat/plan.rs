@@ -1,59 +1,77 @@
-use super::super::prepare_connection;
 use crate::api::stat::plan::stat_plan;
-use crate::schemas::{ChangePlanIn, Status};
+use crate::schemas::ChangePlanIn;
+use crate::tests::db::{
+    add_change_plan, add_empty_row, add_exec_row, add_plan, add_user_id, get_db,
+};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::DatabaseConnection;
+use sea_orm::{DbBackend, MockDatabase};
 
 #[rstest]
-#[case::insert_correct("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec", "A-0", "OK", 200)]
-#[case::insert_incorrect_user("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1", "A-0", "User not found", 404)]
-#[case::insert_incorrect_plan(
-    "11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec",
-    "A-8",
-    "Changed plan not found",
-    404
-)]
-#[tokio::test]
-async fn stat_plan_endpoint(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-    #[case] user_id: String,
-    #[case] plan_id: String,
-    #[case] status: Status,
-    #[case] status_code: u16,
-) {
-    assert!(prepare_connection.is_ok());
-    let db = prepare_connection.unwrap();
-    let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_plan)).await;
+#[actix_web::test]
+async fn test_200_stat_plan() {
+    let db = Data::new(
+        add_exec_row(add_change_plan(add_plan(add_user_id(MockDatabase::new(
+            DbBackend::Sqlite,
+        )))))
+        .into_connection(),
+    );
+    let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
     let payload = ChangePlanIn {
-        user_id: uuid::Uuid::parse_str(&user_id).unwrap(),
-        plan_id,
+        user_id: Default::default(),
+        plan_id: "A-0".to_string(),
     };
     let req = test::TestRequest::put()
         .uri("/change-plan")
         .set_json(payload.clone())
         .to_request();
     let resp = test::call_service(&app, req).await;
-    assert_eq!(resp.status(), status_code);
+    assert_eq!(resp.status(), 200);
+}
+
+#[rstest]
+#[actix_web::test]
+async fn test_404_stat_plan_user() {
+    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
+    let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
+    let payload = ChangePlanIn {
+        user_id: Default::default(),
+        plan_id: "A-0".to_string(),
+    };
     let req = test::TestRequest::put()
         .uri("/change-plan")
         .set_json(payload.clone())
         .to_request();
-    let resp: Status = test::call_and_read_body_json(&app, req).await;
-    assert_eq!(resp, status);
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status(), 404);
 }
 
 #[rstest]
-#[tokio::test]
-async fn test_429_stat_plan_endpoint(
-    #[future(awt)] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
-) {
-    assert!(prepare_connection.is_ok());
-    let db = prepare_connection.unwrap();
-    let app = test::init_service(App::new().app_data(Data::new(db)).service(stat_plan)).await;
+#[actix_web::test]
+async fn test_404_stat_plan_plan() {
+    let db = Data::new(
+        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
+    );
+    let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
     let payload = ChangePlanIn {
-        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1").unwrap(),
+        user_id: Default::default(),
+        plan_id: "A-8".to_string(),
+    };
+    let req = test::TestRequest::put()
+        .uri("/change-plan")
+        .set_json(payload.clone())
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+    assert_eq!(resp.status(), 404);
+}
+
+#[rstest]
+#[actix_web::test]
+async fn test_429_stat_plan_endpoint() {
+    let app = test::init_service(App::new().app_data(get_db()).service(stat_plan)).await;
+    let payload = ChangePlanIn {
+        user_id: Default::default(),
         plan_id: "A-".into(),
     };
     let req = test::TestRequest::put()

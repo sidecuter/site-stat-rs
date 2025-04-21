@@ -51,7 +51,7 @@ async fn main() -> std::io::Result<()> {
     }
     let app_state = web::Data::new(AppState::default());
     let addr = format!("{}:{}", app_state.host, app_state.port);
-    let pool = get_database_connection(&app_state.database_url).await;
+    let pool = web::Data::new(get_database_connection(&app_state.database_url).await);
     if !std::path::Path::new(&app_state.files_path).exists() {
         fs::create_dir(app_state.files_path.clone())?;
     }
@@ -74,7 +74,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(create_cors(&app_state))
             .app_data(data_entries.clone())
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(pool.clone())
             .app_data(app_state.clone())
             .wrap(Logger::default())
             .configure(api::init_routes)

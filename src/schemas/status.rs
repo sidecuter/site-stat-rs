@@ -1,6 +1,5 @@
 use crate::impl_responder;
 use serde::Serialize;
-use std::str::FromStr;
 use utoipa::ToSchema;
 
 #[derive(Serialize, ToSchema, Debug, Clone, Eq, PartialEq)]
@@ -15,16 +14,6 @@ impl Default for Status {
         Self {
             status: "OK".to_string(),
         }
-    }
-}
-
-impl FromStr for Status {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Self {
-            status: s.to_string(),
-        })
     }
 }
 
