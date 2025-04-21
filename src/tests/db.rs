@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow};
 use crate::entity::{aud, plan, user_id};
@@ -20,14 +19,14 @@ pub fn add_exec_row(mock_database: MockDatabase) -> MockDatabase {
 
 pub fn add_user_id(mock_database: MockDatabase) -> MockDatabase {
     mock_database.append_query_results([[user_id::Model {
-        user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
-        creation_date: chrono::Utc::now().naive_utc(),
+        user_id: Default::default(),
+        creation_date: Default::default()
     }]])
 }
 
 pub fn add_plan(mock_database: MockDatabase) -> MockDatabase {
     mock_database.append_query_results([[plan::Model {
-        id: "A-0".to_string()
+        id: Default::default()
     }]])
 }
 
@@ -35,7 +34,7 @@ pub fn add_aud(mock_database: MockDatabase, count: u8) -> MockDatabase {
     let mut mock_database = mock_database;
     for _ in 0..count {
         mock_database = mock_database.append_query_results([[aud::Model {
-            id: "A-100".to_string()
+            id: Default::default()
         }]]);
     }
     mock_database
