@@ -1,11 +1,11 @@
 use crate::api::stat::aud::stat_aud;
-use crate::entity::{aud, select_aud, user_id};
+use crate::entity::select_aud;
 use crate::schemas::SelectAuditoryIn;
-use crate::tests::get_db;
+use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_user_id, get_db};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase, MockExecResult, MockRow};
+use sea_orm::{DbBackend, MockDatabase};
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
 
@@ -13,14 +13,7 @@ use std::str::FromStr;
 #[tokio::test]
 async fn test_200_stat_aud_endpoint() {
     let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .append_query_results([[user_id::Model {
-                user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
-                creation_date: chrono::Utc::now().naive_utc(),
-            }]])
-            .append_query_results([[aud::Model {
-                id: "a-100".to_string(),
-            }]])
+        add_exec_row(add_aud(add_user_id(MockDatabase::new(DbBackend::Sqlite)), 1))
             .append_query_results([[select_aud::Model {
                 id: 0,
                 user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
@@ -28,10 +21,6 @@ async fn test_200_stat_aud_endpoint() {
                 auditory_id: "a-100".to_string(),
                 success: true,
             }]])
-            .append_exec_results([MockExecResult {
-                last_insert_id: 0,
-                rows_affected: 1,
-            }])
             .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
@@ -53,8 +42,7 @@ async fn test_200_stat_aud_endpoint() {
 #[tokio::test]
 async fn test_404_stat_aud_endpoint_user() {
     let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .append_query_results::<MockRow, Vec<_>, Vec<Vec<_>>>(vec![vec![]])
+        add_empty_row(MockDatabase::new(DbBackend::Sqlite))
             .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
@@ -76,12 +64,7 @@ async fn test_404_stat_aud_endpoint_user() {
 #[tokio::test]
 async fn test_404_stat_aud_endpoint_aud() {
     let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .append_query_results([[user_id::Model {
-                user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
-                creation_date: chrono::Utc::now().naive_utc(),
-            }]])
-            .append_query_results::<MockRow, Vec<_>, Vec<Vec<_>>>(vec![vec![]])
+        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite)))
             .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
