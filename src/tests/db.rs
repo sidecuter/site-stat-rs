@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use crate::entity::{aud, change_plan, plan, select_aud, site_stat, start_way, user_id};
+use crate::entity::{aud, change_plan, plan, problem, review, select_aud, site_stat, start_way, user_id};
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow, Value};
 
@@ -78,5 +78,22 @@ pub fn add_change_plan(mock_database: MockDatabase) -> MockDatabase {
         user_id: Default::default(),
         visit_date: Default::default(),
         plan_id: "".to_string(),
+    }]])
+}
+
+pub fn add_review(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[review::Model {
+        id: 0,
+        user_id: Default::default(),
+        creation_date: Default::default(),
+        text: "".to_string(),
+        image_name: None,
+        problem_id: "".to_string(),
+    }]])
+}
+
+pub fn add_problem(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[problem::Model {
+        id: "".to_string(),
     }]])
 }
