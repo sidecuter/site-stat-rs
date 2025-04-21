@@ -3328,7 +3328,6 @@ dependencies = [
  "bincode",
  "chrono",
  "dotenv",
- "migration",
  "mime",
  "mockito",
  "ordered-float 5.0.0",

@@ -3,8 +3,7 @@ use crate::api::get::popular::get_popular;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase};
-use migration::Value;
+use sea_orm::{DbBackend, MockDatabase, Value};
 
 #[rstest]
 #[tokio::test]
