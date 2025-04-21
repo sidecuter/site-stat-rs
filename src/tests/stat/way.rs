@@ -1,7 +1,6 @@
 use crate::api::stat::way::stat_way;
-use crate::entity::start_way;
 use crate::schemas::StartWayIn;
-use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_user_id, get_db};
+use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_start_way, add_user_id, get_db};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
@@ -11,17 +10,10 @@ use sea_orm::{DbBackend, MockDatabase};
 #[tokio::test]
 async fn test_200_stat_way() {
     let db = Data::new(
-        add_exec_row(add_aud(
+        add_exec_row(add_start_way(add_aud(
             add_user_id(MockDatabase::new(DbBackend::Sqlite)),
             2,
-        ))
-        .append_query_results([[start_way::Model {
-            id: 0,
-            user_id: Default::default(),
-            start_id: Default::default(),
-            end_id: Default::default(),
-            visit_date: Default::default(),
-        }]])
+        )))
         .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;

@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use crate::entity::{aud, plan, user_id};
+use crate::entity::{aud, change_plan, plan, select_aud, site_stat, start_way, user_id};
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow, Value};
 
@@ -41,4 +41,42 @@ pub fn add_count_result(mock_database: MockDatabase, quantity: usize) -> MockDat
     let mut map = BTreeMap::new();
     map.insert("num_items".to_string(), Value::Int(Some(1)));
     mock_database.append_query_results(vec![[map]; quantity])
+}
+
+pub fn add_site(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[site_stat::Model {
+        id: 0,
+        user_id: Default::default(),
+        visit_date: Default::default(),
+        endpoint: None,
+    }]])
+}
+
+pub fn add_select_add(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[select_aud::Model {
+        id: 0,
+        user_id: Default::default(),
+        visit_date: Default::default(),
+        auditory_id: "".to_string(),
+        success: false,
+    }]])
+}
+
+pub fn add_start_way(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[start_way::Model {
+        id: 0,
+        user_id: Default::default(),
+        start_id: "".to_string(),
+        end_id: "".to_string(),
+        visit_date: Default::default(),
+    }]])
+}
+
+pub fn add_change_plan(mock_database: MockDatabase) -> MockDatabase {
+    mock_database.append_query_results([[change_plan::Model {
+        id: 0,
+        user_id: Default::default(),
+        visit_date: Default::default(),
+        plan_id: "".to_string(),
+    }]])
 }

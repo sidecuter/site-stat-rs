@@ -1,7 +1,6 @@
 use crate::api::stat::site::stat_site;
-use crate::entity::site_stat;
 use crate::schemas::SiteStatisticsIn;
-use crate::tests::db::{add_empty_row, add_exec_row, add_user_id, get_db};
+use crate::tests::db::{add_empty_row, add_exec_row, add_site, add_user_id, get_db};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
@@ -12,18 +11,12 @@ use utoipa::gen::serde_json::json;
 #[tokio::test]
 async fn test_200_stat_site() {
     let db = Data::new(
-        add_exec_row(add_user_id(MockDatabase::new(DbBackend::Sqlite)))
-            .append_query_results([[site_stat::Model {
-                id: 0,
-                user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
-                visit_date: chrono::Utc::now().naive_utc(),
-                endpoint: None,
-            }]])
+        add_exec_row(add_site(add_user_id(MockDatabase::new(DbBackend::Sqlite))))
             .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
-        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
+        user_id: Default::default(),
         endpoint: None,
     };
     let req = test::TestRequest::put()
@@ -40,7 +33,7 @@ async fn test_404_stat_site_user() {
     let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
-        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
+        user_id: Default::default(),
         endpoint: None,
     };
     let req = test::TestRequest::put()
