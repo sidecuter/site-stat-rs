@@ -35,15 +35,7 @@ async fn test_200_stat_aud_endpoint() {
                 MockExecResult {
                     last_insert_id: 0,
                     rows_affected: 1,
-                },
-                MockExecResult {
-                    last_insert_id: 0,
-                    rows_affected: 1,
-                },
-                MockExecResult {
-                    last_insert_id: 0,
-                    rows_affected: 1,
-                },
+                }
             ])
             .into_connection(),
     );
