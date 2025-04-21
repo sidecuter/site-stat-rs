@@ -1,16 +1,13 @@
 use crate::api::stat::aud::stat_aud;
 use crate::entity::{aud, select_aud, user_id};
 use crate::schemas::SelectAuditoryIn;
+use crate::tests::get_db;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow};
+use sea_orm::{DbBackend, MockDatabase, MockExecResult, MockRow};
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
-
-fn get_db() -> Data<DatabaseConnection> {
-    Data::new(MockDatabase::new(DbBackend::Sqlite).into_connection())
-}
 
 #[rstest]
 #[tokio::test]
@@ -31,12 +28,10 @@ async fn test_200_stat_aud_endpoint() {
                 auditory_id: "a-100".to_string(),
                 success: true,
             }]])
-            .append_exec_results([
-                MockExecResult {
-                    last_insert_id: 0,
-                    rows_affected: 1,
-                }
-            ])
+            .append_exec_results([MockExecResult {
+                last_insert_id: 0,
+                rows_affected: 1,
+            }])
             .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
