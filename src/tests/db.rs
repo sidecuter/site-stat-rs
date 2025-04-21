@@ -37,7 +37,7 @@ pub fn add_aud(mock_database: MockDatabase, count: usize) -> MockDatabase {
     }]; count])
 }
 
-pub fn add_count_result(mock_database: MockDatabase, quantity: usize) -> MockDatabase {
+pub fn add_count(mock_database: MockDatabase, quantity: usize) -> MockDatabase {
     let mut map = BTreeMap::new();
     map.insert("num_items".to_string(), Value::Int(Some(1)));
     mock_database.append_query_results(vec![[map]; quantity])
@@ -88,7 +88,7 @@ pub fn add_review(mock_database: MockDatabase) -> MockDatabase {
         creation_date: Default::default(),
         text: "".to_string(),
         image_name: None,
-        problem_id: "".to_string(),
+        problem_id: "work".to_string(),
     }]])
 }
 
