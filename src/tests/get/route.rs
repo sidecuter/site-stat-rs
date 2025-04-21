@@ -13,7 +13,7 @@ static GRAPH_M: &[u8] = include_bytes!("graph_data.bin");
 #[once]
 fn shared_state() -> Data<AppStateMutable> {
     let (graph, _): (Graph, usize) =
-        bincode::decode_from_slice(&GRAPH_M, bincode::config::standard()).unwrap();
+        bincode::decode_from_slice(GRAPH_M, bincode::config::standard()).unwrap();
     Data::new(AppStateMutable {
         data_entry: Mutex::new([("M".to_string(), graph)].into_iter().collect()),
     })
@@ -23,7 +23,7 @@ fn shared_state() -> Data<AppStateMutable> {
 #[case::route("m-3301", "m-3501", "campus_M", 200)]
 #[case::route("m-3301", "m-3501", "campus_BS", 500)]
 #[case::route("m-3301", "m-3101", "campus_M", 404)]
-#[tokio::test]
+#[actix_web::test]
 async fn get_route_endpoint(
     shared_state: &Data<AppStateMutable>,
     #[case] start: &str,

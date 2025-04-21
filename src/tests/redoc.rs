@@ -5,7 +5,7 @@ use utoipa::OpenApi;
 use utoipa_redoc::{Redoc, Servable};
 
 #[rstest]
-#[tokio::test]
+#[actix_web::test]
 async fn test_swagger() {
     let app = test::init_service(
         App::new().service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi())),
