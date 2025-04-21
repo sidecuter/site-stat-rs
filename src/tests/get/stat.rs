@@ -5,7 +5,7 @@ use actix_web::{test, App};
 use chrono::NaiveDate;
 use rstest::*;
 use sea_orm::{DbBackend, MockDatabase};
-use crate::tests::db::add_count_result;
+use crate::tests::db::add_count;
 
 #[rstest]
 #[case::site(Target::Site, None, None)]
@@ -43,7 +43,7 @@ async fn test_200_get_stat(
     #[case] end_date: Option<NaiveDate>,
 ) {
     let db = Data::new(
-        add_count_result(MockDatabase::new(DbBackend::Sqlite), 3)
+        add_count(MockDatabase::new(DbBackend::Sqlite), 3)
             .into_connection()
     );
     let app = test::init_service(App::new().app_data(db).service(get_stat)).await;
