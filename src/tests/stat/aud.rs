@@ -13,15 +13,18 @@ use std::str::FromStr;
 #[tokio::test]
 async fn test_200_stat_aud_endpoint() {
     let db = Data::new(
-        add_exec_row(add_aud(add_user_id(MockDatabase::new(DbBackend::Sqlite)), 1))
-            .append_query_results([[select_aud::Model {
-                id: 0,
-                user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
-                visit_date: chrono::Utc::now().naive_utc(),
-                auditory_id: "a-100".to_string(),
-                success: true,
-            }]])
-            .into_connection(),
+        add_exec_row(add_aud(
+            add_user_id(MockDatabase::new(DbBackend::Sqlite)),
+            1,
+        ))
+        .append_query_results([[select_aud::Model {
+            id: 0,
+            user_id: uuid::Uuid::from_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
+            visit_date: chrono::Utc::now().naive_utc(),
+            auditory_id: "a-100".to_string(),
+            success: true,
+        }]])
+        .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
@@ -41,10 +44,7 @@ async fn test_200_stat_aud_endpoint() {
 #[rstest]
 #[tokio::test]
 async fn test_404_stat_aud_endpoint_user() {
-    let db = Data::new(
-        add_empty_row(MockDatabase::new(DbBackend::Sqlite))
-            .into_connection(),
-    );
+    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1").unwrap(),
@@ -64,8 +64,7 @@ async fn test_404_stat_aud_endpoint_user() {
 #[tokio::test]
 async fn test_404_stat_aud_endpoint_aud() {
     let db = Data::new(
-        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite)))
-            .into_connection(),
+        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {

@@ -37,10 +37,7 @@ async fn test_200_stat_plan() {
 #[rstest]
 #[tokio::test]
 async fn test_404_stat_plan_user() {
-    let db = Data::new(
-        add_empty_row(MockDatabase::new(DbBackend::Sqlite))
-            .into_connection(),
-    );
+    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
     let payload = ChangePlanIn {
         user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1e1").unwrap(),
@@ -58,8 +55,7 @@ async fn test_404_stat_plan_user() {
 #[tokio::test]
 async fn test_404_stat_plan_plan() {
     let db = Data::new(
-        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite)))
-            .into_connection(),
+        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_plan)).await;
     let payload = ChangePlanIn {

@@ -1,25 +1,28 @@
 use crate::api::stat::way::stat_way;
+use crate::entity::start_way;
 use crate::schemas::StartWayIn;
+use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_user_id, get_db};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
 use sea_orm::{DbBackend, MockDatabase};
-use crate::entity::start_way;
-use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_user_id, get_db};
 
 #[rstest]
 #[tokio::test]
 async fn test_200_stat_way() {
     let db = Data::new(
-        add_exec_row(add_aud(add_user_id(MockDatabase::new(DbBackend::Sqlite)), 2))
-            .append_query_results([[start_way::Model {
-                id: 0,
-                user_id: Default::default(),
-                start_id: Default::default(),
-                end_id: Default::default(),
-                visit_date: Default::default(),
-            }]])
-            .into_connection()
+        add_exec_row(add_aud(
+            add_user_id(MockDatabase::new(DbBackend::Sqlite)),
+            2,
+        ))
+        .append_query_results([[start_way::Model {
+            id: 0,
+            user_id: Default::default(),
+            start_id: Default::default(),
+            end_id: Default::default(),
+            visit_date: Default::default(),
+        }]])
+        .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
@@ -38,10 +41,7 @@ async fn test_200_stat_way() {
 #[rstest]
 #[tokio::test]
 async fn test_404_stat_way_user() {
-    let db = Data::new(
-        add_empty_row(MockDatabase::new(DbBackend::Sqlite))
-            .into_connection()
-    );
+    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
         user_id: Default::default(),
@@ -60,8 +60,7 @@ async fn test_404_stat_way_user() {
 #[tokio::test]
 async fn test_404_stat_way_start() {
     let db = Data::new(
-        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite)))
-            .into_connection()
+        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
@@ -81,8 +80,11 @@ async fn test_404_stat_way_start() {
 #[tokio::test]
 async fn test_404_stat_way_end() {
     let db = Data::new(
-        add_empty_row(add_aud(add_user_id(MockDatabase::new(DbBackend::Sqlite)), 1))
-            .into_connection()
+        add_empty_row(add_aud(
+            add_user_id(MockDatabase::new(DbBackend::Sqlite)),
+            1,
+        ))
+        .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
