@@ -1,6 +1,6 @@
 use crate::api::stat::site::stat_site;
 use crate::schemas::SiteStatisticsIn;
-use crate::tests::db::{add_empty_row, add_exec_row, add_site, add_user_id, get_db};
+use crate::tests::db::{get_db, FillDb};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
@@ -11,7 +11,11 @@ use utoipa::gen::serde_json::json;
 #[actix_web::test]
 async fn test_200_stat_site() {
     let db = Data::new(
-        add_exec_row(add_site(add_user_id(MockDatabase::new(DbBackend::Sqlite)))).into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .add_site()
+            .add_exec_row()
+            .into_connection()
     );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
@@ -29,7 +33,11 @@ async fn test_200_stat_site() {
 #[rstest]
 #[actix_web::test]
 async fn test_404_stat_site_user() {
-    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
+    let db = Data::new(
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_empty_row()
+            .into_connection()
+    );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
         user_id: Default::default(),
