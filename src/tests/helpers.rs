@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 pub fn prepare_tmp_dir() -> String {
     let filepath = format!("/tmp/{}", Uuid::new_v4());
-    std::env::set_var("APP_FILES_PATH", filepath.clone());
+    std::env::set_var("APP_STATIC_PATH", filepath.clone());
     let appstate = AppConfig::new();
     let files_path = Path::new(&appstate.static_path).join("images");
     if !files_path.exists() {
