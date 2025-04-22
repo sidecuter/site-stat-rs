@@ -1,10 +1,10 @@
 use crate::api::get::{auds::get_auds, plans::get_plans, sites::get_sites, ways::get_ways};
 use crate::api::review::get::get_reviews;
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::schemas::{
     ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
 };
-use crate::tests::db::{FillDb, get_db};
+use crate::tests::db::{get_db, FillDb};
 use actix_web::web::Data;
 use actix_web::{test, web, App};
 use rstest::*;
@@ -70,7 +70,7 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
 #[actix_web::test]
 async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
     let db = get_db_filled(endpoint);
-    let app_state = Data::new(AppState::new());
+    let app_state = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
             .app_data(app_state)
@@ -108,7 +108,7 @@ async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
 #[actix_web::test]
 async fn test_422_get(#[case] endpoint: Endpoint) {
     let db = get_db();
-    let app_state = Data::new(AppState::new());
+    let app_state = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
             .app_data(app_state)
@@ -142,7 +142,7 @@ async fn test_422_get(#[case] endpoint: Endpoint) {
 #[actix_web::test]
 async fn test_403_get(#[case] endpoint: Endpoint) {
     let db = get_db();
-    let app_state = Data::new(AppState::new());
+    let app_state = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
             .app_data(app_state)
@@ -173,7 +173,7 @@ async fn test_403_get(#[case] endpoint: Endpoint) {
 #[actix_web::test]
 async fn check_value(#[case] endpoint: Endpoint) {
     let db = get_db_filled(endpoint);
-    let app_state = Data::new(AppState::new());
+    let app_state = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
             .app_data(app_state)

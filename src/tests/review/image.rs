@@ -1,7 +1,7 @@
 use super::super::helpers::prepare_tmp_dir;
 use super::super::helpers::BLACK_1X1_PNG;
 use crate::api::review::image::get_image;
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::rstest;
@@ -22,7 +22,7 @@ async fn get_image_endpoint() {
     }
     let app = test::init_service(
         App::new()
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(get_image),
     )
     .await;

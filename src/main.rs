@@ -1,89 +1,89 @@
-use actix_rt::spawn;
-use actix_web::{
-    self,
-    middleware::Logger,
-    web::{self, JsonConfig, QueryConfig},
-    App, HttpServer,
-};
-#[cfg(not(debug_assertions))]
+use actix_web::web::{Data, JsonConfig, QueryConfig};
 use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
-use stat_api::app_state::AppState;
+use stat_api::config::AppConfig;
 use stat_api::cors::create_cors;
 use stat_api::mut_state::AppStateMutable;
 use stat_api::task::start_data_refresh_task;
 use stat_api::{api, api_docs, errors::ApiError};
-use std::fs;
-use std::sync::Mutex;
 use utoipa::OpenApi;
 use utoipa_redoc::{Redoc, Servable};
 
-#[cfg(not(debug_assertions))]
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    dotenv::dotenv().ok();
+    init_logger();
+    let config = Data::new(AppConfig::default());
+    let addr = config.get_addr();
+    let pool = Data::new(get_database_connection(&config.database_url).await);
+    let files_path = config.get_files_path();
+    let front_path = config.get_front_path();
+    ensure_dir_exists(&files_path)?;
+    ensure_dir_exists(&front_path)?;
+    let state = Data::new(AppStateMutable::default());
+
+    tracing::info!("Listening on http://{addr}");
+    tracing::info!("Redoc UI is available at http://{addr}/redoc");
+
+    actix_rt::spawn(start_data_refresh_task(
+        state.clone(),
+        std::time::Duration::from_secs(config.data_refresh_interval),
+    ));
+
+    actix_web::HttpServer::new(move || {
+        actix_web::App::new()
+            .wrap(create_cors(&config))
+            .app_data(state.clone())
+            .app_data(pool.clone())
+            .app_data(config.clone())
+            .wrap(actix_web::middleware::Logger::default())
+            .configure(api::init_routes)
+            .app_data(json_errors_handler())
+            .app_data(query_errors_handler())
+            .service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi()))
+            .service(frontend(front_path.to_str().unwrap()))
+    })
+    .bind(addr)?
+    .run()
+    .await
+}
+
 async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
     let mut opt = ConnectOptions::new(connection_string);
-    opt.sqlx_logging(false);
+    if cfg!(not(debug_assertions)) {
+        opt.sqlx_logging(false);
+    }
     Database::connect(opt)
         .await
         .expect("Failed to create database connection pool")
 }
 
-#[cfg(debug_assertions)]
-async fn get_database_connection(connection_string: &str) -> DatabaseConnection {
-    Database::connect(connection_string)
-        .await
-        .expect("Failed to create database connection pool")
+fn init_logger() {
+    let level = if cfg!(debug_assertions) {
+        tracing::Level::DEBUG
+    } else {
+        tracing::Level::INFO
+    };
+    tracing_subscriber::fmt()
+        .with_max_level(level) // В продакшене использовать JSON формат
+        .init();
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    dotenv::dotenv().ok();
-    #[cfg(debug_assertions)]
-    {
-        tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::DEBUG)
-            .init();
+fn ensure_dir_exists(path: &std::path::Path) -> std::io::Result<()> {
+    if !path.exists() {
+        std::fs::create_dir(path)?;
     }
-    #[cfg(not(debug_assertions))]
-    {
-        tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::INFO)
-            .init();
-    }
-    let app_state = web::Data::new(AppState::default());
-    let addr = format!("{}:{}", app_state.host, app_state.port);
-    let pool = web::Data::new(get_database_connection(&app_state.database_url).await);
-    if !std::path::Path::new(&app_state.files_path).exists() {
-        fs::create_dir(app_state.files_path.clone())?;
-    }
-    if !std::path::Path::new(&app_state.front_path).exists() {
-        fs::create_dir(app_state.front_path.clone())?;
-    }
-    let data_entries = web::Data::new(AppStateMutable {
-        data_entry: Mutex::new(Default::default()),
-    });
+    Ok(())
+}
 
-    tracing::info!("Listening on http://{addr}");
-    tracing::info!("Redoc UI is available at http://{addr}/redoc");
+fn json_errors_handler() -> JsonConfig {
+    JsonConfig::default().error_handler(|err, _| ApiError::from(err).into())
+}
 
-    spawn(start_data_refresh_task(
-        data_entries.clone(),
-        app_state.data_refresh_interval,
-    ));
+fn query_errors_handler() -> QueryConfig {
+    QueryConfig::default().error_handler(|err, _| ApiError::from(err).into())
+}
 
-    HttpServer::new(move || {
-        App::new()
-            .wrap(create_cors(&app_state))
-            .app_data(data_entries.clone())
-            .app_data(pool.clone())
-            .app_data(app_state.clone())
-            .wrap(Logger::default())
-            .configure(api::init_routes)
-            .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
-            .app_data(QueryConfig::default().error_handler(|err, _| ApiError::from(err).into()))
-            .service(Redoc::with_url("/redoc", api_docs::ApiDoc::openapi()))
-            .service(actix_files::Files::new("/", &app_state.front_path).index_file("index.html"))
-    })
-    .bind(addr)?
-    .run()
-    .await
+fn frontend(path: &str) -> actix_files::Files {
+    actix_files::Files::new("/", path).index_file("index.html")
 }

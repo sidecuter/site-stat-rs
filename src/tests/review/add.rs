@@ -1,6 +1,6 @@
 use super::super::helpers::{generate_multipart_payload, prepare_tmp_dir, BLACK_1X1_PNG};
 use crate::api::review::add;
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::schemas::Problem;
 use crate::tests::db::FillDb;
 use actix_web::web::{Bytes, Data};
@@ -17,12 +17,12 @@ async fn test_200_add_review() {
             .add_user_id()
             .add_review()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(
         App::new()
             .app_data(db)
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(add::add_review),
     )
     .await;
@@ -52,12 +52,12 @@ async fn test_200_add_review_with_image() {
             .add_user_id()
             .add_review()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(
         App::new()
             .app_data(db)
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(add::add_review),
     )
     .await;
@@ -89,12 +89,12 @@ async fn test_404_add_review_user() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(
         App::new()
             .app_data(db)
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(add::add_review),
     )
     .await;
@@ -121,12 +121,12 @@ async fn test_415_add_review() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(
         App::new()
             .app_data(db)
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(add::add_review),
     )
     .await;
@@ -157,12 +157,12 @@ async fn test_422_add_review() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(
         App::new()
             .app_data(db)
-            .app_data(Data::new(AppState::default()))
+            .app_data(Data::new(AppConfig::default()))
             .service(add::add_review),
     )
     .await;

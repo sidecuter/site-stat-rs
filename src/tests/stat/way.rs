@@ -15,7 +15,7 @@ async fn test_200_stat_way() {
             .add_aud(2)
             .add_start_way()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
@@ -37,7 +37,7 @@ async fn test_404_stat_way_user() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
@@ -60,7 +60,7 @@ async fn test_404_stat_way_start() {
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
@@ -84,7 +84,7 @@ async fn test_404_stat_way_end() {
             .add_user_id()
             .add_aud(1)
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {

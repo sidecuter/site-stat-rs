@@ -1,4 +1,4 @@
-use crate::{app_state::AppState, errors::ApiError};
+use crate::{config::AppConfig, errors::ApiError};
 use actix_governor::governor::middleware::StateInformationMiddleware;
 use actix_governor::{Governor, GovernorConfigBuilder, PeerIpKeyExtractor};
 use actix_web::{
@@ -13,7 +13,7 @@ pub async fn api_key_middleware(
     req: ServiceRequest,
     next: Next<BoxBody>,
 ) -> Result<ServiceResponse<BoxBody>, Error> {
-    if let Some(app_state) = req.app_data::<Data<AppState>>() {
+    if let Some(app_state) = req.app_data::<Data<AppConfig>>() {
         if req
             .head()
             .headers()

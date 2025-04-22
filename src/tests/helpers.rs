@@ -1,4 +1,4 @@
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::schemas::Problem;
 use actix_web::http::header;
 use actix_web::http::header::HeaderMap;
@@ -12,9 +12,9 @@ use uuid::Uuid;
 
 pub fn prepare_tmp_dir() -> String {
     let filepath = format!("/tmp/{}", Uuid::new_v4());
-    std::env::set_var("FILES_PATH", filepath.clone());
-    let appstate = AppState::new();
-    let files_path = Path::new(&appstate.files_path).join("images");
+    std::env::set_var("APP_FILES_PATH", filepath.clone());
+    let appstate = AppConfig::new();
+    let files_path = Path::new(&appstate.static_path).join("images");
     if !files_path.exists() {
         fs::create_dir_all(files_path).unwrap();
     }

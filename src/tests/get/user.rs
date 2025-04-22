@@ -12,7 +12,7 @@ async fn get_user_endpoint() {
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(get_user_id)).await;
     let req = test::TestRequest::get().uri("/user-id").to_request();

@@ -5,9 +5,9 @@ use std::collections::BTreeMap;
 
 pub trait FillDb {
     fn add_empty_row(self) -> Self;
-    
+
     fn add_exec_row(self) -> Self;
-    
+
     fn add_user_id(self) -> Self;
 
     fn add_plan(self) -> Self;
@@ -114,7 +114,7 @@ impl FillDb for MockDatabase {
             image_name: None,
             problem_id: "work".to_string(),
         }]])
-    }   
+    }
 }
 
 pub fn get_db() -> Data<DatabaseConnection> {

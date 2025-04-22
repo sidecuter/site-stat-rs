@@ -1,6 +1,6 @@
 use crate::api::stat::aud::stat_aud;
 use crate::schemas::SelectAuditoryIn;
-use crate::tests::db::{FillDb, get_db};
+use crate::tests::db::{get_db, FillDb};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
@@ -16,7 +16,7 @@ async fn test_200_stat_aud_endpoint() {
             .add_aud(1)
             .add_select_add()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
@@ -39,7 +39,7 @@ async fn test_404_stat_aud_endpoint_user() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
@@ -63,7 +63,7 @@ async fn test_404_stat_aud_endpoint_aud() {
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {

@@ -1,4 +1,4 @@
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::entity::review;
 use crate::errors::{ApiError, ApiResult};
 use crate::schemas::Filter;
@@ -102,7 +102,7 @@ impl ReviewFormIn {
         }
     }
 
-    pub async fn save_image(self, state: &AppState) -> ApiResult<Option<String>> {
+    pub async fn save_image(self, config: &AppConfig) -> ApiResult<Option<String>> {
         Ok(if let Some(img) = self.image {
             if let Some(mime) = img.content_type.clone() {
                 if mime.type_() != mime::IMAGE {
@@ -124,7 +124,8 @@ impl ReviewFormIn {
                 ))?
             };
             let img_name = format!("{img_id}.{img_ext}");
-            let path = Path::new(&state.files_path)
+            let path = Path::new(&config.static_path)
+                .join(&config.files_dir)
                 .join(img_name.clone())
                 .to_str()
                 .ok_or(ApiError::UnprocessableData(
