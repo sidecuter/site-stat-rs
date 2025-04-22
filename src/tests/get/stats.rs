@@ -4,9 +4,7 @@ use crate::app_state::AppState;
 use crate::schemas::{
     ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
 };
-use crate::tests::db::{
-    add_change_plan, add_count, add_review, add_select_add, add_site, add_start_way, get_db,
-};
+use crate::tests::db::{FillDb, get_db};
 use actix_web::web::Data;
 use actix_web::{test, web, App};
 use rstest::*;
@@ -47,13 +45,13 @@ pub fn get_service(cfg: &mut web::ServiceConfig) {
 }
 
 fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
-    let mut mock = MockDatabase::new(DbBackend::Sqlite);
+    let mut mock = MockDatabase::new(DbBackend::Sqlite).add_count(2);
     mock = match endpoint {
-        Endpoint::Sites => add_site(add_count(mock, 2)),
-        Endpoint::Auds => add_select_add(add_count(mock, 2)),
-        Endpoint::Ways => add_start_way(add_count(mock, 2)),
-        Endpoint::Plans => add_change_plan(add_count(mock, 2)),
-        Endpoint::Reviews => add_review(add_count(mock, 2)),
+        Endpoint::Sites => mock.add_site(),
+        Endpoint::Auds => mock.add_select_add(),
+        Endpoint::Ways => mock.add_start_way(),
+        Endpoint::Plans => mock.add_change_plan(),
+        Endpoint::Reviews => mock.add_review(),
     };
     Data::new(mock.into_connection())
 }

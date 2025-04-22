@@ -2,7 +2,7 @@ use super::super::helpers::{generate_multipart_payload, prepare_tmp_dir, BLACK_1
 use crate::api::review::add;
 use crate::app_state::AppState;
 use crate::schemas::Problem;
-use crate::tests::db::{add_empty_row, add_exec_row, add_review, add_user_id};
+use crate::tests::db::FillDb;
 use actix_web::web::{Bytes, Data};
 use actix_web::{test, App};
 use rstest::*;
@@ -13,10 +13,11 @@ use std::fs;
 #[actix_web::test]
 async fn test_200_add_review() {
     let db = Data::new(
-        add_exec_row(add_review(add_user_id(MockDatabase::new(
-            DbBackend::Sqlite,
-        ))))
-        .into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .add_review()
+            .add_exec_row()
+            .into_connection()
     );
     let app = test::init_service(
         App::new()
@@ -47,10 +48,11 @@ async fn test_200_add_review() {
 async fn test_200_add_review_with_image() {
     let filepath = prepare_tmp_dir();
     let db = Data::new(
-        add_exec_row(add_review(add_user_id(MockDatabase::new(
-            DbBackend::Sqlite,
-        ))))
-        .into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .add_review()
+            .add_exec_row()
+            .into_connection()
     );
     let app = test::init_service(
         App::new()
@@ -84,7 +86,11 @@ async fn test_200_add_review_with_image() {
 #[rstest]
 #[actix_web::test]
 async fn test_404_add_review_user() {
-    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
+    let db = Data::new(
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_empty_row()
+            .into_connection()
+    );
     let app = test::init_service(
         App::new()
             .app_data(db)
@@ -113,10 +119,9 @@ async fn test_404_add_review_user() {
 #[actix_web::test]
 async fn test_415_add_review() {
     let db = Data::new(
-        add_exec_row(add_review(add_user_id(MockDatabase::new(
-            DbBackend::Sqlite,
-        ))))
-        .into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .into_connection()
     );
     let app = test::init_service(
         App::new()
@@ -150,10 +155,9 @@ async fn test_415_add_review() {
 #[actix_web::test]
 async fn test_422_add_review() {
     let db = Data::new(
-        add_exec_row(add_review(add_user_id(MockDatabase::new(
-            DbBackend::Sqlite,
-        ))))
-        .into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .into_connection()
     );
     let app = test::init_service(
         App::new()
