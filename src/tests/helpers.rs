@@ -7,14 +7,13 @@ use mime::Mime;
 use rand::distr::{Alphanumeric, SampleString};
 use rand::rng;
 use std::fs;
-use std::path::Path;
 use uuid::Uuid;
 
 pub fn prepare_tmp_dir() -> String {
     let filepath = format!("/tmp/{}", Uuid::new_v4());
     std::env::set_var("APP_STATIC_PATH", filepath.clone());
-    let appstate = AppConfig::new();
-    let files_path = Path::new(&appstate.static_path).join("images");
+    let config = AppConfig::new();
+    let files_path = config.get_files_path();
     if !files_path.exists() {
         fs::create_dir_all(files_path).unwrap();
     }

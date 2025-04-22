@@ -13,12 +13,12 @@ pub async fn api_key_middleware(
     req: ServiceRequest,
     next: Next<BoxBody>,
 ) -> Result<ServiceResponse<BoxBody>, Error> {
-    if let Some(app_state) = req.app_data::<Data<AppConfig>>() {
+    if let Some(config) = req.app_data::<Data<AppConfig>>() {
         if req
             .head()
             .headers()
             .get("Api-Key")
-            .is_some_and(|hv| hv.as_bytes() == app_state.admin_key.as_bytes())
+            .is_some_and(|hv| hv.as_bytes() == config.admin_key.as_bytes())
         {
             next.call(req).await
         } else {

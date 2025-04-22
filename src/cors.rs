@@ -4,9 +4,9 @@ use actix_web::http::Method;
 use actix_web::web;
 use std::str::FromStr;
 
-pub fn create_cors(app_state: &web::Data<AppConfig>) -> Cors {
-    let allowed_origins = app_state.allowed_hosts.as_deref().unwrap_or_default();
-    let allowed_methods = app_state.allowed_methods.as_deref().unwrap_or_default();
+pub fn create_cors(config: &web::Data<AppConfig>) -> Cors {
+    let allowed_origins = config.allowed_hosts.as_deref().unwrap_or_default();
+    let allowed_methods = config.allowed_methods.as_deref().unwrap_or_default();
 
     allowed_origins
         .iter()

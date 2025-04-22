@@ -70,10 +70,10 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
 #[actix_web::test]
 async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
     let db = get_db_filled(endpoint);
-    let app_state = Data::new(AppConfig::new());
+    let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
-            .app_data(app_state)
+            .app_data(config)
             .app_data(db)
             .configure(get_service),
     )
@@ -108,10 +108,10 @@ async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool) {
 #[actix_web::test]
 async fn test_422_get(#[case] endpoint: Endpoint) {
     let db = get_db();
-    let app_state = Data::new(AppConfig::new());
+    let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
-            .app_data(app_state)
+            .app_data(config)
             .app_data(db)
             .configure(get_service),
     )
@@ -142,10 +142,10 @@ async fn test_422_get(#[case] endpoint: Endpoint) {
 #[actix_web::test]
 async fn test_403_get(#[case] endpoint: Endpoint) {
     let db = get_db();
-    let app_state = Data::new(AppConfig::new());
+    let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
-            .app_data(app_state)
+            .app_data(config)
             .app_data(db)
             .configure(get_service),
     )
@@ -173,10 +173,10 @@ async fn test_403_get(#[case] endpoint: Endpoint) {
 #[actix_web::test]
 async fn check_value(#[case] endpoint: Endpoint) {
     let db = get_db_filled(endpoint);
-    let app_state = Data::new(AppConfig::new());
+    let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
-            .app_data(app_state)
+            .app_data(config)
             .app_data(db)
             .configure(get_service),
     )

@@ -25,7 +25,7 @@ use actix_web::{get, web};
 )]
 #[get("/image/{filename:[a-f0-9]{32}\\.\\w{3,4}}")]
 async fn get_image(
-    state: web::Data<AppConfig>,
+    config: web::Data<AppConfig>,
     filename: web::Path<String>,
 ) -> ApiResult<NamedFile> {
     let filename = filename.clone();
@@ -36,7 +36,7 @@ async fn get_image(
         Err(ApiError::UnprocessableData("Incorrect path".to_string()))?
     }
     let filename = filename.unwrap();
-    let path = state.get_files_path().join(filename);
+    let path = config.get_files_path().join(filename);
     if path.exists() {
         Ok(NamedFile::open_async(path).await?)
     } else {
