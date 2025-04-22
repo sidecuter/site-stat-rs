@@ -1,6 +1,6 @@
 use crate::api::stat::aud::stat_aud;
 use crate::schemas::SelectAuditoryIn;
-use crate::tests::db::{add_aud, add_empty_row, add_exec_row, add_select_add, add_user_id, get_db};
+use crate::tests::db::{FillDb, get_db};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
@@ -11,11 +11,12 @@ use std::net::{IpAddr, SocketAddr};
 #[actix_web::test]
 async fn test_200_stat_aud_endpoint() {
     let db = Data::new(
-        add_exec_row(add_select_add(add_aud(
-            add_user_id(MockDatabase::new(DbBackend::Sqlite)),
-            1,
-        )))
-        .into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .add_aud(1)
+            .add_select_add()
+            .add_exec_row()
+            .into_connection()
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
@@ -35,7 +36,11 @@ async fn test_200_stat_aud_endpoint() {
 #[rstest]
 #[actix_web::test]
 async fn test_404_stat_aud_endpoint_user() {
-    let db = Data::new(add_empty_row(MockDatabase::new(DbBackend::Sqlite)).into_connection());
+    let db = Data::new(
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_empty_row()
+            .into_connection()
+    );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: Default::default(),
@@ -55,7 +60,10 @@ async fn test_404_stat_aud_endpoint_user() {
 #[actix_web::test]
 async fn test_404_stat_aud_endpoint_aud() {
     let db = Data::new(
-        add_empty_row(add_user_id(MockDatabase::new(DbBackend::Sqlite))).into_connection(),
+        MockDatabase::new(DbBackend::Sqlite)
+            .add_user_id()
+            .add_empty_row()
+            .into_connection()
     );
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
