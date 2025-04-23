@@ -10,7 +10,7 @@ members = [".", "migration"]
 actix-web = "4.10.2"
 chrono = { version = "0.4.40", default-features = false, features = ["serde", "std"] }
 dotenv = "0.15"
-sea-orm = { version = "1.1.10", features = ["debug-print", "runtime-tokio", "sqlx-sqlite", "with-uuid"] }
+sea-orm = { version = "1.1.10", features = ["debug-print", "runtime-actix", "sqlx-sqlite", "with-uuid"] }
 serde = { version = "1.0.219", features = ["derive"] }
 uuid = { version = "1.16.0", features = ["v4"] }
 thiserror = "2.0.12"
@@ -34,7 +34,7 @@ config = { version = "0.15.11", default-features = false }
 bincode = { version = "2.0.1" }
 mockito = "1.7.0"
 rstest = "0.25.0"
-serde_qs = "0.14.0"
+serde_qs = "0.15.0"
 rand = "0.9.1"
 
 [dev-dependencies.sea-orm]
