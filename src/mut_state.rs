@@ -9,8 +9,7 @@ pub struct AppStateMutable {
 impl Default for AppStateMutable {
     fn default() -> Self {
         Self {
-            data_entry: Mutex::new(Default::default())
+            data_entry: Mutex::new(Default::default()),
         }
     }
 }
-

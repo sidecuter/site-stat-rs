@@ -1,6 +1,6 @@
-use std::path::{Path, PathBuf};
 use config::Config;
 use serde::Deserialize;
+use std::path::{Path, PathBuf};
 
 fn default_host() -> String {
     String::from("127.0.0.1")

@@ -1,7 +1,21 @@
 use crate::entity::{aud, change_plan, plan, review, select_aud, site_stat, start_way, user_id};
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow, Value};
-use std::collections::BTreeMap;
+
+macro_rules! btreemap {
+    () => {
+        std::collections::BTreeMap::new()
+    };
+
+    // Список пар ключ:значение
+    ($($key:expr => $value:expr),+ $(,)?) => {
+        {
+            let mut temp_map = std::collections::BTreeMap::new();
+            $(temp_map.insert($key, $value);)+
+            temp_map
+        }
+    };
+}
 
 pub trait FillDb {
     fn add_empty_row(self) -> Self;
@@ -62,9 +76,12 @@ impl FillDb for MockDatabase {
     }
 
     fn add_count(self, quantity: usize) -> Self {
-        let mut map = BTreeMap::new();
-        map.insert("num_items".to_string(), Value::Int(Some(1)));
-        self.append_query_results(vec![[map]; quantity])
+        self.append_query_results(vec![
+            [
+                btreemap!["num_items".to_string() => Value::Int(Some(1))]
+            ];
+            quantity
+        ])
     }
 
     fn add_site(self) -> Self {
