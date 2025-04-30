@@ -15,7 +15,7 @@ async fn test_200_stat_site() {
             .add_user_id()
             .add_site()
             .add_exec_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {
@@ -36,7 +36,7 @@ async fn test_404_stat_site_user() {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_empty_row()
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(stat_site)).await;
     let payload = SiteStatisticsIn {

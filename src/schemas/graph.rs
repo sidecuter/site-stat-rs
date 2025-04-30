@@ -215,7 +215,7 @@ impl Graph {
             }
         }
 
-        println!(
+        tracing::info!(
             "The task took {:.4} seconds",
             start_time.elapsed().as_secs_f64()
         );

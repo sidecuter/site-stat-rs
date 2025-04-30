@@ -45,7 +45,7 @@ async fn test_200_get_stat(
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
             .add_count(3)
-            .into_connection()
+            .into_connection(),
     );
     let app = test::init_service(App::new().app_data(db).service(get_stat)).await;
     let query = FilterQuery {

@@ -1,9 +1,8 @@
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::errors::{ApiError, ApiResult};
 use crate::schemas::Status;
 use actix_files::NamedFile;
 use actix_web::{get, web};
-use std::path::Path;
 
 #[utoipa::path(
     get,
@@ -26,19 +25,19 @@ use std::path::Path;
 )]
 #[get("/image/{filename:[a-f0-9]{32}\\.\\w{3,4}}")]
 async fn get_image(
-    state: web::Data<AppState>,
+    config: web::Data<AppConfig>,
     filename: web::Path<String>,
 ) -> ApiResult<NamedFile> {
     let filename = filename.clone();
-    let filename = Path::new(&filename)
+    let filename = std::path::Path::new(&filename)
         .file_name()
         .and_then(|v| v.to_str().to_owned());
     if filename.is_none() {
         Err(ApiError::UnprocessableData("Incorrect path".to_string()))?
     }
     let filename = filename.unwrap();
-    let path = Path::new(&state.files_path).join(filename);
-    if Path::exists(&path) {
+    let path = config.get_files_path().join(filename);
+    if path.exists() {
         Ok(NamedFile::open_async(path).await?)
     } else {
         Err(ApiError::NotFound("File".to_owned()))
