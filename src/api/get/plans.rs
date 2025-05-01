@@ -40,7 +40,7 @@ async fn get_plans(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<ChangePlanOut>> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(ChangePlanOut::pagination(db.get_ref(), &data).await?)

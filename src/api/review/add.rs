@@ -1,6 +1,6 @@
 #![allow(clippy::clone_on_copy)]
 
-use crate::app_state::AppState;
+use crate::config::AppConfig;
 use crate::entity::user_id;
 use crate::errors::ApiResult;
 use crate::schemas::review::ReviewFormIn;
@@ -36,7 +36,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, IntoActiveModel};
 )]
 #[post("add")]
 async fn add_review(
-    state: web::Data<AppState>,
+    config: web::Data<AppConfig>,
     MultipartForm(data): MultipartForm<ReviewFormIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
@@ -47,7 +47,7 @@ async fn add_review(
         problem: data.problem.clone(),
         ..Default::default()
     };
-    let image_name = data.save_image(&state).await?;
+    let image_name = data.save_image(&config).await?;
     review_in.image_name = image_name;
     review_in
         .into_active_model()

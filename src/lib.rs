@@ -1,6 +1,6 @@
 pub mod api;
 pub mod api_docs;
-pub mod app_state;
+pub mod config;
 pub mod cors;
 pub mod entity;
 pub mod errors;

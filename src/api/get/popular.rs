@@ -2,7 +2,7 @@ use crate::entity::{select_aud, start_way};
 use crate::errors::ApiResult;
 use crate::schemas::{Popular, Status};
 use actix_web::{get, web};
-use sea_orm::sea_query::*;
+use sea_orm::sea_query::{Alias, Expr, Order, Query, UnionType};
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QuerySelect,
     QueryTrait,

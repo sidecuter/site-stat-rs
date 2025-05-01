@@ -13,10 +13,11 @@ pub async fn start_data_refresh_task(state: web::Data<AppStateMutable>, interval
             .map_err(|e| {
                 tracing::error!("Refresh failed: {}", e);
             })
-            .map(|_| tracing::info!("Data refreshed"));
+            .map(|()| tracing::info!("Data refreshed"));
     }
 }
 
+#[allow(clippy::significant_drop_tightening)]
 async fn refresh_data(
     state: &web::Data<AppStateMutable>,
 ) -> Result<(), Box<dyn std::error::Error>> {

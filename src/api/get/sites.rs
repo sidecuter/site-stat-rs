@@ -40,7 +40,7 @@ async fn get_sites(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<SiteStatisticsOut>> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(SiteStatisticsOut::pagination(db.get_ref(), &data).await?)

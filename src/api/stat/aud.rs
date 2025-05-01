@@ -45,7 +45,7 @@ async fn stat_aud(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;

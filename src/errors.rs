@@ -32,14 +32,13 @@ pub enum ApiError {
 impl ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match *self {
-            ApiError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::UnprocessableData(_) => StatusCode::UNPROCESSABLE_ENTITY,
-            ApiError::NotFound(_) => StatusCode::NOT_FOUND,
-            ApiError::BadRequest(_) => StatusCode::BAD_REQUEST,
-            ApiError::PathNotFound(_) => StatusCode::NOT_FOUND,
-            ApiError::NotAllowed(_) => StatusCode::FORBIDDEN,
-            ApiError::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
-            ApiError::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE,
+            Self::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::UnprocessableData(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            Self::NotFound(_) | Self::PathNotFound(_) => StatusCode::NOT_FOUND,
+            Self::BadRequest(_) => StatusCode::BAD_REQUEST,
+            Self::NotAllowed(_) => StatusCode::FORBIDDEN,
+            Self::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
+            Self::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE,
         }
     }
 
