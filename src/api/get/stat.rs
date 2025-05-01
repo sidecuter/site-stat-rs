@@ -32,7 +32,7 @@ async fn get_stat(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Statistics> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     let period: Period = (&data).into();

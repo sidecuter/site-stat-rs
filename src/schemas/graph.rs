@@ -23,14 +23,16 @@ pub enum VertexType {
 }
 
 impl VertexType {
+    #[allow(clippy::missing_const_for_fn)]
+    #[must_use]
     pub fn as_str(&self) -> &str {
         match self {
-            VertexType::Hallway => "hallway",
-            VertexType::EntrancesToAu => "entrancesToAu",
-            VertexType::Stair => "stair",
-            VertexType::Crossing => "crossing",
-            VertexType::CrossingSpace => "crossingSpace",
-            VertexType::Lift => "lift",
+            Self::Hallway => "hallway",
+            Self::EntrancesToAu => "entrancesToAu",
+            Self::Stair => "stair",
+            Self::Crossing => "crossing",
+            Self::CrossingSpace => "crossingSpace",
+            Self::Lift => "lift",
         }
     }
 }
@@ -40,13 +42,13 @@ impl FromStr for VertexType {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "hallway" => Ok(VertexType::Hallway),
-            "entrancesToAu" => Ok(VertexType::EntrancesToAu),
-            "stair" => Ok(VertexType::Stair),
-            "crossing" => Ok(VertexType::Crossing),
-            "crossingSpace" => Ok(VertexType::CrossingSpace),
-            "lift" => Ok(VertexType::Lift),
-            _ => Err(format!("Invalid vertex type: {}", s)),
+            "hallway" => Ok(Self::Hallway),
+            "entrancesToAu" => Ok(Self::EntrancesToAu),
+            "stair" => Ok(Self::Stair),
+            "crossing" => Ok(Self::Crossing),
+            "crossingSpace" => Ok(Self::CrossingSpace),
+            "lift" => Ok(Self::Lift),
+            _ => Err(format!("Invalid vertex type: {s}")),
         }
     }
 }
@@ -95,6 +97,7 @@ pub struct Graph {
 }
 
 impl Graph {
+    #[must_use]
     pub fn new(
         location: Arc<LocationData>,
         plans: Vec<Arc<PlanData>>,
@@ -133,7 +136,7 @@ impl Graph {
                             plan: Arc::clone(plan),
                         }),
                     );
-                })
+                });
             });
     }
 
@@ -152,8 +155,8 @@ impl Graph {
                         Arc::make_mut(self.vertexes.get_mut(stair2).unwrap())
                             .neighbor_data
                             .push((stair1.clone(), 916.));
-                    })
-                })
+                    });
+                });
             });
     }
 
@@ -168,13 +171,15 @@ impl Graph {
             Arc::make_mut(self.vertexes.get_mut(c2).unwrap())
                 .neighbor_data
                 .push((c1.clone(), dist));
-        })
+        });
     }
 
+    #[must_use]
     pub fn has_vertex(&self, id: &str) -> bool {
         self.vertexes.contains_key(id)
     }
 
+    #[allow(clippy::cast_possible_truncation)]
     pub fn get_shortest_way_from_to(&self, start: &str, end: &str) -> ShortestWay {
         let start_time = Instant::now();
 
@@ -222,7 +227,7 @@ impl Graph {
 
         // Формирование результата
         ShortestWay {
-            way: self.reconstruct_path(start_idx, end_idx, &prev, &index_to_vertex),
+            way: Self::reconstruct_path(start_idx, end_idx, &prev, &index_to_vertex),
             distance: distances[end_idx].floor() as i32,
         }
     }
@@ -259,7 +264,6 @@ impl Graph {
     }
 
     fn reconstruct_path(
-        &self,
         start_idx: usize,
         end_idx: usize,
         prev: &[Option<usize>],

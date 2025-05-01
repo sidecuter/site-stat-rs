@@ -55,6 +55,10 @@ pub struct PlanData {
     pub corpus: Arc<CorpusData>,
 }
 
+/// Parsing row data to `DataEntries`
+///
+/// # Errors
+/// Parsing and network errors
 pub async fn parse_data(url: &str) -> Result<DataEntry, Box<dyn std::error::Error>> {
     let data_dto = fetch_data(url).await?;
     let locations = parse_locations(&data_dto.locations);
@@ -136,6 +140,10 @@ fn parse_plans(plans_dto: &[PlanDto], corpuses: &[Arc<CorpusData>]) -> Vec<Arc<P
         .collect()
 }
 
+/// Fetch data from network resourse
+///
+/// # Errors
+/// Parsing and network errors
 pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>> {
     let client = reqwest::Client::new();
     let response = client
@@ -150,6 +158,10 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
     }
 }
 
+/// Loads graph from resource
+///
+/// # Errors
+/// Network errors, parsing errors
 pub async fn get_graphs() -> Result<HashMap<String, Graph>, Box<dyn std::error::Error>> {
     #[cfg(not(test))]
     const DATA_URL: &str = "https://mospolynavigation.github.io/polyna-preprocess/locationsV2.json";

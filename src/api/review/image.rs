@@ -31,9 +31,9 @@ async fn get_image(
     let filename = filename.clone();
     let filename = std::path::Path::new(&filename)
         .file_name()
-        .and_then(|v| v.to_str().to_owned());
+        .and_then(|v| v.to_str());
     if filename.is_none() {
-        Err(ApiError::UnprocessableData("Incorrect path".to_string()))?
+        Err(ApiError::UnprocessableData("Incorrect path".to_string()))?;
     }
     let filename = filename.unwrap();
     let path = config.get_files_path().join(filename);

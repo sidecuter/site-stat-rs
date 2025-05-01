@@ -9,6 +9,12 @@ use actix_web::{
     Error, Responder,
 };
 
+#[allow(clippy::doc_markdown)]
+/// Check for api key in request headers
+///
+/// # Errors
+/// ApiKey in request don't match ApiKey in config
+#[allow(clippy::future_not_send)]
 pub async fn api_key_middleware(
     req: ServiceRequest,
     next: Next<BoxBody>,
@@ -33,6 +39,8 @@ pub async fn api_key_middleware(
     }
 }
 
+#[allow(clippy::missing_panics_doc)]
+#[must_use]
 pub fn build_rate_limits() -> Governor<PeerIpKeyExtractor, StateInformationMiddleware> {
     let config = GovernorConfigBuilder::default()
         .burst_size(1)

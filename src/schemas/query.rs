@@ -14,15 +14,20 @@ pub enum Query {
 }
 
 impl Query {
+    #[must_use]
     pub fn generate_query(&self) -> SelectStatement {
         match self {
-            Query::Site(q) => q.to_owned().into_query(),
-            Query::Auds(q) => q.to_owned().into_query(),
-            Query::Ways(q) => q.to_owned().into_query(),
-            Query::Plans(q) => q.to_owned().into_query(),
+            Self::Site(q) => q.to_owned().into_query(),
+            Self::Auds(q) => q.to_owned().into_query(),
+            Self::Ways(q) => q.to_owned().into_query(),
+            Self::Plans(q) => q.to_owned().into_query(),
         }
     }
 
+    /// Counts statistics for specified endpoint
+    ///
+    /// # Errors
+    /// db errors
     pub async fn count(
         mut self,
         db: &DatabaseConnection,
@@ -56,13 +61,14 @@ impl Query {
 
     async fn count_query(self, db: &DatabaseConnection) -> Result<u64, DbErr> {
         match self {
-            Query::Site(q) => q.count(db).await,
-            Query::Auds(q) => q.count(db).await,
-            Query::Ways(q) => q.count(db).await,
-            Query::Plans(q) => q.count(db).await,
+            Self::Site(q) => q.count(db).await,
+            Self::Auds(q) => q.count(db).await,
+            Self::Ways(q) => q.count(db).await,
+            Self::Plans(q) => q.count(db).await,
         }
     }
 
+    #[must_use]
     pub fn apply_period_filter(self, period: &Period) -> Self {
         let Some((start, end)) = period.0 else {
             return self;

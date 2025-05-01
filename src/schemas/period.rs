@@ -8,6 +8,7 @@ use utoipa::ToSchema;
 #[cfg_attr(test, derive(serde::Deserialize))]
 pub struct Period(pub Option<(NaiveDateTime, NaiveDateTime)>);
 
+#[allow(clippy::fallible_impl_from)]
 impl From<&Query<FilterQuery>> for Period {
     fn from(value: &Query<FilterQuery>) -> Self {
         match (value.start_date, value.end_date) {

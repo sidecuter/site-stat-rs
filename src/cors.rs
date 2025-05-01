@@ -15,7 +15,6 @@ pub fn create_cors(config: &web::Data<AppConfig>) -> Cors {
         .allowed_methods(
             allowed_methods
                 .iter()
-                .filter_map(|method| Method::from_str(method).ok())
-                .collect::<Vec<_>>(),
+                .filter_map(|method| Method::from_str(method).ok()),
         )
 }

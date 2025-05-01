@@ -59,11 +59,11 @@ impl Display for Location {
             f,
             "{}",
             match self {
-                Location::CampusBS => "BS",
-                Location::CampusAV => "AV",
-                Location::CampusPR => "PR",
-                Location::CampusPK => "PK",
-                Location::CampusM => "M",
+                Self::CampusBS => "BS",
+                Self::CampusAV => "AV",
+                Self::CampusPR => "PR",
+                Self::CampusPK => "PK",
+                Self::CampusM => "M",
             }
         )
     }
