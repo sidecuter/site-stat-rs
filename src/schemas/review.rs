@@ -63,13 +63,14 @@ pub struct ReviewOut {
     pub creation_date: NaiveDateTime,
 }
 
+#[allow(clippy::fallible_impl_from)]
 impl From<String> for Problem {
     fn from(value: String) -> Self {
         match &value as &str {
-            "way" => Problem::Way,
-            "plan" => Problem::Plan,
-            "other" => Problem::Other,
-            "work" => Problem::Work,
+            "way" => Self::Way,
+            "plan" => Self::Plan,
+            "other" => Self::Other,
+            "work" => Self::Work,
             _ => panic!("Unexpected behavior"),
         }
     }
@@ -78,30 +79,38 @@ impl From<String> for Problem {
 impl Display for Problem {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let val = match self {
-            Problem::Way => String::from("way"),
-            Problem::Work => String::from("work"),
-            Problem::Plan => String::from("plan"),
-            Problem::Other => String::from("other"),
+            Self::Way => String::from("way"),
+            Self::Work => String::from("work"),
+            Self::Plan => String::from("plan"),
+            Self::Other => String::from("other"),
         };
-        write!(f, "{}", val)
+        write!(f, "{val}")
     }
 }
 
 impl ReviewFormIn {
     fn create_filename() -> String {
-        Uuid::new_v4().to_string().replace("-", "")
+        Uuid::new_v4().to_string().replace('-', "")
     }
 
-    fn get_file_ext(mimetype: Mime) -> Option<String> {
+    fn get_file_ext(mimetype: &Mime) -> Option<String> {
         static ALLOWED_TYPES: [&str; 5] = ["png", "jpeg", "heif", "gif", "webp"];
         match mimetype.subtype().as_str().to_lowercase() {
             filetype if filetype.len() <= 4 && ALLOWED_TYPES.contains(&filetype.as_str()) => {
-                Some(filetype.to_string())
+                Some(filetype)
             }
             _ => None,
         }
     }
 
+    /// Saves file if it valid
+    /// 
+    /// # Errors
+    /// 
+    /// Wrong mime, no mime, unsupported image type, Non utf-8 image name, IO errors
+    /// 
+    /// # Panics
+    /// It can't panic, cause unwrap used after check
     pub async fn save_image(self, config: &AppConfig) -> ApiResult<Option<String>> {
         Ok(if let Some(img) = self.image {
             if let Some(mime) = img.content_type.clone() {
@@ -116,7 +125,7 @@ impl ReviewFormIn {
                 ))?;
             }
             let img_id = Self::create_filename();
-            let img_ext = if let Some(img_ext) = Self::get_file_ext(img.content_type.unwrap()) {
+            let img_ext = if let Some(img_ext) = Self::get_file_ext(&img.content_type.unwrap()) {
                 img_ext
             } else {
                 Err(ApiError::UnsupportedMediaType(
@@ -128,7 +137,7 @@ impl ReviewFormIn {
                 .join(&config.files_dir)
                 .join(img_name.clone())
                 .to_str()
-                .ok_or(ApiError::UnprocessableData(
+                .ok_or_else(|| ApiError::UnprocessableData(
                     "File name is not a valid UTF-8 sequence".to_owned(),
                 ))?
                 .to_owned();
@@ -136,7 +145,7 @@ impl ReviewFormIn {
             web::block(move || {
                 if Path::new(&path).exists() {
                     std::fs::remove_file(path.clone())?;
-                };
+                }
                 let mut target_file = std::fs::File::create(path)?;
                 let mut img_file = img.file.reopen()?;
                 std::io::copy(&mut img_file, &mut target_file)

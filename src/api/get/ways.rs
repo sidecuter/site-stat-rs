@@ -40,7 +40,7 @@ async fn get_ways(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<StartWayOut>> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(StartWayOut::pagination(db.get_ref(), &data).await?)

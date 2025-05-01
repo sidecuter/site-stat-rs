@@ -8,6 +8,7 @@ where
     M: FromQueryResult + Sized + Send + Sync + 'db,
     Self: Serialize + Clone + From<M>,
 {
+    #[must_use]
     fn pagination(
         db: &DatabaseConnection,
         filter: &Filter,
@@ -20,7 +21,7 @@ where
             let items = pages.fetch_page(filter.page - 1).await?;
 
             Ok(Self::return_answer(
-                items.into_iter().map(|model| model.into()).collect(),
+                items.into_iter().map(Into::into).collect(),
                 filter,
                 total,
                 all_pages,
@@ -29,6 +30,8 @@ where
     }
 
     fn get_query(filter: &Filter) -> Select<E>;
+    
+    #[must_use]
     fn return_answer(items: Vec<Self>, data: &Filter, total: u64, pages: u64) -> Pagination<Self> {
         Pagination::new(items, data.page, data.size, total, pages)
     }

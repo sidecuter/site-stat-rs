@@ -40,7 +40,7 @@ async fn get_auds(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<SelectAuditoryOut>> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(SelectAuditoryOut::pagination(db.get_ref(), &data).await?)

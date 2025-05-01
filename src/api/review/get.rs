@@ -40,7 +40,7 @@ async fn get_reviews(
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Pagination<ReviewOut>> {
     match data.validate() {
-        Ok(_) => Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
     Ok(ReviewOut::pagination(db.get_ref(), &data).await?)

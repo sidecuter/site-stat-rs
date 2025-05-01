@@ -30,7 +30,7 @@ fn default_front_dir() -> String {
     String::from("web")
 }
 
-fn default_refresh() -> u64 {
+const fn default_refresh() -> u64 {
     600
 }
 
@@ -65,6 +65,8 @@ impl Default for AppConfig {
 }
 
 impl AppConfig {
+    #[allow(clippy::missing_panics_doc)]
+    #[must_use]
     pub fn new() -> Self {
         Config::builder()
             .add_source(
@@ -81,18 +83,22 @@ impl AppConfig {
             .expect("Invalid config types")
     }
 
+    #[must_use]
     pub fn get_base_path(&self) -> PathBuf {
         Path::new(&self.static_path).to_path_buf()
     }
 
+    #[must_use]
     pub fn get_files_path(&self) -> PathBuf {
         Path::new(&self.static_path).join(&self.files_dir)
     }
 
+    #[must_use]
     pub fn get_front_path(&self) -> PathBuf {
         Path::new(&self.static_path).join(&self.front_dir)
     }
 
+    #[must_use]
     pub fn get_addr(&self) -> String {
         format!("{}:{}", self.host, self.port)
     }

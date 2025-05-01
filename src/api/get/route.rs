@@ -5,6 +5,7 @@ use crate::schemas::graph::ShortestWay;
 use crate::schemas::Status;
 use actix_web::{get, web};
 
+#[allow(clippy::significant_drop_tightening)]
 #[utoipa::path(
     get,
     path = "/api/get/route",
@@ -67,13 +68,13 @@ async fn get_route(
     let graphs_lock = app_state.data_entry.lock()?;
     let graph = graphs_lock
         .get(&query.loc.to_string())
-        .ok_or(ApiError::InternalError(
+        .ok_or_else(|| ApiError::InternalError(
             "Campus is not available now".to_string(),
         ))?;
     if !graph.has_vertex(&query.from_p) || !graph.has_vertex(&query.to_p) {
         Err(ApiError::NotFound(
             "You are trying to get a route along non-existent vertex".to_string(),
-        ))?
+        ))?;
     }
     Ok(graph.get_shortest_way_from_to(&query.from_p, &query.to_p))
 }

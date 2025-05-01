@@ -22,7 +22,7 @@ impl<T: Responder + From<W>, W: ModelTrait> ConversionTrait<T> for Result<W, DbE
             tracing::error!("{e}");
             e.into()
         })
-        .map(|v| v.into())
+        .map(Into::into)
     }
 }
 
