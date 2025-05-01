@@ -178,7 +178,7 @@ impl Graph {
     pub fn has_vertex(&self, id: &str) -> bool {
         self.vertexes.contains_key(id)
     }
-    
+
     #[allow(clippy::cast_possible_truncation)]
     pub fn get_shortest_way_from_to(&self, start: &str, end: &str) -> ShortestWay {
         let start_time = Instant::now();

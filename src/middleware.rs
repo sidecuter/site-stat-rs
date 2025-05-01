@@ -11,7 +11,7 @@ use actix_web::{
 
 #[allow(clippy::doc_markdown)]
 /// Check for api key in request headers
-/// 
+///
 /// # Errors
 /// ApiKey in request don't match ApiKey in config
 #[allow(clippy::future_not_send)]

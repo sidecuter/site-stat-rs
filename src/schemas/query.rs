@@ -25,7 +25,7 @@ impl Query {
     }
 
     /// Counts statistics for specified endpoint
-    /// 
+    ///
     /// # Errors
     /// db errors
     pub async fn count(

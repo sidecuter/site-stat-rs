@@ -104,11 +104,11 @@ impl ReviewFormIn {
     }
 
     /// Saves file if it valid
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Wrong mime, no mime, unsupported image type, Non utf-8 image name, IO errors
-    /// 
+    ///
     /// # Panics
     /// It can't panic, cause unwrap used after check
     pub async fn save_image(self, config: &AppConfig) -> ApiResult<Option<String>> {
@@ -137,9 +137,11 @@ impl ReviewFormIn {
                 .join(&config.files_dir)
                 .join(img_name.clone())
                 .to_str()
-                .ok_or_else(|| ApiError::UnprocessableData(
-                    "File name is not a valid UTF-8 sequence".to_owned(),
-                ))?
+                .ok_or_else(|| {
+                    ApiError::UnprocessableData(
+                        "File name is not a valid UTF-8 sequence".to_owned(),
+                    )
+                })?
                 .to_owned();
             tracing::info!("saving to {path}");
             web::block(move || {

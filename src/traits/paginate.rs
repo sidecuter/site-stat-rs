@@ -30,7 +30,7 @@ where
     }
 
     fn get_query(filter: &Filter) -> Select<E>;
-    
+
     #[must_use]
     fn return_answer(items: Vec<Self>, data: &Filter, total: u64, pages: u64) -> Pagination<Self> {
         Pagination::new(items, data.page, data.size, total, pages)

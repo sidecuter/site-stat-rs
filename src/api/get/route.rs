@@ -68,9 +68,7 @@ async fn get_route(
     let graphs_lock = app_state.data_entry.lock()?;
     let graph = graphs_lock
         .get(&query.loc.to_string())
-        .ok_or_else(|| ApiError::InternalError(
-            "Campus is not available now".to_string(),
-        ))?;
+        .ok_or_else(|| ApiError::InternalError("Campus is not available now".to_string()))?;
     if !graph.has_vertex(&query.from_p) || !graph.has_vertex(&query.to_p) {
         Err(ApiError::NotFound(
             "You are trying to get a route along non-existent vertex".to_string(),

@@ -56,7 +56,7 @@ pub struct PlanData {
 }
 
 /// Parsing row data to `DataEntries`
-/// 
+///
 /// # Errors
 /// Parsing and network errors
 pub async fn parse_data(url: &str) -> Result<DataEntry, Box<dyn std::error::Error>> {
@@ -141,7 +141,7 @@ fn parse_plans(plans_dto: &[PlanDto], corpuses: &[Arc<CorpusData>]) -> Vec<Arc<P
 }
 
 /// Fetch data from network resourse
-/// 
+///
 /// # Errors
 /// Parsing and network errors
 pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>> {
@@ -159,7 +159,7 @@ pub async fn fetch_data(url: &str) -> Result<DataDto, Box<dyn std::error::Error>
 }
 
 /// Loads graph from resource
-/// 
+///
 /// # Errors
 /// Network errors, parsing errors
 pub async fn get_graphs() -> Result<HashMap<String, Graph>, Box<dyn std::error::Error>> {
