@@ -17,12 +17,13 @@ pub async fn start_data_refresh_task(state: web::Data<AppStateMutable>, interval
     }
 }
 
-#[allow(clippy::significant_drop_tightening)]
 async fn refresh_data(
     state: &web::Data<AppStateMutable>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let new_entry = get_graphs().await?;
-    let mut entry = state.data_entry.lock().map_err(|v| format!("{v}"))?;
-    *entry = new_entry;
+    {
+        let mut entry = state.data_entry.lock().map_err(|v| format!("{v}"))?;
+        *entry = new_entry;
+    }
     Ok(())
 }
