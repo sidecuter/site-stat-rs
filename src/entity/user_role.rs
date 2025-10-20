@@ -3,44 +3,43 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "change_plan")]
+#[sea_orm(table_name = "user_role")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
-    pub user_id: Uuid,
-    pub visit_date: DateTime,
-    pub plan_id: String,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub user_id: i32,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub role_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::plan::Entity",
-        from = "Column::PlanId",
-        to = "super::plan::Column::Id",
+        belongs_to = "super::role::Entity",
+        from = "Column::RoleId",
+        to = "super::role::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Plan,
+    Role,
     #[sea_orm(
-        belongs_to = "super::user_id::Entity",
+        belongs_to = "super::user::Entity",
         from = "Column::UserId",
-        to = "super::user_id::Column::UserId",
+        to = "super::user::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    UserId,
+    User,
 }
 
-impl Related<super::plan::Entity> for Entity {
+impl Related<super::role::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Plan.def()
+        Relation::Role.def()
     }
 }
 
-impl Related<super::user_id::Entity> for Entity {
+impl Related<super::user::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::UserId.def()
+        Relation::User.def()
     }
 }
 
