@@ -21,6 +21,8 @@ use utoipa::OpenApi;
         crate::api::review::add::add_review,
         crate::api::review::get::get_reviews,
         crate::api::review::image::get_image,
+        // Auth routes
+        crate::api::auth::login::login,
     ),
     components (
         schemas (
@@ -44,13 +46,16 @@ use utoipa::OpenApi;
             crate::schemas::period::Period,
             crate::schemas::graph::VertexType,
             crate::schemas::graph::Vertex,
-            crate::schemas::graph::ShortestWay
+            crate::schemas::graph::ShortestWay,
+            crate::schemas::login_request::LoginRequest,
+            crate::schemas::token::TokenResponse
         )
     ),
     tags (
         (name = "Get", description = "Getters for content"),
         (name = "Stat", description = "Statistics insertion endpoints"),
         (name = "Review", description = "Endpoint for reviews"),
+        (name = "Auth", description = "Endpoints for authentication"),
     ),
 )]
 pub struct ApiDoc;
