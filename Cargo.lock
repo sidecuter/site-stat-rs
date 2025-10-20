@@ -3583,7 +3583,6 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "argon2",
- "base64",
  "bincode",
  "chrono",
  "config",
