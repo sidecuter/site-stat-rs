@@ -15,6 +15,7 @@ pub mod start_way;
 pub mod stats;
 pub mod status;
 pub mod token;
+pub mod user;
 pub mod user_id;
 pub(crate) mod validators;
 
@@ -33,5 +34,6 @@ pub use self::{
     stats::Statistics,
     status::Status,
     token::TokenResponse,
+    user::UserResp,
     user_id::UserId,
 };
