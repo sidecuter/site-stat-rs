@@ -30,6 +30,10 @@ fn default_front_dir() -> String {
     String::from("web")
 }
 
+fn default_jwt_token() -> String {
+    String::from("524c9b6806b8f7ae95c56747d35432c7")
+}
+
 const fn default_refresh() -> u64 {
     600
 }
@@ -56,6 +60,8 @@ pub struct AppConfig {
     pub allowed_methods: Option<Vec<String>>,
     #[serde(default = "default_refresh")]
     pub data_refresh_interval: u64,
+    #[serde(default = "default_jwt_token")]
+    pub jwt_token: String
 }
 
 impl Default for AppConfig {

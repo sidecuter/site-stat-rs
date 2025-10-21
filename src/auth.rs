@@ -10,6 +10,8 @@ use argon2::{
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
+use crate::config::AppConfig;
+use crate::traits::EntityId;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
@@ -57,7 +59,7 @@ pub async fn authenticate_user(
     }
 }
 
-pub fn create_token(user_id: i32) -> ApiResult<String> {
+pub fn create_token(user_id: i32, jwt_token: &String) -> ApiResult<String> {
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_err(|_| ApiError::InternalError("Invalid time".to_string()))?
@@ -73,7 +75,7 @@ pub fn create_token(user_id: i32) -> ApiResult<String> {
     let token = encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret("asdasd".as_bytes()),
+        &EncodingKey::from_secret(jwt_token.as_bytes()),
     )?;
     Ok(token)
 }
@@ -90,6 +92,7 @@ async fn get_current_user(db_conn: &DatabaseConnection, user_id: i32) -> ApiResu
 async fn func_helper(
     auth_header_value: String,
     db_conn: Arc<DatabaseConnection>,
+    jwt_token: String
 ) -> ApiResult<CurrentUser> {
     let bearer_token: Vec<&str> = auth_header_value.split_whitespace().collect();
     if bearer_token[0] != "Bearer" {
@@ -101,7 +104,7 @@ async fn func_helper(
     let validation = Validation::default();
     let token_data = decode::<Claims>(
         token,
-        &DecodingKey::from_secret("asdasd".as_bytes()),
+        &DecodingKey::from_secret(jwt_token.as_bytes()),
         &validation,
     )
     .map_err(|_| ApiError::InvalidToken)?;
@@ -122,7 +125,7 @@ impl FromRequest for CurrentUser {
     type Error = ApiError;
     type Future = std::pin::Pin<Box<dyn futures::Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(req: &HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+    fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
         let auth_header = req
             .headers()
             .get(actix_web::http::header::AUTHORIZATION)
@@ -137,6 +140,11 @@ impl FromRequest for CurrentUser {
             }
         };
 
+        let jwt_token = req
+            .app_data::<web::Data<AppConfig>>()
+            .map(|v| v.jwt_token.clone())
+            .ok_or(ApiError::InternalError("Can't get jwt secret".to_string()))?;
+
         let db_conn = req
             .app_data::<web::Data<DatabaseConnection>>()
             .cloned()
@@ -148,6 +156,6 @@ impl FromRequest for CurrentUser {
                 return Box::pin(async move { Err(e) });
             }
         };
-        Box::pin(func_helper(auth_header_value, Arc::clone(&db_conn)))
+        Box::pin(func_helper(auth_header_value, Arc::clone(&db_conn), jwt_token))
     }
 }
