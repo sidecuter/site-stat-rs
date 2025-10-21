@@ -18,6 +18,8 @@ pub mod token;
 pub mod user;
 pub mod user_id;
 pub(crate) mod validators;
+pub(crate) mod rights;
+pub(crate) mod goals;
 
 pub use self::{
     change_plan::{ChangePlanIn, ChangePlanOut},
