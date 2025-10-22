@@ -14,6 +14,7 @@ mod m20250323_195737_create_problem_table;
 mod m20250323_200124_populate_problem_table;
 mod m20250323_200126_create_review_table;
 mod m20251018_061409_add_user_auth_related_models;
+mod m20251022_211300_populate_auth_related_tables;
 
 pub struct Migrator;
 
@@ -34,6 +35,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250323_200124_populate_problem_table::Migration),
             Box::new(m20250323_200126_create_review_table::Migration),
             Box::new(m20251018_061409_add_user_auth_related_models::Migration),
+            Box::new(m20251022_211300_populate_auth_related_tables::Migration),
         ]
     }
 }
