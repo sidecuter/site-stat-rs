@@ -9,7 +9,6 @@ pub struct Migration;
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-        // Replace the sample below with your own migration scripts
         let mut insert = Query::insert()
             .into_table(Problem::Table)
             .columns([Problem::Id])
