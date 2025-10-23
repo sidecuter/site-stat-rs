@@ -1,7 +1,7 @@
 #![allow(clippy::clone_on_copy)]
 
 use crate::config::AppConfig;
-use crate::entity::user_id;
+use crate::entity::user_ids;
 use crate::errors::ApiResult;
 use crate::schemas::review::ReviewFormIn;
 use crate::schemas::{ReviewIn, Status};
@@ -40,7 +40,7 @@ async fn add_review(
     MultipartForm(data): MultipartForm<ReviewFormIn>,
     db: web::Data<DatabaseConnection>,
 ) -> ApiResult<Status> {
-    user_id::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
+    user_ids::Entity::filter(data.user_id.clone(), db.get_ref(), "User".to_string()).await?;
     let mut review_in = ReviewIn {
         user_id: data.user_id.clone(),
         text: data.text.clone(),

@@ -1,4 +1,4 @@
-use crate::entity::{aud, user_id};
+use crate::entity::{aud, user_ids};
 use crate::errors::{ApiError, ApiResult};
 use crate::middleware::build_rate_limits;
 use crate::schemas::{SelectAuditoryIn, Status};
@@ -48,7 +48,7 @@ async fn stat_aud(
         Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
-    user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
+    user_ids::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     aud::Entity::filter(
         data.auditory_id.clone(),
         db.get_ref(),

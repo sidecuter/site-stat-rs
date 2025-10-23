@@ -1,4 +1,4 @@
-use crate::entity::{change_plan, select_aud, site_stat, start_way, user_id};
+use crate::entity::{change_plan, select_aud, site_stat, start_way, user_ids};
 use crate::schemas::{Period, Statistics, Target};
 use crate::{build_query, filter_visit};
 use sea_orm::{
@@ -37,14 +37,14 @@ impl Query {
 
         let subquery = self.generate_query();
         let base_query =
-            user_id::Entity::find().filter(user_id::Column::UserId.in_subquery(subquery));
+            user_ids::Entity::find().filter(user_ids::Column::UserId.in_subquery(subquery));
 
         let visitors = base_query.clone().count(db).await?;
 
         let unique_query = match period {
             Period(Some((start, end))) => base_query
                 .clone()
-                .filter(user_id::Column::CreationDate.between(*start, *end)),
+                .filter(user_ids::Column::CreationDate.between(*start, *end)),
             _ => base_query.clone(),
         };
 
