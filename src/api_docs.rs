@@ -49,26 +49,21 @@ impl Modify for Security {
             crate::schemas::status::Status,
             crate::schemas::UserId,
             crate::schemas::SiteStatisticsIn,
-            crate::schemas::SiteStatisticsOut,
             crate::schemas::SelectAuditoryIn,
-            crate::schemas::SelectAuditoryOut,
             crate::schemas::StartWayIn,
-            crate::schemas::StartWayOut,
             crate::schemas::ChangePlanIn,
-            crate::schemas::ChangePlanOut,
-            crate::schemas::Filter,
             crate::schemas::Target,
             crate::schemas::FilterQuery,
             crate::schemas::stats::Statistics,
             crate::schemas::review::ReviewFormIn,
-            crate::schemas::review::ReviewOut,
             crate::schemas::popular::Popular,
             crate::schemas::period::Period,
             crate::schemas::graph::VertexType,
             crate::schemas::graph::Vertex,
             crate::schemas::graph::ShortestWay,
             crate::schemas::login_request::LoginRequest,
-            crate::schemas::token::TokenResponse
+            crate::schemas::token::TokenResponse,
+            crate::schemas::login_request::LoginRequest
         )
     ),
     tags (
