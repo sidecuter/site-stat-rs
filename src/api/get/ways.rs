@@ -32,6 +32,9 @@ use validator::Validate;
             example = json!(Status{status: "internal error".to_string()})
         )
     ),
+    security(
+        ("oauth2_bearer" = ["view::stats"])
+    ),
     tag = "Get"
 )]
 #[get("/ways")]
