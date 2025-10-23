@@ -4,7 +4,7 @@ version = "1.0.0"
 edition = "2021"
 
 [workspace]
-members = [".", "migration"]
+members = [".", "migration", "admin_control"]
 
 [dependencies]
 actix-web = "4.11.0"
