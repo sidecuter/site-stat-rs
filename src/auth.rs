@@ -178,7 +178,7 @@ fn extractor(req: &HttpRequest) -> ApiResult<(String, Arc<DatabaseConnection>, S
 
     let jwt_secret = req
         .app_data::<web::Data<AppConfig>>()
-        .map(|v| v.jwt_token.clone())
+        .map(|v| v.jwt_secret.clone())
         .ok_or(ApiError::InternalError("Can't get jwt secret".to_string()))?;
 
     let db_conn = req

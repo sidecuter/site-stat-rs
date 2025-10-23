@@ -36,7 +36,7 @@ async fn token(
     let user = authenticate_user(&db_conn, &login_data.username, &login_data.password).await?;
 
     if let Some(user) = user {
-        let token = create_token(user.id, &config.jwt_token)?;
+        let token = create_token(user.id, &config.jwt_secret)?;
         Ok(TokenResponse {
             access_token: token,
             token_type: "bearer".to_string(),
