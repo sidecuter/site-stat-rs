@@ -60,4 +60,3 @@ impl Related<super::role::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-

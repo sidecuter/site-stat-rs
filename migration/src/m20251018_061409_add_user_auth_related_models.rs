@@ -83,7 +83,7 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(User::Id))
                     .col(string(User::Login))
                     .col(string(User::Hash))
-                    .col(string(User::Token).null())
+                    .col(ColumnDef::new(User::Token).string().null())
                     .col(boolean(User::IsActive))
                     .to_owned(),
             )

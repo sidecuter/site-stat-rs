@@ -9,7 +9,7 @@ pub struct Model {
     pub id: i32,
     pub login: String,
     pub hash: String,
-    pub token: String,
+    pub token: Option<String>,
     pub is_active: bool,
 }
 
@@ -35,4 +35,3 @@ impl Related<super::role::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-

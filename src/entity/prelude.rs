@@ -15,4 +15,3 @@ pub use super::start_way::Entity as StartWay;
 pub use super::user::Entity as User;
 pub use super::user_id::Entity as UserId;
 pub use super::user_role::Entity as UserRole;
-

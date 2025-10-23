@@ -23,4 +23,3 @@ impl Related<super::role_right_goal::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-
