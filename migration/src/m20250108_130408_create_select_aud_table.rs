@@ -1,4 +1,4 @@
-use crate::m20220101_000001_create_table::UserId;
+use crate::m20220101_000001_create_table::UserIds;
 use crate::m20250108_120158_create_auds_table::Aud;
 use sea_orm_migration::{prelude::*, schema::*};
 
@@ -30,7 +30,7 @@ impl MigrationTrait for Migration {
                     .foreign_key(
                         ForeignKey::create()
                             .from(SelectAud::Table, SelectAud::UserId)
-                            .to(UserId::Table, UserId::UserId)
+                            .to(UserIds::Table, UserIds::UserId)
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
