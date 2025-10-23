@@ -15,7 +15,7 @@ pub mod select_aud;
 pub mod site_stat;
 pub mod start_way;
 pub mod user;
-pub mod user_id;
+pub mod user_ids;
 pub mod user_role;
 
 seaography::register_entity_modules!([
@@ -32,6 +32,6 @@ seaography::register_entity_modules!([
     site_stat,
     start_way,
     user,
-    user_id,
+    user_ids,
     user_role,
 ]);

@@ -32,18 +32,18 @@ pub enum Relation {
     )]
     Aud1,
     #[sea_orm(
-        belongs_to = "super::user_id::Entity",
+        belongs_to = "super::user_ids::Entity",
         from = "Column::UserId",
-        to = "super::user_id::Column::UserId",
+        to = "super::user_ids::Column::UserId",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    UserId,
+    UserIds,
 }
 
-impl Related<super::user_id::Entity> for Entity {
+impl Related<super::user_ids::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::UserId.def()
+        Relation::UserIds.def()
     }
 }
 
@@ -55,6 +55,6 @@ pub enum RelatedEntity {
     Aud2,
     #[sea_orm(entity = "super::aud::Entity", def = "Relation::Aud1.def()")]
     Aud1,
-    #[sea_orm(entity = "super::user_id::Entity")]
-    UserId,
+    #[sea_orm(entity = "super::user_ids::Entity")]
+    UserIds,
 }
