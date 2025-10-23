@@ -45,6 +45,9 @@ impl Modify for Security {
         crate::api::review::image::get_image,
         // Auth routes
         crate::api::auth::login::token,
+        // Graphql routes
+        crate::api::graphql::index::index,
+        crate::api::graphql::playground::graphql_playground,
     ),
     components (
         schemas (
