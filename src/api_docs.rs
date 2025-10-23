@@ -1,6 +1,6 @@
 use serde::Serialize;
 use utoipa::openapi::security::{
-    Flow, HttpAuthScheme, HttpBuilder, OAuth2, Password, Scopes, SecurityScheme,
+    Flow, OAuth2, Password, Scopes, SecurityScheme,
 };
 use utoipa::{Modify, OpenApi};
 
@@ -10,15 +10,6 @@ struct Security;
 impl Modify for Security {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
         if let Some(schema) = openapi.components.as_mut() {
-            schema.add_security_scheme(
-                "api_key",
-                SecurityScheme::Http(
-                    HttpBuilder::new()
-                        .scheme(HttpAuthScheme::Bearer)
-                        .bearer_format("JWT")
-                        .build(),
-                ),
-            );
             schema.add_security_scheme(
                 "oauth2_bearer",
                 SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
