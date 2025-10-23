@@ -83,7 +83,7 @@ impl MigrationTrait for Migration {
                     .col(pk_auto(User::Id))
                     .col(string(User::Login))
                     .col(string(User::Hash))
-                    .col(string(User::Token).null())
+                    .col(ColumnDef::new(User::Token).string().null())
                     .col(boolean(User::IsActive))
                     .to_owned(),
             )
@@ -141,28 +141,28 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-enum Goal {
+pub enum Goal {
     Table,
     Id,
     Name,
 }
 
 #[derive(DeriveIden)]
-enum Right {
+pub enum Right {
     Table,
     Id,
     Name,
 }
 
 #[derive(DeriveIden)]
-enum Role {
+pub enum Role {
     Table,
     Id,
     Name,
 }
 
 #[derive(DeriveIden)]
-enum RoleRightGoal {
+pub enum RoleRightGoal {
     Table,
     RoleId,
     RightId,
@@ -170,7 +170,7 @@ enum RoleRightGoal {
 }
 
 #[derive(DeriveIden)]
-enum User {
+pub enum User {
     Table,
     Id,
     Login,
@@ -180,7 +180,7 @@ enum User {
 }
 
 #[derive(DeriveIden)]
-enum UserRole {
+pub enum UserRole {
     Table,
     UserId,
     RoleId,

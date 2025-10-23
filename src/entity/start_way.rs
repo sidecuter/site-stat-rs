@@ -48,4 +48,3 @@ impl Related<super::user_id::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-

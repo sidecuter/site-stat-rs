@@ -1,6 +1,8 @@
 use crate::api::get::stat::get_stat;
+use crate::config::AppConfig;
 use crate::schemas::{FilterQuery, Target};
 use crate::tests::db::FillDb;
+use crate::tests::fixtures::jwt_token;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use chrono::NaiveDate;
@@ -41,13 +43,16 @@ async fn test_200_get_stat(
     #[case] target: Target,
     #[case] start_date: Option<NaiveDate>,
     #[case] end_date: Option<NaiveDate>,
+    jwt_token: &String,
 ) {
     let db = Data::new(
         MockDatabase::new(DbBackend::Sqlite)
+            .add_user_roles()
             .add_count(3)
             .into_connection(),
     );
-    let app = test::init_service(App::new().app_data(db).service(get_stat)).await;
+    let config = Data::new(AppConfig::new());
+    let app = test::init_service(App::new().app_data(db).app_data(config).service(get_stat)).await;
     let query = FilterQuery {
         target,
         start_date,
@@ -56,6 +61,7 @@ async fn test_200_get_stat(
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/stat?{query}"))
+        .insert_header(("Authorization", format!("Bearer {}", jwt_token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), 200);

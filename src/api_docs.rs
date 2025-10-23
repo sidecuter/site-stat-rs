@@ -1,7 +1,29 @@
-use utoipa::OpenApi;
+use serde::Serialize;
+use utoipa::openapi::security::{
+    Flow, OAuth2, Password, Scopes, SecurityScheme,
+};
+use utoipa::{Modify, OpenApi};
+
+#[derive(Debug, Serialize)]
+struct Security;
+
+impl Modify for Security {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        if let Some(schema) = openapi.components.as_mut() {
+            schema.add_security_scheme(
+                "oauth2_bearer",
+                SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
+                    "http://localhost:8080/api/auth/token",
+                    Scopes::new(),
+                ))])),
+            );
+        }
+    }
+}
 
 #[derive(OpenApi)]
 #[openapi(
+    modifiers(&Security),
     paths(
         // Get routes
         crate::api::get::user_id::get_user_id,
@@ -22,7 +44,7 @@ use utoipa::OpenApi;
         crate::api::review::get::get_reviews,
         crate::api::review::image::get_image,
         // Auth routes
-        crate::api::auth::login::login,
+        crate::api::auth::login::token,
     ),
     components (
         schemas (

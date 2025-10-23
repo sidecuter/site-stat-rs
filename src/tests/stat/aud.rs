@@ -14,7 +14,7 @@ async fn test_200_stat_aud_endpoint() {
         MockDatabase::new(DbBackend::Sqlite)
             .add_user_id()
             .add_aud(1)
-            .add_select_add()
+            .add_select_aud()
             .add_exec_row()
             .into_connection(),
     );

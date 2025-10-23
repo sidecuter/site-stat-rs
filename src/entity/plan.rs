@@ -22,4 +22,3 @@ impl Related<super::change_plan::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-
