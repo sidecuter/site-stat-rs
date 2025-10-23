@@ -4,13 +4,12 @@ use crate::config::AppConfig;
 use crate::schemas::{
     ChangePlanOut, Filter, Pagination, ReviewOut, SelectAuditoryOut, SiteStatisticsOut, StartWayOut,
 };
-use crate::tests::db::FillDb;
+use crate::tests::fixtures::{jwt_token, prepare_connection};
 use actix_web::web::Data;
 use actix_web::{test, web, App};
 use rstest::*;
-use sea_orm::{DatabaseConnection, DbBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 use std::fmt::{Display, Formatter};
-use crate::tests::fixtures::jwt_token;
 
 #[derive(Copy, Clone)]
 enum Endpoint {
@@ -45,20 +44,6 @@ pub fn get_service(cfg: &mut web::ServiceConfig) {
     );
 }
 
-fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
-    let mut mock = MockDatabase::new(DbBackend::Sqlite)
-        .add_user_roles()
-        .add_count(2);
-    mock = match endpoint {
-        Endpoint::Sites => mock.add_site(),
-        Endpoint::Auds => mock.add_select_aud(),
-        Endpoint::Ways => mock.add_start_way(),
-        Endpoint::Plans => mock.add_change_plan(),
-        Endpoint::Reviews => mock.add_review(),
-    };
-    Data::new(mock.into_connection())
-}
-
 #[rstest]
 #[case::site_ok(Endpoint::Sites, false)]
 #[case::auds_ok(Endpoint::Auds, false)]
@@ -71,8 +56,15 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
 #[case::plans_filter(Endpoint::Plans, true)]
 #[case::reviews_filter(Endpoint::Reviews, true)]
 #[actix_web::test]
-async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool, jwt_token: &String) {
-    let db = get_db_filled(endpoint);
+async fn test_200_get(
+    #[case] endpoint: Endpoint,
+    #[case] filter: bool,
+    jwt_token: &String,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
@@ -93,10 +85,7 @@ async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool, jwt_toke
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
-        .insert_header((
-            "Authorization",
-            format!("Bearer {}", jwt_token),
-        ))
+        .insert_header(("Authorization", format!("Bearer {}", jwt_token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), 200);
@@ -109,8 +98,14 @@ async fn test_200_get(#[case] endpoint: Endpoint, #[case] filter: bool, jwt_toke
 #[case::plans_validation(Endpoint::Plans)]
 #[case::reviews_validation(Endpoint::Reviews)]
 #[actix_web::test]
-async fn test_422_get(#[case] endpoint: Endpoint, jwt_token: &String) {
-    let db = get_db_filled(endpoint);
+async fn test_422_get(
+    #[case] endpoint: Endpoint,
+    jwt_token: &String,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
@@ -127,10 +122,7 @@ async fn test_422_get(#[case] endpoint: Endpoint, jwt_token: &String) {
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
-        .insert_header((
-            "Authorization",
-            format!("Bearer {}", jwt_token),
-        ))
+        .insert_header(("Authorization", format!("Bearer {}", jwt_token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
     assert_eq!(resp.status().as_u16(), 422);
@@ -143,8 +135,13 @@ async fn test_422_get(#[case] endpoint: Endpoint, jwt_token: &String) {
 #[case::plans_notallowed(Endpoint::Plans)]
 #[case::reviews_notallowed(Endpoint::Reviews)]
 #[actix_web::test]
-async fn test_403_get(#[case] endpoint: Endpoint) {
-    let db = get_db_filled(endpoint);
+async fn test_403_get(
+    #[case] endpoint: Endpoint,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
@@ -173,8 +170,14 @@ async fn test_403_get(#[case] endpoint: Endpoint) {
 #[case::plans(Endpoint::Plans)]
 #[case::plans(Endpoint::Reviews)]
 #[actix_web::test]
-async fn check_value(#[case] endpoint: Endpoint, jwt_token: &String) {
-    let db = get_db_filled(endpoint);
+async fn check_value(
+    #[case] endpoint: Endpoint,
+    jwt_token: &String,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let config = Data::new(AppConfig::new());
     let app = test::init_service(
         App::new()
@@ -191,10 +194,7 @@ async fn check_value(#[case] endpoint: Endpoint, jwt_token: &String) {
     let query = serde_qs::to_string(&query).unwrap();
     let req = test::TestRequest::get()
         .uri(&format!("/{endpoint}?{query}"))
-        .insert_header((
-            "Authorization",
-            format!("Bearer {}", jwt_token),
-        ))
+        .insert_header(("Authorization", format!("Bearer {}", jwt_token)))
         .to_request();
     match endpoint {
         Endpoint::Sites => {

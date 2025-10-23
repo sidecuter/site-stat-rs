@@ -1,25 +1,22 @@
 use crate::api::stat::way::stat_way;
 use crate::schemas::StartWayIn;
-use crate::tests::db::{get_db, FillDb};
+use crate::tests::fixtures::prepare_connection;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 
 #[rstest]
 #[actix_web::test]
-async fn test_200_stat_way() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_aud(2)
-            .add_start_way()
-            .add_exec_row()
-            .into_connection(),
-    );
+async fn test_200_stat_way(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
-        user_id: Default::default(),
+        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
         start_id: "a-100".to_string(),
         end_id: "a-101".to_string(),
     };
@@ -33,12 +30,12 @@ async fn test_200_stat_way() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_stat_way_user() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_stat_way_user(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
         user_id: Default::default(),
@@ -55,17 +52,16 @@ async fn test_404_stat_way_user() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_stat_way_start() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_stat_way_start(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
-        user_id: Default::default(),
-        start_id: "a-100".to_string(),
+        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
+        start_id: "a-1000".to_string(),
         end_id: "a-101".to_string(),
     };
     let req = test::TestRequest::put()
@@ -78,19 +74,17 @@ async fn test_404_stat_way_start() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_stat_way_end() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_aud(1)
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_stat_way_end(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
-        user_id: Default::default(),
+        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
         start_id: "a-100".to_string(),
-        end_id: "a-101".to_string(),
+        end_id: "a-1010".to_string(),
     };
     let req = test::TestRequest::put()
         .uri("/start-way")
@@ -102,8 +96,13 @@ async fn test_404_stat_way_end() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_422_stat_way_endpoint() {
-    let app = test::init_service(App::new().app_data(get_db()).service(stat_way)).await;
+async fn test_422_stat_way_endpoint(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
+    let app = test::init_service(App::new().app_data(db).service(stat_way)).await;
     let payload = StartWayIn {
         user_id: Default::default(),
         start_id: "a-101".into(),

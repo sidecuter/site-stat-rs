@@ -1,26 +1,23 @@
 use crate::api::stat::aud::stat_aud;
 use crate::schemas::SelectAuditoryIn;
-use crate::tests::db::{get_db, FillDb};
+use crate::tests::fixtures::prepare_connection;
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 use std::net::{IpAddr, SocketAddr};
 
 #[rstest]
 #[actix_web::test]
-async fn test_200_stat_aud_endpoint() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_aud(1)
-            .add_select_aud()
-            .add_exec_row()
-            .into_connection(),
-    );
+async fn test_200_stat_aud_endpoint(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
-        user_id: Default::default(),
+        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
         auditory_id: "a-100".to_string(),
         success: true,
     };
@@ -35,12 +32,12 @@ async fn test_200_stat_aud_endpoint() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_stat_aud_endpoint_user() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_stat_aud_endpoint_user(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: Default::default(),
@@ -58,17 +55,16 @@ async fn test_404_stat_aud_endpoint_user() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_stat_aud_endpoint_aud() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_stat_aud_endpoint_aud(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
-        user_id: Default::default(),
-        auditory_id: "a-100".to_string(),
+        user_id: uuid::Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec").unwrap(),
+        auditory_id: "a-1000".to_string(),
         success: true,
     };
     let req = test::TestRequest::put()
@@ -82,8 +78,13 @@ async fn test_404_stat_aud_endpoint_aud() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_429_stat_aud_endpoint() {
-    let app = test::init_service(App::new().app_data(get_db()).service(stat_aud)).await;
+async fn test_429_stat_aud_endpoint(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
+    let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: Default::default(),
         auditory_id: "a-".into(),
@@ -103,8 +104,13 @@ async fn test_429_stat_aud_endpoint() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_422_stat_aud_endpoint() {
-    let app = test::init_service(App::new().app_data(get_db()).service(stat_aud)).await;
+async fn test_422_stat_aud_endpoint(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
+    let app = test::init_service(App::new().app_data(db).service(stat_aud)).await;
     let payload = SelectAuditoryIn {
         user_id: Default::default(),
         auditory_id: "a-".into(),

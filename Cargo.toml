@@ -43,7 +43,4 @@ mockito = "1.7.0"
 rstest = "0.26.1"
 serde_qs = "0.15.0"
 rand = "0.9.2"
-
-[dev-dependencies.sea-orm]
-version = "1.1.17"
-features = ["mock"]
+migration = { path = "migration" }

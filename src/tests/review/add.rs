@@ -2,23 +2,21 @@ use super::super::helpers::{generate_multipart_payload, prepare_tmp_dir, BLACK_1
 use crate::api::review::add;
 use crate::config::AppConfig;
 use crate::schemas::Problem;
-use crate::tests::db::FillDb;
+use crate::tests::fixtures::prepare_connection;
 use actix_web::web::{Bytes, Data};
 use actix_web::{test, App};
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 use std::fs;
 
 #[rstest]
 #[actix_web::test]
-async fn test_200_add_review() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_review()
-            .add_exec_row()
-            .into_connection(),
-    );
+async fn test_200_add_review(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(
         App::new()
             .app_data(db)
@@ -45,15 +43,13 @@ async fn test_200_add_review() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_200_add_review_with_image() {
+async fn test_200_add_review_with_image(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
     let filepath = prepare_tmp_dir();
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .add_review()
-            .add_exec_row()
-            .into_connection(),
-    );
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(
         App::new()
             .app_data(db)
@@ -85,12 +81,12 @@ async fn test_200_add_review_with_image() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_404_add_review_user() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_empty_row()
-            .into_connection(),
-    );
+async fn test_404_add_review_user(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(
         App::new()
             .app_data(db)
@@ -99,7 +95,7 @@ async fn test_404_add_review_user() {
     )
     .await;
     let (payload, header) = generate_multipart_payload(
-        "11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec".to_string(),
+        "11e1a4b8-7fa7-4501-9faa-541a5e0ff1ed".to_string(),
         Problem::Work,
         "awesome text".to_string(),
         None,
@@ -117,12 +113,12 @@ async fn test_404_add_review_user() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_415_add_review() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .into_connection(),
-    );
+async fn test_415_add_review(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(
         App::new()
             .app_data(db)
@@ -153,12 +149,12 @@ async fn test_415_add_review() {
 
 #[rstest]
 #[actix_web::test]
-async fn test_422_add_review() {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_id()
-            .into_connection(),
-    );
+async fn test_422_add_review(
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let app = test::init_service(
         App::new()
             .app_data(db)

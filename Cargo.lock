@@ -3896,6 +3896,7 @@ dependencies = [
  "dotenv",
  "futures",
  "jsonwebtoken",
+ "migration",
  "mime",
  "mockito",
  "ordered-float 5.1.0",

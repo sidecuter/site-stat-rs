@@ -1,13 +1,12 @@
 use crate::api::get::stat::get_stat;
 use crate::config::AppConfig;
 use crate::schemas::{FilterQuery, Target};
-use crate::tests::db::FillDb;
-use crate::tests::fixtures::jwt_token;
+use crate::tests::fixtures::{jwt_token, prepare_connection};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use chrono::NaiveDate;
 use rstest::*;
-use sea_orm::{DbBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 
 #[rstest]
 #[case::site(Target::Site, None, None)]
@@ -44,13 +43,11 @@ async fn test_200_get_stat(
     #[case] start_date: Option<NaiveDate>,
     #[case] end_date: Option<NaiveDate>,
     jwt_token: &String,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
 ) {
-    let db = Data::new(
-        MockDatabase::new(DbBackend::Sqlite)
-            .add_user_roles()
-            .add_count(3)
-            .into_connection(),
-    );
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let config = Data::new(AppConfig::new());
     let app = test::init_service(App::new().app_data(db).app_data(config).service(get_stat)).await;
     let query = FilterQuery {

@@ -1,3 +1,4 @@
+use crate::auth::hash_password;
 use crate::config::AppConfig;
 use crate::schemas::Problem;
 use actix_web::http::header;
@@ -6,6 +7,7 @@ use actix_web::web::{BufMut, Bytes, BytesMut};
 use mime::Mime;
 use rand::distr::{Alphanumeric, SampleString};
 use rand::rng;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
 use std::fs;
 use uuid::Uuid;
 
@@ -18,6 +20,74 @@ pub fn prepare_tmp_dir() -> String {
         fs::create_dir_all(files_path).unwrap();
     }
     filepath
+}
+
+pub async fn prepare_database(db: &DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
+    crate::entity::user_ids::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        creation_date: Set(chrono::Utc::now().naive_utc()),
+    }
+    .insert(db)
+    .await?;
+    crate::entity::site_stat::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        visit_date: Set(chrono::Utc::now().naive_utc()),
+        endpoint: Set(None),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::select_aud::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        visit_date: Set(chrono::Utc::now().naive_utc()),
+        auditory_id: Set("a-100".into()),
+        success: Set(true),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::start_way::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        visit_date: Set(chrono::Utc::now().naive_utc()),
+        start_id: Set("a-100".into()),
+        end_id: Set("a-101".into()),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::change_plan::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        visit_date: Set(chrono::Utc::now().naive_utc()),
+        plan_id: Set("A-0".into()),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::review::ActiveModel {
+        user_id: Set(Uuid::parse_str("11e1a4b8-7fa7-4501-9faa-541a5e0ff1ec")?),
+        creation_date: Set(chrono::Utc::now().naive_utc()),
+        text: Set("Awesome review".to_owned()),
+        problem_id: Set("way".to_owned()),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::user::ActiveModel {
+        id: Set(1),
+        login: Set(String::from("admin")),
+        hash: Set(hash_password("123")?),
+        is_active: Set(true),
+        ..Default::default()
+    }
+    .insert(db)
+    .await?;
+    crate::entity::user_role::ActiveModel {
+        user_id: Set(1),
+        role_id: Set(1),
+    }
+    .insert(db)
+    .await?;
+    Ok(())
 }
 
 const CRLF: &[u8] = b"\r\n";
