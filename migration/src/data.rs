@@ -490,7 +490,7 @@ pub const PROBLEMS: [&str; 4] = ["way", "plan", "work", "other"];
 
 pub const ROLES: [(&str, i32); 1] = [("admin", 1)];
 
-pub const GOALS: [(&str, i32); 7] = [
+pub const GOALS: [(&str, i32); 8] = [
     ("stats", 1),
     ("dashboards", 2),
     ("users", 3),
@@ -498,11 +498,12 @@ pub const GOALS: [(&str, i32); 7] = [
     ("tables", 5),
     ("resources", 6),
     ("tasks", 7),
+    ("reviews", 8),
 ];
 
 pub const RIGHTS: [(&str, i32); 4] = [("view", 1), ("create", 2), ("edit", 3), ("delete", 4)];
 
-pub const ROLE_RIGHT_GOALS: [(i32, i32, i32); 18] = [
+pub const ROLE_RIGHT_GOALS: [(i32, i32, i32); 21] = [
     (1, 1, 1),
     (1, 1, 2),
     (1, 1, 3),
@@ -521,4 +522,7 @@ pub const ROLE_RIGHT_GOALS: [(i32, i32, i32); 18] = [
     (1, 4, 6),
     (1, 1, 7),
     (1, 3, 7),
+    (1, 1, 8),
+    (1, 3, 8),
+    (1, 4, 8),
 ];
