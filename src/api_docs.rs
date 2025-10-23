@@ -27,10 +27,6 @@ impl Modify for Security {
     paths(
         // Get routes
         crate::api::get::user_id::get_user_id,
-        crate::api::get::sites::get_sites,
-        crate::api::get::auds::get_auds,
-        crate::api::get::ways::get_ways,
-        crate::api::get::plans::get_plans,
         crate::api::get::popular::get_popular,
         crate::api::get::stat::get_stat,
         crate::api::get::route::get_route,
@@ -41,7 +37,6 @@ impl Modify for Security {
         crate::api::stat::plan::stat_plan,
         // Review routes
         crate::api::review::add::add_review,
-        crate::api::review::get::get_reviews,
         crate::api::review::image::get_image,
         // Auth routes
         crate::api::auth::login::token,
