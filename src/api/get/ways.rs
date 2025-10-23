@@ -1,6 +1,6 @@
 use crate::auth::IsCapable;
 use crate::errors::{ApiError, ApiResult};
-use crate::schemas::{rights, goals, Filter, Pagination, StartWayOut, Status};
+use crate::schemas::{goals, rights, Filter, Pagination, StartWayOut, Status};
 use crate::traits::Paginate;
 use actix_web::{get, web};
 use sea_orm::DatabaseConnection;

@@ -1,9 +1,9 @@
 use crate::auth::{authenticate_user, create_token};
+use crate::config::AppConfig;
 use crate::errors::{ApiError, ApiResult};
-use crate::schemas::{LoginRequest, TokenResponse, Status};
+use crate::schemas::{LoginRequest, Status, TokenResponse};
 use actix_web::{post, web};
 use sea_orm::DatabaseConnection;
-use crate::config::AppConfig;
 
 #[utoipa::path(
     post,
@@ -31,7 +31,7 @@ use crate::config::AppConfig;
 async fn token(
     login_data: web::Form<LoginRequest>,
     db_conn: web::Data<DatabaseConnection>,
-    config: web::Data<AppConfig>
+    config: web::Data<AppConfig>,
 ) -> ApiResult<TokenResponse> {
     let user = authenticate_user(&db_conn, &login_data.username, &login_data.password).await?;
 

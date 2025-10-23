@@ -119,7 +119,7 @@ impl<T> From<PoisonError<T>> for ApiError {
 
 impl From<jsonwebtoken::errors::Error> for ApiError {
     fn from(err: jsonwebtoken::errors::Error) -> Self {
-        Self::JWTError(err.to_string()) 
+        Self::JWTError(err.to_string())
     }
 }
 

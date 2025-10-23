@@ -61,7 +61,7 @@ pub struct AppConfig {
     #[serde(default = "default_refresh")]
     pub data_refresh_interval: u64,
     #[serde(default = "default_jwt_token")]
-    pub jwt_token: String
+    pub jwt_token: String,
 }
 
 impl Default for AppConfig {

@@ -21,12 +21,10 @@ impl Modify for Security {
             );
             schema.add_security_scheme(
                 "oauth2_bearer",
-                SecurityScheme::OAuth2(OAuth2::new(
-                    [Flow::Password(Password::new(
-                        "http://localhost:8080/api/auth/token",
-                        Scopes::new(),
-                    ))],
-                )),
+                SecurityScheme::OAuth2(OAuth2::new([Flow::Password(Password::new(
+                    "http://localhost:8080/api/auth/token",
+                    Scopes::new(),
+                ))])),
             );
         }
     }

@@ -1,9 +1,9 @@
+use crate::auth::IsCapable;
 use crate::config::AppConfig;
 use crate::errors::{ApiError, ApiResult};
-use crate::schemas::{rights, goals, Status};
+use crate::schemas::{goals, rights, Status};
 use actix_files::NamedFile;
 use actix_web::{get, web};
-use crate::auth::IsCapable;
 
 #[utoipa::path(
     get,
@@ -35,7 +35,7 @@ use crate::auth::IsCapable;
 async fn get_image(
     config: web::Data<AppConfig>,
     filename: web::Path<String>,
-    _is_capable: IsCapable<rights::View, goals::Reviews>
+    _is_capable: IsCapable<rights::View, goals::Reviews>,
 ) -> ApiResult<NamedFile> {
     let filename = filename.clone();
     let filename = std::path::Path::new(&filename)
