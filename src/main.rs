@@ -22,8 +22,8 @@ async fn main() -> std::io::Result<()> {
     ensure_dir_exists(&front_path)?;
     let state = Data::new(AppStateMutable::default());
 
-    tracing::info!("Listening on http://{addr}");
-    tracing::info!("Redoc UI is available at http://{addr}/redoc");
+    tracing::debug!("Listening on http://{addr}");
+    tracing::debug!("Redoc UI is available at http://{addr}/redoc");
 
     actix_rt::spawn(start_data_refresh_task(
         state.clone(),
