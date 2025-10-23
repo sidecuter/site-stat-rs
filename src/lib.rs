@@ -11,6 +11,7 @@ pub mod mut_state;
 pub mod schemas;
 pub mod task;
 pub mod traits;
+pub mod query_root;
 
 #[cfg(test)]
 mod tests;
