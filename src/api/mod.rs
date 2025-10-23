@@ -14,7 +14,8 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(stat::init_routes)
             .configure(review::init_routes)
             .configure(auth::init_routes)
-            .configure(graphql::init_routes)
-            // .wrap(NormalizePath::trim()),
+            .service(graphql::index::index)
+            .service(graphql::playground::graphql_playground)
+            .wrap(NormalizePath::trim()),
     );
 }

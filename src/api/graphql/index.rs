@@ -5,9 +5,9 @@ use seaography::async_graphql;
 
 #[utoipa::path(
     post,
-    path = "/api/graphql/",
+    path = "/api/graphql",
 )]
-#[post("/")]
+#[post("/graphql")]
 async fn index(schema: web::Data<Schema>, req: GraphQLRequest) -> GraphQLResponse {
     schema.execute(req.into_inner()).await.into()
 }
