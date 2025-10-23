@@ -1,4 +1,6 @@
-use crate::entity::{aud, change_plan, plan, review, select_aud, site_stat, start_way, user_id};
+use crate::entity::{
+    aud, change_plan, plan, review, role_right_goal, select_aud, site_stat, start_way, user_id,
+};
 use actix_web::web::Data;
 use sea_orm::{DatabaseConnection, DbBackend, MockDatabase, MockExecResult, MockRow, Value};
 
@@ -39,6 +41,8 @@ pub trait FillDb {
     fn add_change_plan(self) -> Self;
 
     fn add_review(self) -> Self;
+
+    fn add_user_roles(self) -> Self;
 }
 
 impl FillDb for MockDatabase {
@@ -131,6 +135,21 @@ impl FillDb for MockDatabase {
             image_name: None,
             problem_id: "work".to_string(),
         }]])
+    }
+
+    fn add_user_roles(self) -> Self {
+        self.append_query_results([[
+            role_right_goal::Model {
+                role_id: 1,
+                right_id: 1,
+                goal_id: 1,
+            },
+            role_right_goal::Model {
+                role_id: 1,
+                right_id: 1,
+                goal_id: 8,
+            },
+        ]])
     }
 }
 

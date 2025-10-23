@@ -27,6 +27,8 @@ pub enum ApiError {
     TooManyRequests(String),
     #[error("{0}")]
     UnsupportedMediaType(String),
+    #[error("Token is empty")]
+    TokenNotPresent,
     #[error("Invalid token")]
     InvalidToken,
     #[error("User is inactive or not present")]
@@ -52,6 +54,7 @@ impl ResponseError for ApiError {
             Self::InvalidToken => StatusCode::UNPROCESSABLE_ENTITY,
             Self::UserInactive | Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
             Self::PasswordHashError(_) | Self::JWTError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::TokenNotPresent => StatusCode::FORBIDDEN
         }
     }
 

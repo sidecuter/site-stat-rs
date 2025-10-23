@@ -10,10 +10,6 @@ fn default_port() -> String {
     String::from("8080")
 }
 
-fn default_admin_key() -> String {
-    String::from("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
-}
-
 fn default_database_url() -> String {
     String::from("sqlite://app.db?mode=rwc")
 }
@@ -44,8 +40,6 @@ pub struct AppConfig {
     pub host: String,
     #[serde(default = "default_port")]
     pub port: String,
-    #[serde(default = "default_admin_key")]
-    pub admin_key: String,
     #[serde(default = "default_database_url")]
     pub database_url: String,
     #[serde(default = "default_static_path")]

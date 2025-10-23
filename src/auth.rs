@@ -59,7 +59,7 @@ pub async fn authenticate_user(
     }
 }
 
-pub fn create_token(user_id: i32, jwt_token: &String) -> ApiResult<String> {
+pub fn create_token(user_id: i32, jwt_secret: &str) -> ApiResult<String> {
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_err(|_| ApiError::InternalError("Invalid time".to_string()))?
@@ -75,7 +75,7 @@ pub fn create_token(user_id: i32, jwt_token: &String) -> ApiResult<String> {
     let token = encode(
         &Header::default(),
         &claims,
-        &EncodingKey::from_secret(jwt_token.as_bytes()),
+        &EncodingKey::from_secret(jwt_secret.as_bytes()),
     )?;
     Ok(token)
 }
@@ -152,22 +152,18 @@ impl FromRequest for CurrentUser {
 async fn gather_rights(
     db_conn: &DatabaseConnection,
     current_user_id: i32,
-) -> ApiResult<Vec<(i32, i32)>> {
+) -> ApiResult<Vec<role_right_goal::Model>> {
     let qr = user_role::Entity::find()
         .filter(user_role::Column::UserId.eq(current_user_id))
         .select_only()
         .column(user_role::Column::RoleId)
         .into_query();
     Ok(role_right_goal::Entity::find()
-        .select_only()
-        .column(role_right_goal::Column::RightId)
-        .column(role_right_goal::Column::GoalId)
         .filter(role_right_goal::Column::RoleId.in_subquery(qr))
         .distinct_on([(
             role_right_goal::Column::RightId,
             role_right_goal::Column::GoalId,
         )])
-        .into_tuple()
         .all(db_conn)
         .await?)
 }
@@ -178,7 +174,7 @@ fn extractor(req: &HttpRequest) -> ApiResult<(String, Arc<DatabaseConnection>, S
         .get(actix_web::http::header::AUTHORIZATION)
         .and_then(|hv| hv.to_str().ok())
         .map(|s| s.to_string())
-        .ok_or(ApiError::InvalidToken)?;
+        .ok_or(ApiError::TokenNotPresent)?;
 
     let jwt_secret = req
         .app_data::<web::Data<AppConfig>>()
@@ -211,7 +207,7 @@ async fn is_capable_helper(
     let rights = gather_rights(&db_conn, user_id).await?;
     Ok(rights
         .into_iter()
-        .any(|right_goal| right_goal == (right_id, goal_id)))
+        .any(|right_goal| (right_goal.right_id, right_goal.goal_id) == (right_id, goal_id)))
 }
 
 pub struct IsCapable<R, G>(PhantomData<R>, PhantomData<G>);
