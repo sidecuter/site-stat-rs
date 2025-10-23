@@ -29,7 +29,7 @@ pub enum ApiError {
     UnsupportedMediaType(String),
     #[error("Invalid token")]
     InvalidToken,
-    #[error("User is inactive")]
+    #[error("User is inactive or not present")]
     UserInactive,
     #[error("Invalid credentials")]
     InvalidCredentials,
@@ -49,7 +49,8 @@ impl ResponseError for ApiError {
             Self::NotAllowed(_) => StatusCode::FORBIDDEN,
             Self::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
             Self::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE,
-            Self::InvalidToken | Self::UserInactive | Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
+            Self::InvalidToken => StatusCode::UNPROCESSABLE_ENTITY,
+            Self::UserInactive | Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
             Self::PasswordHashError(_) | Self::JWTError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
