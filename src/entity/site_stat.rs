@@ -31,3 +31,9 @@ impl Related<super::user_id::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
+pub enum RelatedEntity {
+    #[sea_orm(entity = "super::user_id::Entity")]
+    UserId,
+}

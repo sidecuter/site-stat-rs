@@ -55,3 +55,17 @@ impl Related<super::start_way::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
+pub enum RelatedEntity {
+    #[sea_orm(entity = "super::change_plan::Entity")]
+    ChangePlan,
+    #[sea_orm(entity = "super::review::Entity")]
+    Review,
+    #[sea_orm(entity = "super::select_aud::Entity")]
+    SelectAud,
+    #[sea_orm(entity = "super::site_stat::Entity")]
+    SiteStat,
+    #[sea_orm(entity = "super::start_way::Entity")]
+    StartWay,
+}

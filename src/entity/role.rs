@@ -40,3 +40,13 @@ impl Related<super::user::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
+pub enum RelatedEntity {
+    #[sea_orm(entity = "super::role_right_goal::Entity")]
+    RoleRightGoal,
+    #[sea_orm(entity = "super::user_role::Entity")]
+    UserRole,
+    #[sea_orm(entity = "super::user::Entity")]
+    User,
+}

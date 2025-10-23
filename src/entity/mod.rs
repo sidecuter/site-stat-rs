@@ -17,3 +17,21 @@ pub mod start_way;
 pub mod user;
 pub mod user_id;
 pub mod user_role;
+
+seaography::register_entity_modules!([
+    aud,
+    change_plan,
+    goal,
+    plan,
+    problem,
+    review,
+    right,
+    role,
+    role_right_goal,
+    select_aud,
+    site_stat,
+    start_way,
+    user,
+    user_id,
+    user_role,
+]);
