@@ -56,6 +56,10 @@ pub struct AppConfig {
     pub data_refresh_interval: u64,
     #[serde(default = "default_jwt_token")]
     pub jwt_secret: String,
+    #[serde(default)]
+    pub complexity_limit: Option<usize>,
+    #[serde(default)]
+    pub depth_limit: Option<usize>,
 }
 
 impl Default for AppConfig {
