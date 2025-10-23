@@ -48,7 +48,7 @@ fn get_db_filled(endpoint: Endpoint) -> Data<DatabaseConnection> {
     let mut mock = MockDatabase::new(DbBackend::Sqlite).add_count(2);
     mock = match endpoint {
         Endpoint::Sites => mock.add_site(),
-        Endpoint::Auds => mock.add_select_add(),
+        Endpoint::Auds => mock.add_select_aud(),
         Endpoint::Ways => mock.add_start_way(),
         Endpoint::Plans => mock.add_change_plan(),
         Endpoint::Reviews => mock.add_review(),

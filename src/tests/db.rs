@@ -32,7 +32,7 @@ pub trait FillDb {
 
     fn add_site(self) -> Self;
 
-    fn add_select_add(self) -> Self;
+    fn add_select_aud(self) -> Self;
 
     fn add_start_way(self) -> Self;
 
@@ -93,7 +93,7 @@ impl FillDb for MockDatabase {
         }]])
     }
 
-    fn add_select_add(self) -> Self {
+    fn add_select_aud(self) -> Self {
         self.append_query_results([[select_aud::Model {
             id: 0,
             user_id: Default::default(),
