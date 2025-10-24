@@ -3,6 +3,7 @@ use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
 use stat_api::config::AppConfig;
 use stat_api::cors::create_cors;
+use stat_api::graphql::query_root::schema;
 use stat_api::mut_state::AppStateMutable;
 use stat_api::task::start_data_refresh_task;
 use stat_api::{api, api_docs, errors::ApiError};
@@ -21,7 +22,7 @@ async fn main() -> std::io::Result<()> {
     ensure_dir_exists(&files_path)?;
     ensure_dir_exists(&front_path)?;
     let state = Data::new(AppStateMutable::default());
-    let schema = stat_api::query_root::schema(
+    let schema = schema(
         database.clone(),
         config.depth_limit,
         config.complexity_limit,

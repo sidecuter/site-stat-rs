@@ -37,6 +37,7 @@ seaography = {version = "2.0.0-rc.3", features = ["with-decimal", "with-chrono",
 async-graphql-actix-web = { version = "7.0" }
 async-graphql = "7.0.17"
 tokio = {version = "1.48.0", features = ["macros", "rt-multi-thread"]}
+async-trait = "0.1.89"
 
 [dev-dependencies]
 bincode = { version = "2.0.1" }

@@ -1,6 +1,6 @@
 use crate::entity::{change_plan, select_aud, site_stat, start_way};
 use crate::generate_statistics_query;
-use crate::query_root::types::{FilterQuery, Statistics};
+use super::types::{FilterQuery, Statistics};
 use async_graphql::Context;
 use sea_orm::{DatabaseConnection, ExprTrait, FromQueryResult, Iden, IntoSimpleExpr};
 use seaography::CustomFields;
