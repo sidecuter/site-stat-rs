@@ -5,6 +5,7 @@ use seaography::async_graphql::http::{playground_source, GraphQLPlaygroundConfig
 #[utoipa::path(
     get,
     path = "/api/graphql",
+    tag = "GraphQL"
 )]
 #[get("/graphql")]
 async fn graphql_playground() -> ApiResult<HttpResponse> {

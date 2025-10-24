@@ -69,6 +69,7 @@ impl Modify for Security {
         (name = "Stat", description = "Statistics insertion endpoints"),
         (name = "Review", description = "Endpoint for reviews"),
         (name = "Auth", description = "Endpoints for authentication"),
+        (name = "GraphQL", description = "Endpoints for GraphQL"),
     ),
 )]
 pub struct ApiDoc;
