@@ -1,5 +1,6 @@
 pub mod api;
 pub mod api_docs;
+pub mod auth;
 pub mod config;
 pub mod cors;
 pub mod entity;
@@ -10,6 +11,7 @@ pub mod mut_state;
 pub mod schemas;
 pub mod task;
 pub mod traits;
+pub mod graphql;
 
 #[cfg(test)]
 mod tests;

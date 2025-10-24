@@ -27,6 +27,18 @@ pub enum ApiError {
     TooManyRequests(String),
     #[error("{0}")]
     UnsupportedMediaType(String),
+    #[error("Token is empty")]
+    TokenNotPresent,
+    #[error("Invalid token")]
+    InvalidToken,
+    #[error("User is inactive or not present")]
+    UserInactive,
+    #[error("Invalid credentials")]
+    InvalidCredentials,
+    #[error("Password hash error: {0}")]
+    PasswordHashError(String),
+    #[error("JWT error: {0}")]
+    JWTError(String),
 }
 
 impl ResponseError for ApiError {
@@ -39,6 +51,10 @@ impl ResponseError for ApiError {
             Self::NotAllowed(_) => StatusCode::FORBIDDEN,
             Self::TooManyRequests(_) => StatusCode::TOO_MANY_REQUESTS,
             Self::UnsupportedMediaType(_) => StatusCode::UNSUPPORTED_MEDIA_TYPE,
+            Self::InvalidToken => StatusCode::UNPROCESSABLE_ENTITY,
+            Self::UserInactive | Self::InvalidCredentials => StatusCode::UNAUTHORIZED,
+            Self::PasswordHashError(_) | Self::JWTError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::TokenNotPresent => StatusCode::FORBIDDEN
         }
     }
 
@@ -101,6 +117,18 @@ impl From<std::io::Error> for ApiError {
 impl<T> From<PoisonError<T>> for ApiError {
     fn from(value: PoisonError<T>) -> Self {
         Self::InternalError(value.to_string())
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for ApiError {
+    fn from(err: jsonwebtoken::errors::Error) -> Self {
+        Self::JWTError(err.to_string())
+    }
+}
+
+impl From<argon2::password_hash::Error> for ApiError {
+    fn from(err: argon2::password_hash::Error) -> Self {
+        Self::PasswordHashError(err.to_string())
     }
 }
 

@@ -11,10 +11,10 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(UserId::Table)
+                    .table(UserIds::Table)
                     .if_not_exists()
-                    .col(pk_uuid(UserId::UserId))
-                    .col(date_time(UserId::CreationDate).not_null())
+                    .col(pk_uuid(UserIds::UserId))
+                    .col(date_time(UserIds::CreationDate).not_null())
                     .to_owned(),
             )
             .await
@@ -24,13 +24,14 @@ impl MigrationTrait for Migration {
         // Replace the sample below with your own migration scripts
 
         manager
-            .drop_table(Table::drop().table(UserId::Table).to_owned())
+            .drop_table(Table::drop().table(UserIds::Table).to_owned())
             .await
     }
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(DeriveIden)]
-pub enum UserId {
+pub enum UserIds {
     Table,
     #[sea_orm(iden = "user_id")]
     UserId,

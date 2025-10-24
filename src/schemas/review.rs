@@ -1,16 +1,10 @@
 use crate::config::AppConfig;
 use crate::entity::review;
 use crate::errors::{ApiError, ApiResult};
-use crate::schemas::Filter;
-use crate::traits::Paginate;
-use crate::{impl_paginate, impl_responder};
 use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
 use actix_web::web;
-use chrono::NaiveDateTime;
 use mime::Mime;
-use sea_orm::{
-    ActiveValue::Set, ColumnTrait, EntityTrait, IntoActiveModel, QueryFilter, QueryOrder, Select,
-};
+use sea_orm::{ActiveValue::Set, IntoActiveModel};
 use serde::{Deserialize, Serialize};
 use std::{
     fmt::{Display, Formatter},
@@ -47,20 +41,6 @@ pub struct ReviewIn {
     pub text: String,
     pub problem: Problem,
     pub image_name: Option<String>,
-}
-
-#[derive(Serialize, ToSchema, Debug, Clone)]
-#[cfg_attr(test, derive(serde::Deserialize))]
-pub struct ReviewOut {
-    #[schema(example = "0b696946-f48a-47b0-b0dd-d93276d29d65")]
-    pub user_id: Uuid,
-    #[schema(example = "Some cool review")]
-    pub text: String,
-    pub problem: Problem,
-    #[schema(example = "0b696946f48a47b0b0ddd93276d29d65.png")]
-    pub image_name: Option<String>,
-    #[schema(example = "2025-01-07T20:10:34.956397956")]
-    pub creation_date: NaiveDateTime,
 }
 
 #[allow(clippy::fallible_impl_from)]
@@ -175,18 +155,6 @@ impl Default for ReviewIn {
     }
 }
 
-impl From<review::Model> for ReviewOut {
-    fn from(value: review::Model) -> Self {
-        Self {
-            user_id: value.user_id,
-            text: value.text,
-            problem: value.problem_id.into(),
-            image_name: value.image_name,
-            creation_date: value.creation_date,
-        }
-    }
-}
-
 impl IntoActiveModel<review::ActiveModel> for ReviewIn {
     fn into_active_model(self) -> review::ActiveModel {
         review::ActiveModel {
@@ -199,6 +167,3 @@ impl IntoActiveModel<review::ActiveModel> for ReviewIn {
         }
     }
 }
-
-impl_paginate!(ReviewOut, review);
-impl_responder!(ReviewOut);

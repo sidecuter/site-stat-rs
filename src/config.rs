@@ -10,10 +10,6 @@ fn default_port() -> String {
     String::from("8080")
 }
 
-fn default_admin_key() -> String {
-    String::from("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
-}
-
 fn default_database_url() -> String {
     String::from("sqlite://app.db?mode=rwc")
 }
@@ -30,6 +26,10 @@ fn default_front_dir() -> String {
     String::from("web")
 }
 
+fn default_jwt_token() -> String {
+    String::from("524c9b6806b8f7ae95c56747d35432c7")
+}
+
 const fn default_refresh() -> u64 {
     600
 }
@@ -40,8 +40,6 @@ pub struct AppConfig {
     pub host: String,
     #[serde(default = "default_port")]
     pub port: String,
-    #[serde(default = "default_admin_key")]
-    pub admin_key: String,
     #[serde(default = "default_database_url")]
     pub database_url: String,
     #[serde(default = "default_static_path")]
@@ -56,6 +54,12 @@ pub struct AppConfig {
     pub allowed_methods: Option<Vec<String>>,
     #[serde(default = "default_refresh")]
     pub data_refresh_interval: u64,
+    #[serde(default = "default_jwt_token")]
+    pub jwt_secret: String,
+    #[serde(default)]
+    pub complexity_limit: Option<usize>,
+    #[serde(default)]
+    pub depth_limit: Option<usize>,
 }
 
 impl Default for AppConfig {
