@@ -1,4 +1,4 @@
-use crate::entity::user_id;
+use crate::entity::user_ids;
 use crate::impl_responder;
 use chrono::NaiveDateTime;
 use sea_orm::{ActiveValue::Set, IntoActiveModel};
@@ -22,8 +22,8 @@ impl Default for UserId {
     }
 }
 
-impl From<user_id::Model> for UserId {
-    fn from(value: user_id::Model) -> Self {
+impl From<user_ids::Model> for UserId {
+    fn from(value: user_ids::Model) -> Self {
         Self {
             user_id: value.user_id,
             creation_date: value.creation_date,
@@ -31,9 +31,9 @@ impl From<user_id::Model> for UserId {
     }
 }
 
-impl IntoActiveModel<user_id::ActiveModel> for UserId {
-    fn into_active_model(self) -> user_id::ActiveModel {
-        user_id::ActiveModel {
+impl IntoActiveModel<user_ids::ActiveModel> for UserId {
+    fn into_active_model(self) -> user_ids::ActiveModel {
+        user_ids::ActiveModel {
             user_id: Set(self.user_id),
             creation_date: Set(self.creation_date),
         }

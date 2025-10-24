@@ -1,4 +1,4 @@
-use crate::entity::{plan, user_id};
+use crate::entity::{plan, user_ids};
 use crate::errors::{ApiError, ApiResult};
 use crate::schemas::{ChangePlanIn, Status};
 use crate::traits::{ConversionToStatusTrait, FilterTrait};
@@ -43,7 +43,7 @@ async fn stat_plan(
         Ok(()) => Ok(()),
         Err(e) => Err(ApiError::UnprocessableData(e.to_string())),
     }?;
-    user_id::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
+    user_ids::Entity::filter(data.user_id, db.get_ref(), "User".to_string()).await?;
     plan::Entity::filter(
         data.plan_id.clone(),
         db.get_ref(),

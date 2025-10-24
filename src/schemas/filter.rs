@@ -1,23 +1,8 @@
-use crate::schemas::validators::{page_default, size_default};
 use chrono::NaiveDate;
 use serde::Deserialize;
 use std::fmt::{Display, Formatter};
 use utoipa::ToSchema;
 use validator::Validate;
-
-#[derive(Deserialize, Clone, ToSchema, Validate)]
-#[cfg_attr(test, derive(serde::Serialize))]
-pub struct Filter {
-    pub user_id: Option<uuid::Uuid>,
-    #[schema(example = 1, minimum = 1)]
-    #[serde(default = "page_default")]
-    #[validate(range(min = 1))]
-    pub page: u64,
-    #[schema(example = 50, maximum = 100)]
-    #[serde(default = "size_default")]
-    #[validate(range(max = 100))]
-    pub size: u64,
-}
 
 #[derive(Deserialize, Debug, Clone, ToSchema)]
 #[serde(rename_all = "lowercase")]

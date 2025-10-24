@@ -3,6 +3,7 @@ use actix_web::web;
 
 pub mod auth;
 pub mod get;
+pub mod graphql;
 pub mod review;
 pub mod stat;
 
@@ -13,6 +14,8 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
             .configure(stat::init_routes)
             .configure(review::init_routes)
             .configure(auth::init_routes)
+            .service(graphql::index::index)
+            .service(graphql::playground::graphql_playground)
             .wrap(NormalizePath::trim()),
     );
 }

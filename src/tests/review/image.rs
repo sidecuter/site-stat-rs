@@ -2,12 +2,11 @@ use super::super::helpers::prepare_tmp_dir;
 use super::super::helpers::BLACK_1X1_PNG;
 use crate::api::review::image::get_image;
 use crate::config::AppConfig;
-use crate::tests::db::FillDb;
-use crate::tests::fixtures::jwt_token;
+use crate::tests::fixtures::{jwt_token, prepare_connection};
 use actix_web::web::Data;
 use actix_web::{test, App};
 use rstest::rstest;
-use sea_orm::{DatabaseBackend, MockDatabase};
+use sea_orm::DatabaseConnection;
 use std::fs;
 use std::io::Write;
 use std::path::Path;
@@ -15,7 +14,13 @@ use uuid::Uuid;
 
 #[rstest]
 #[actix_web::test]
-async fn get_image_endpoint(jwt_token: &String) {
+async fn get_image_endpoint(
+    jwt_token: &String,
+    #[future] prepare_connection: Result<DatabaseConnection, Box<dyn std::error::Error>>,
+) {
+    let prepare_connection = prepare_connection.await;
+    assert!(prepare_connection.is_ok());
+    let db = Data::new(prepare_connection.unwrap());
     let filename = format!("{}.png", Uuid::new_v4().to_string().replace("-", ""));
     let filepath = prepare_tmp_dir();
     {
@@ -26,11 +31,7 @@ async fn get_image_endpoint(jwt_token: &String) {
     let app = test::init_service(
         App::new()
             .app_data(Data::new(AppConfig::default()))
-            .app_data(Data::new(
-                MockDatabase::new(DatabaseBackend::Sqlite)
-                    .add_user_roles()
-                    .into_connection(),
-            ))
+            .app_data(db)
             .service(get_image),
     )
     .await;

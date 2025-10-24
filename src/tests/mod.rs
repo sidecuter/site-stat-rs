@@ -1,4 +1,3 @@
-mod db;
 mod fetchers;
 mod get;
 mod helpers;

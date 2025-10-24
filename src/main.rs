@@ -3,6 +3,7 @@ use sea_orm::ConnectOptions;
 use sea_orm::{Database, DatabaseConnection};
 use stat_api::config::AppConfig;
 use stat_api::cors::create_cors;
+use stat_api::graphql::query_root::schema;
 use stat_api::mut_state::AppStateMutable;
 use stat_api::task::start_data_refresh_task;
 use stat_api::{api, api_docs, errors::ApiError};
@@ -15,15 +16,22 @@ async fn main() -> std::io::Result<()> {
     init_logger();
     let config = Data::new(AppConfig::default());
     let addr = config.get_addr();
-    let pool = Data::new(get_database_connection(&config.database_url).await);
+    let database = get_database_connection(&config.database_url).await;
     let files_path = config.get_files_path();
     let front_path = config.get_front_path();
     ensure_dir_exists(&files_path)?;
     ensure_dir_exists(&front_path)?;
     let state = Data::new(AppStateMutable::default());
+    let schema = Data::new(schema(
+        database.clone(),
+        config.depth_limit,
+        config.complexity_limit,
+    )
+    .unwrap());
+    let pool = Data::new(database);
 
-    tracing::debug!("Listening on http://{addr}");
-    tracing::debug!("Redoc UI is available at http://{addr}/redoc");
+    tracing::info!("Listening on http://{addr}");
+    tracing::info!("Redoc UI is available at http://{addr}/redoc");
 
     actix_rt::spawn(start_data_refresh_task(
         state.clone(),
@@ -34,6 +42,7 @@ async fn main() -> std::io::Result<()> {
         actix_web::App::new()
             .wrap(create_cors(&config))
             .app_data(state.clone())
+            .app_data(schema.clone())
             .app_data(pool.clone())
             .app_data(config.clone())
             .wrap(actix_web::middleware::Logger::default())

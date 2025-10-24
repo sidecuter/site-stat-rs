@@ -23,3 +23,9 @@ impl Related<super::role_right_goal::Entity> for Entity {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
+pub enum RelatedEntity {
+    #[sea_orm(entity = "super::role_right_goal::Entity")]
+    RoleRightGoal,
+}
