@@ -12,6 +12,6 @@ pub struct Statistics {
 
 #[derive(Clone, CustomInputType)]
 pub struct FilterQuery {
-    pub start_date: Option<NaiveDate>,
-    pub end_date: Option<NaiveDate>,
+    pub start_date: NaiveDate,
+    pub end_date: NaiveDate,
 }

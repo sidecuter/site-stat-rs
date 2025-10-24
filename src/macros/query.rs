@@ -36,17 +36,17 @@ macro_rules! generate_statistics_query {
             .from(TableEntity)
             .to_owned();
 
-        let mighty_query = match ($filter.start_date, $filter.end_date) {
-            (Some(start_date), Some(end_date)) => mighty_query
+        let mighty_query = match $filter {
+            Some(filter) => mighty_query
                 .and_where(
                     Expr::col((TableEntity, TableColumn::VisitDate))
-                        .gte(start_date),
+                        .gte(filter.start_date),
                 )
                 .and_where(
-                    Expr::col((TableEntity, TableColumn::VisitDate)).lt(end_date),
+                    Expr::col((TableEntity, TableColumn::VisitDate)).lt(filter.end_date),
                 )
                 .to_owned(),
-            _ => mighty_query,
+            None => mighty_query,
         };
         mighty_query
     }};

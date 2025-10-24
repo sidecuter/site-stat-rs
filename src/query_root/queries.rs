@@ -19,7 +19,7 @@ pub struct Operations;
 impl Operations {
     async fn site_stats(
         ctx: &Context<'_>,
-        filter: FilterQuery,
+        filter: Option<FilterQuery>,
     ) -> async_graphql::Result<Vec<Statistics>> {
         let db = ctx.data::<DatabaseConnection>()?;
         let query = generate_statistics_query!(site_stat, filter);
@@ -29,7 +29,7 @@ impl Operations {
 
     async fn aud_stats(
         ctx: &Context<'_>,
-        filter: FilterQuery,
+        filter: Option<FilterQuery>,
     ) -> async_graphql::Result<Vec<Statistics>> {
         let db = ctx.data::<DatabaseConnection>()?;
         let query = generate_statistics_query!(select_aud, filter);
@@ -39,7 +39,7 @@ impl Operations {
 
     async fn way_stats(
         ctx: &Context<'_>,
-        filter: FilterQuery,
+        filter: Option<FilterQuery>,
     ) -> async_graphql::Result<Vec<Statistics>> {
         let db = ctx.data::<DatabaseConnection>()?;
         let query = generate_statistics_query!(start_way, filter);
@@ -49,7 +49,7 @@ impl Operations {
 
     async fn plan_stats(
         ctx: &Context<'_>,
-        filter: FilterQuery,
+        filter: Option<FilterQuery>,
     ) -> async_graphql::Result<Vec<Statistics>> {
         let db = ctx.data::<DatabaseConnection>()?;
         let query = generate_statistics_query!(change_plan, filter);
