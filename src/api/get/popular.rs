@@ -1,11 +1,12 @@
 use crate::entity::{select_aud, start_way};
 use crate::errors::ApiResult;
+use crate::schemas::popular::PopularAud;
 use crate::schemas::{Popular, Status};
 use actix_web::{get, web};
 use sea_orm::sea_query::{Alias, Expr, Order, Query, UnionType};
 use sea_orm::{
-    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QuerySelect,
-    QueryTrait,
+    ColumnTrait, DatabaseConnection, EntityTrait, ExprTrait, FromQueryResult, QueryFilter,
+    QuerySelect, QueryTrait,
 };
 
 #[utoipa::path(
@@ -26,8 +27,8 @@ use sea_orm::{
 async fn get_popular(db: web::Data<DatabaseConnection>) -> ApiResult<Popular> {
     let qr = select_aud::Entity::find()
         .select_only()
-        .column_as(select_aud::Column::AuditoryId, "ID")
-        .expr_as(select_aud::Column::AuditoryId.count(), "CNT")
+        .column_as(select_aud::Column::AuditoryId, "Id")
+        .expr_as(select_aud::Column::AuditoryId.count(), "Cnt")
         .filter(select_aud::Column::Success.eq(1))
         .group_by(select_aud::Column::AuditoryId)
         .into_query()
@@ -36,8 +37,8 @@ async fn get_popular(db: web::Data<DatabaseConnection>) -> ApiResult<Popular> {
                 UnionType::All,
                 start_way::Entity::find()
                     .select_only()
-                    .column_as(start_way::Column::StartId, "ID")
-                    .expr_as(start_way::Column::StartId.count().mul(3), "CNT")
+                    .column_as(start_way::Column::StartId, "Id")
+                    .expr_as(start_way::Column::StartId.count().mul(3), "Cnt")
                     .group_by(start_way::Column::StartId)
                     .into_query(),
             ),
@@ -45,25 +46,23 @@ async fn get_popular(db: web::Data<DatabaseConnection>) -> ApiResult<Popular> {
                 UnionType::All,
                 start_way::Entity::find()
                     .select_only()
-                    .column_as(start_way::Column::EndId, "ID")
-                    .expr_as(start_way::Column::EndId.count().mul(3), "CNT")
+                    .column_as(start_way::Column::EndId, "Id")
+                    .expr_as(start_way::Column::EndId.count().mul(3), "Cnt")
                     .group_by(start_way::Column::EndId)
                     .into_query(),
             ),
         ])
         .to_owned();
     let result_query = Query::select()
-        .column(Alias::new("ID"))
-        .group_by_col(Alias::new("ID"))
+        .column(Alias::new("Id"))
+        .expr_as(Expr::col(Alias::new("Cnt")).sum(), Alias::new("Cnt"))
+        .group_by_col(Alias::new("Id"))
         .from_subquery(qr, Alias::new("tr"))
-        .order_by_expr(Expr::col(Alias::new("CNT")).sum(), Order::Desc)
+        .order_by_expr(Expr::col(Alias::new("Cnt")).sum(), Order::Desc)
         .to_owned();
     let stmt = db.get_database_backend().build(&result_query);
-    let results = db.query_all(stmt).await?;
-    Ok(Popular(
-        results
-            .into_iter()
-            .map(|val| val.try_get_by_index::<String>(0).unwrap())
-            .collect(),
-    ))
+    let results = PopularAud::find_by_statement(stmt)
+        .all(db.get_ref())
+        .await?;
+    Ok(Popular(results))
 }
