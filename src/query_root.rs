@@ -1,3 +1,6 @@
+mod queries;
+pub mod types;
+
 use crate::entity::*;
 use async_graphql::dynamic::*;
 use sea_orm::DatabaseConnection;
@@ -12,6 +15,14 @@ pub fn schema(
 ) -> Result<Schema, SchemaError> {
     let mut builder = Builder::new(&CONTEXT, database.clone());
     builder = register_entity_modules(builder);
+    seaography::register_custom_inputs!(
+        builder,
+        [
+            types::FilterQuery
+        ]
+    );
+    seaography::register_custom_outputs!(builder, [types::Statistics]);
+    seaography::register_custom_queries!(builder, [queries::Operations]);
     builder
         .set_depth_limit(depth)
         .set_complexity_limit(complexity)
