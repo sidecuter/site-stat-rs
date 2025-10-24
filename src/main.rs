@@ -22,12 +22,12 @@ async fn main() -> std::io::Result<()> {
     ensure_dir_exists(&files_path)?;
     ensure_dir_exists(&front_path)?;
     let state = Data::new(AppStateMutable::default());
-    let schema = schema(
+    let schema = Data::new(schema(
         database.clone(),
         config.depth_limit,
         config.complexity_limit,
     )
-    .unwrap();
+    .unwrap());
     let pool = Data::new(database);
 
     tracing::info!("Listening on http://{addr}");
@@ -42,7 +42,7 @@ async fn main() -> std::io::Result<()> {
         actix_web::App::new()
             .wrap(create_cors(&config))
             .app_data(state.clone())
-            .app_data(Data::new(schema.clone()))
+            .app_data(schema.clone())
             .app_data(pool.clone())
             .app_data(config.clone())
             .wrap(actix_web::middleware::Logger::default())
