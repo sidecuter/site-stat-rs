@@ -28,7 +28,6 @@ impl Modify for Security {
         // Get routes
         crate::api::get::user_id::get_user_id,
         crate::api::get::popular::get_popular,
-        crate::api::get::stat::get_stat,
         crate::api::get::route::get_route,
         // Set routes
         crate::api::stat::site::stat_site,
@@ -54,7 +53,6 @@ impl Modify for Security {
             crate::schemas::ChangePlanIn,
             crate::schemas::Target,
             crate::schemas::FilterQuery,
-            crate::schemas::stats::Statistics,
             crate::schemas::review::ReviewFormIn,
             crate::schemas::popular::Popular,
             crate::schemas::period::Period,

@@ -7,13 +7,11 @@ pub mod graph;
 pub mod login_request;
 pub mod period;
 pub mod popular;
-mod query;
 pub mod review;
 pub(crate) mod rights;
 pub mod select_aud;
 pub mod site_stat;
 pub mod start_way;
-pub mod stats;
 pub mod status;
 pub mod token;
 pub mod user;
@@ -26,12 +24,10 @@ pub use self::{
     login_request::LoginRequest,
     period::Period,
     popular::Popular,
-    query::Query,
     review::{Problem, ReviewIn},
     select_aud::SelectAuditoryIn,
     site_stat::SiteStatisticsIn,
     start_way::StartWayIn,
-    stats::Statistics,
     status::Status,
     token::TokenResponse,
     user::UserResp,
