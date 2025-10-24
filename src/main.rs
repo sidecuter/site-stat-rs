@@ -30,8 +30,8 @@ async fn main() -> std::io::Result<()> {
     .unwrap();
     let pool = Data::new(database);
 
-    tracing::debug!("Listening on http://{addr}");
-    tracing::debug!("Redoc UI is available at http://{addr}/redoc");
+    tracing::info!("Listening on http://{addr}");
+    tracing::info!("Redoc UI is available at http://{addr}/redoc");
 
     actix_rt::spawn(start_data_refresh_task(
         state.clone(),
