@@ -93,13 +93,13 @@ use std::collections::HashMap;
 #[get("/me")]
 async fn me(db: web::Data<DatabaseConnection>, user: CurrentUser) -> ApiResult<UserResp> {
     let rights_and_goals = gather_rights(db.get_ref(), user.0.id).await?;
-    let mut rights_by_goals: HashMap<String, Vec<String>> = HashMap::new();
-    for right_and_goal in rights_and_goals {
-        rights_by_goals
-            .entry(right_and_goal.goal_name)
-            .and_modify(|v| v.push(right_and_goal.right_name.clone()))
-            .or_insert(vec![right_and_goal.right_name]);
-    }
+    let rights_by_goals: HashMap<String, Vec<String>> =
+        rights_and_goals
+            .into_iter()
+            .fold(HashMap::new(), |mut map, rg| {
+                map.entry(rg.goal_name).or_default().push(rg.right_name);
+                map
+            });
     Ok(UserResp {
         login: user.0.login,
         is_active: user.0.is_active,
