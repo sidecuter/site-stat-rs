@@ -1,7 +1,5 @@
 use serde::Serialize;
-use utoipa::openapi::security::{
-    Flow, OAuth2, Password, Scopes, SecurityScheme,
-};
+use utoipa::openapi::security::{Flow, OAuth2, Password, Scopes, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
 #[derive(Debug, Serialize)]
@@ -39,6 +37,7 @@ impl Modify for Security {
         crate::api::review::image::get_image,
         // Auth routes
         crate::api::auth::login::token,
+        crate::api::auth::me::me,
         // Graphql routes
         crate::api::graphql::index::index,
         crate::api::graphql::playground::graphql_playground,
@@ -61,7 +60,8 @@ impl Modify for Security {
             crate::schemas::graph::ShortestWay,
             crate::schemas::login_request::LoginRequest,
             crate::schemas::token::TokenResponse,
-            crate::schemas::login_request::LoginRequest
+            crate::schemas::login_request::LoginRequest,
+            crate::schemas::user::UserResp,
         )
     ),
     tags (

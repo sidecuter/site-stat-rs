@@ -30,6 +30,6 @@ pub use self::{
     start_way::StartWayIn,
     status::Status,
     token::TokenResponse,
-    user::UserResp,
+    user::{UserResp, RightsGoals},
     user_id::UserId,
 };

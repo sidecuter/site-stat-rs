@@ -22,12 +22,14 @@ async fn main() -> std::io::Result<()> {
     ensure_dir_exists(&files_path)?;
     ensure_dir_exists(&front_path)?;
     let state = Data::new(AppStateMutable::default());
-    let schema = Data::new(schema(
-        database.clone(),
-        config.depth_limit,
-        config.complexity_limit,
-    )
-    .unwrap());
+    let schema = Data::new(
+        schema(
+            database.clone(),
+            config.depth_limit,
+            config.complexity_limit,
+        )
+        .unwrap(),
+    );
     let pool = Data::new(database);
 
     tracing::info!("Listening on http://{addr}");

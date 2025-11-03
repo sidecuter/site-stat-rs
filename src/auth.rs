@@ -1,5 +1,5 @@
 use crate::config::AppConfig;
-use crate::entity::{role_right_goal, user, user_role};
+use crate::entity::{goal, right, role_right_goal, user, user_role};
 use crate::errors::{ApiError, ApiResult};
 use crate::traits::EntityId;
 use actix_web::dev::Payload;
@@ -9,7 +9,9 @@ use argon2::{
     Argon2,
 };
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, ExprTrait, QueryFilter, QuerySelect, QueryTrait};
+use sea_orm::{
+    ColumnTrait, DatabaseConnection, EntityTrait, ExprTrait, QueryFilter, QuerySelect, QueryTrait,
+};
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -149,10 +151,10 @@ impl FromRequest for CurrentUser {
     }
 }
 
-async fn gather_rights(
+pub async fn gather_rights(
     db_conn: &DatabaseConnection,
     current_user_id: i32,
-) -> ApiResult<Vec<role_right_goal::Model>> {
+) -> ApiResult<Vec<crate::schemas::user::RightsGoals>> {
     let qr = user_role::Entity::find()
         .filter(user_role::Column::UserId.eq(current_user_id))
         .select_only()
@@ -160,10 +162,15 @@ async fn gather_rights(
         .into_query();
     Ok(role_right_goal::Entity::find()
         .filter(role_right_goal::Column::RoleId.in_subquery(qr))
+        .column_as(right::Column::Name, "right_name")
+        .column_as(goal::Column::Name, "goal_name")
         .distinct_on([(
             role_right_goal::Column::RightId,
             role_right_goal::Column::GoalId,
         )])
+        .left_join(right::Entity)
+        .left_join(goal::Entity)
+        .into_model::<crate::schemas::user::RightsGoals>()
         .all(db_conn)
         .await?)
 }
